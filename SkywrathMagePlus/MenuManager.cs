@@ -301,7 +301,6 @@ namespace SkywrathMagePlus
             AutoQKeyItem.Item.SetValue(new KeyBind(AutoQKeyItem.Item.GetValue<KeyBind>().Key, KeyBindType.Toggle, false));
             SpamKeyItem = Factory.Item("Spam Q Key", new KeyBind('Q'));
             SpamUnitItem = Factory.Item("Spam Q Units", true);
-            SpamUnitItem.Item.SetTooltip("Creeps, Neutrals and Roshan");
 
             ItemsToggler.PropertyChanged += Changed;
             DrawTargetItem.PropertyChanged += Changed;
