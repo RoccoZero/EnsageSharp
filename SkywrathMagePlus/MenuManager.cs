@@ -94,6 +94,8 @@ namespace SkywrathMagePlus
 
         public MenuItem<StringList> TargetItem { get; }
 
+        public MenuItem<bool> StartComboItem { get; }
+
         public MenuItem<KeyBind> AutoQKeyItem { get; }
 
         public MenuItem<KeyBind> SpamKeyItem { get; }
@@ -292,6 +294,8 @@ namespace SkywrathMagePlus
             OrbwalkerItem = Factory.Item("Orbwalker", new StringList("Default", "Distance", "Free"));
             MinDisInOrbwalkItem = Factory.Item("Min Distance In Orbwalker", new Slider(600, 200, 600));
             TargetItem = Factory.Item("Target", new StringList("Lock", "Default"));
+            StartComboItem = Factory.Item("Start Combo With Mute", false);
+            StartComboItem.Item.SetTooltip("Start Combo With Hex or Ancient Seal");
 
             AutoQKeyItem = Factory.Item("Auto Q Key", new KeyBind('F', KeyBindType.Toggle, false));
             AutoQKeyItem.Item.SetValue(new KeyBind(AutoQKeyItem.Item.GetValue<KeyBind>().Key, KeyBindType.Toggle, false));

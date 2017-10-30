@@ -70,7 +70,7 @@ namespace SkywrathMagePlus
                     }
                 }
 
-                if (!Config.Extensions.Cancel(target))
+                if (!Config.Extensions.Cancel(target) && StartCombo(target))
                 {
                     if (!target.IsLinkensProtected() && !Config.Extensions.AntimageShield(target))
                     {
@@ -288,6 +288,35 @@ namespace SkywrathMagePlus
             {
                 Orbwalker.Move(Game.MousePosition);
             }
+        }
+
+        private bool StartCombo(Hero target)
+        {
+            if (!Menu.StartComboItem)
+            {
+                return true;
+            }
+
+            var Hex = Main.Hex;
+            var AncientSeal = Main.AncientSeal;
+
+            if (Hex != null
+                && Menu.ItemsToggler.Value.IsEnabled(Hex.ToString())
+                && Hex.CanBeCasted
+                && Hex.CanHit(target))
+            {
+                return true;
+            }
+            else
+
+            if (Menu.AbilitiesToggler.Value.IsEnabled(AncientSeal.ToString())
+                && AncientSeal.CanBeCasted
+                && !AncientSeal.CanHit(target))
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }
