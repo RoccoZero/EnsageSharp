@@ -1,6 +1,7 @@
 ﻿using System;
-using System.ComponentModel;
+
 using Ensage;
+using Ensage.SDK.Extensions;
 
 using SharpDX;
 
@@ -10,79 +11,173 @@ namespace SkywrathMagePlus
     {
         private Config Config { get; }
 
-        private Vector2 Screen {get;}
+        private MenuManager Menu { get; }
+
+        private int AlarmNumber { get; set; }
 
         public Renderer(Config config)
         {
             Config = config;
+            Menu = config.Menu;
 
-            Screen = new Vector2(Drawing.Width - 160, Drawing.Height);
-
-            config.TextItem.PropertyChanged += TextChanged;
-
-            if (config.TextItem)
-            {
-                Drawing.OnDraw += OnDraw;
-            }
+            Drawing.OnDraw += OnDraw;
         }
 
         public void Dispose()
         {
-            if (Config.TextItem)
-            {
-                Drawing.OnDraw -= OnDraw;
-            }
+            Drawing.OnDraw -= OnDraw;
         }
 
-        private void TextChanged(object sender, PropertyChangedEventArgs e)
+        private void Text(string text, Vector2 pos, Color color)
         {
-            if (Config.TextItem)
-            {
-                Drawing.OnDraw += OnDraw;
-            }
-            else
-            {
-                Drawing.OnDraw -= OnDraw;
-            }
-        }
-
-        private void Text(string text, float heightpos, Color color)
-        {
-            var pos = new Vector2(Screen.X, Screen.Y * heightpos);
-
             Drawing.DrawText(text, "Arial", pos, new Vector2(21), color, FontFlags.None);
+        }
+
+        private void Texture(Vector2 pos, Vector2 size, string texture)
+        {
+            Drawing.DrawRect(
+                pos,
+                size,
+                Drawing.GetTexture($"materials/ensage_ui/{ texture }.vmat"));
         }
 
         private void OnDraw(EventArgs args)
         {
-            Text($"Combo {(Config.ComboKeyItem ? "ON" : "OFF")}",
-                0.72f,
-                (Config.ComboKeyItem ? Color.Aqua : Color.Yellow));
-
-            Text($"Spam Q {(Config.SpamKeyItem ? "ON" : "OFF")}",
-                0.75f,
-                (Config.SpamKeyItem ? Color.Aqua : Color.Yellow));
-
-            Text($"Auto Q {(!Config.ComboKeyItem && !Config.SpamKeyItem && Config.AutoQKeyItem ? "ON" : "OFF")}",
-                0.78f,
-                (!Config.ComboKeyItem && !Config.SpamKeyItem && Config.AutoQKeyItem ? Color.Aqua : Color.Yellow));
-
-            float pos = 0;
-            if (Config.AutoComboItem)
+            if (Menu.TextItem)
             {
-                pos += 0.03f;
-                Text($"Auto Combo {(!Config.ComboKeyItem ? "ON" : "OFF")}",
-                0.78f + pos,
-                (!Config.ComboKeyItem ? Color.Aqua : Color.Yellow));
+                var setPosText = new Vector2(
+                    Math.Min((Config.Screen.X - 20) - Menu.TextXItem, Config.Screen.X - 20),
+                    Math.Min(Menu.TextYItem - 200, Config.Screen.Y - 90));
+
+                var posText = new Vector2(Config.Screen.X, Config.Screen.Y * 0.65f) - setPosText;
+
+                Text($"Combo { (Menu.ComboKeyItem ? "ON" : "OFF") }", posText, Menu.ComboKeyItem ? Color.Aqua : Color.Yellow);
+                    Text($"Spam Q { (Menu.SpamKeyItem ? "ON" : "OFF") }", posText - new Vector2(0, 20), Menu.SpamKeyItem ? Color.Aqua : Color.Yellow);
+                    Text($"Auto Q { (!Menu.ComboKeyItem && !Menu.SpamKeyItem && Menu.AutoQKeyItem ? "ON" : "OFF") }",
+                        posText - new Vector2(0, 40),
+                        !Menu.ComboKeyItem && !Menu.SpamKeyItem && Menu.AutoQKeyItem ? Color.Aqua : Color.Yellow);
+
+                    var i = 0;
+                    if (Menu.AutoComboItem)
+                    {
+                        i += 20;
+                        Text($"Auto Combo { (!Menu.ComboKeyItem ? "ON" : "OFF") }", posText - new Vector2(0, 40 + i), !Menu.ComboKeyItem ? Color.Aqua : Color.Yellow);
+                    }
+
+                    if (Menu.AutoDisableItem)
+                    {
+                        i += 20;
+                        Text("Auto Disable ON", posText - new Vector2(0, 40 + i), Color.Aqua);
+                    }
+            }
+            
+            if (Menu.CalculationItem)
+            {
+                var setPosTexture = new Vector2(
+                    Math.Min((Config.Screen.X - 20) - Menu.CalculationXItem, Config.Screen.X - 20),
+                    Math.Min(Menu.CalculationYItem - 100, Config.Screen.Y - 90));
+
+                var x = 0;
+                foreach (var Data in Config.DamageCalculation.DamageList)
+                {
+                    var posTexture = new Vector2(Config.Screen.X, Config.Screen.Y * 0.65f + x) - setPosTexture;
+
+                    var hero = Data.GetHero;
+                    var health = Data.GetHealth;
+
+                    var ph = Math.Ceiling((float)health / hero.MaximumHealth * 100);
+                    var doNotKill = DoNotKill(hero);
+
+                    if (!hero.IsVisible)
+                    {
+                        Texture(posTexture + 5, new Vector2(55), $"heroes_round/{ hero.Name.Substring("npc_dota_hero_".Length) }");
+                        Texture(posTexture, new Vector2(65), "other/round_percentage/frame/white");
+                        Texture(posTexture, new Vector2(65), $"other/round_percentage/hp/{ Math.Min(ph, 100) }");
+
+                        if (doNotKill != null)
+                        {
+                            Texture(posTexture + new Vector2(42, 45), new Vector2(20), $"modifier_textures/round/{ doNotKill }");
+                        }
+
+                        x += 80;
+                        continue;
+                    }
+
+                    var damage = Data.GetDamage;
+                    var readyDamage = Data.GetReadyDamage;
+                    var totalDamage = Data.GetTotalDamage;
+
+                    var maxHealth = hero.MaximumHealth + (health - hero.MaximumHealth);
+                    var damagePercent = Math.Ceiling(100 - (health - Math.Max(damage, 0)) / maxHealth * 100);
+                    var readyDamagePercent = Math.Ceiling(100 - (health - Math.Max(readyDamage, 0)) / maxHealth * 100);
+                    var totalDamagePercent = Math.Ceiling(100 - (health - Math.Max(totalDamage, 0)) / maxHealth * 100);
+
+                    if (damagePercent >= 100)
+                    {
+                        Texture(posTexture - 10, new Vector2(85), $"other/round_percentage/alert/{ Alert() }");
+                    }
+
+                    Texture(posTexture + 5, new Vector2(55), $"heroes_round/{ hero.Name.Substring("npc_dota_hero_".Length) }");
+
+                    Texture(posTexture, new Vector2(65), "other/round_percentage/frame/white");
+                    Texture(posTexture, new Vector2(65), $"other/round_percentage/no_percent_gray/{ Math.Min(totalDamagePercent, 100) }");
+                    Texture(posTexture, new Vector2(65), $"other/round_percentage/no_percent_yellow/{ Math.Min(readyDamagePercent, 100) }");
+
+                    var color = damagePercent >= 100 ? "green" : "red";
+                    Texture(posTexture, new Vector2(65), $"other/round_percentage/{ color }/{ Math.Min(damagePercent, 100) }");
+
+                    if (damagePercent >= 100)
+                    {
+                        Texture(posTexture, new Vector2(65), $"other/round_percentage/no_percent_gray/{ Math.Min(damagePercent - 100, 100) }");
+                    }
+
+                    if (doNotKill != null)
+                    {
+                        Texture(posTexture + new Vector2(42, 45), new Vector2(20), $"modifier_textures/round/{ doNotKill }");
+                    }
+
+                    x += 80;
+                }
+            }
+        }
+
+        private string DoNotKill(Hero hero)
+        {
+            var reincarnation = hero.GetAbilityById(AbilityId.skeleton_king_reincarnation);
+            if (reincarnation != null && reincarnation.Cooldown == 0 && reincarnation.Level > 0)
+            {
+                return reincarnation.TextureName;
             }
 
-            if (Config.AutoDisableItem)
+
+            return null;
+        }
+
+        private string Alert()
+        {
+            AlarmNumber += 1;
+            if (AlarmNumber < 10)
             {
-                pos += 0.03f;
-                Text("Auto Disable ON",
-                0.78f + pos,
-                Color.Aqua);
+                return 0.ToString();
             }
+            else if (AlarmNumber < 20)
+            {
+                return 1.ToString();
+            }
+            else if (AlarmNumber < 30)
+            {
+                return 2.ToString();
+            }
+            else if (AlarmNumber < 40)
+            {
+                return 1.ToString();
+            }
+            else
+            {
+                AlarmNumber = 0;
+            }
+
+            return 0.ToString();
         }
     }
 }

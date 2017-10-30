@@ -6,28 +6,28 @@ namespace SkywrathMagePlus.Features
 {
     internal class WithoutFail
     {
-        private Config Config { get; }
+        private MenuManager Menu { get; }
 
         private UpdateMode UpdateMode { get; }
 
         public WithoutFail(Config config)
         {
-            Config = config;
+            Menu = config.Menu;
             UpdateMode = config.UpdateMode;
 
-            if (config.WWithoutFailItem)
+            if (config.Menu.WWithoutFailItem)
             {
                 Player.OnExecuteOrder += OnExecuteOrder;
             }
 
-            config.WWithoutFailItem.PropertyChanged += WWithoutFailChanged;
+            config.Menu.WWithoutFailItem.PropertyChanged += WWithoutFailChanged;
         }
 
         public void Dispose()
         {
-            Config.WWithoutFailItem.PropertyChanged -= WWithoutFailChanged;
+            Menu.WWithoutFailItem.PropertyChanged -= WWithoutFailChanged;
 
-            if (Config.WWithoutFailItem)
+            if (Menu.WWithoutFailItem)
             {
                 Player.OnExecuteOrder -= OnExecuteOrder;
             }
@@ -35,7 +35,7 @@ namespace SkywrathMagePlus.Features
 
         private void WWithoutFailChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (Config.WWithoutFailItem)
+            if (Menu.WWithoutFailItem)
             {
                 Player.OnExecuteOrder += OnExecuteOrder;
             }
@@ -49,7 +49,7 @@ namespace SkywrathMagePlus.Features
         {
             if (args.OrderId == OrderId.Ability 
                 && args.Ability.Name == "skywrath_mage_concussive_shot" 
-                && UpdateMode.WShow == null)
+                && UpdateMode.WShowTarget == null)
             {
                 args.Process = false;
                 Game.PrintMessage($"<font color='#FF6666'>There is no one in the radius.</font>");

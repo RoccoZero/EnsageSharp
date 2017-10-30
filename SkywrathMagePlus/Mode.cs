@@ -1,10 +1,12 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
 using Ensage;
 using Ensage.Common.Threading;
+using Ensage.Common.Objects.UtilityObjects;
 using Ensage.SDK.Extensions;
 using Ensage.SDK.Helpers;
 using Ensage.SDK.Orbwalker.Modes;
@@ -13,11 +15,15 @@ using Ensage.SDK.Prediction.Collision;
 using Ensage.SDK.Service;
 using Ensage.SDK.TargetSelector;
 
+using SharpDX;
+
 namespace SkywrathMagePlus
 {
     internal class Mode : KeyPressOrbwalkingModeAsync
     {
         private Config Config { get; }
+
+        private MenuManager Menu { get; }
 
         private SkywrathMagePlus Main { get; }
 
@@ -25,261 +31,263 @@ namespace SkywrathMagePlus
 
         private IPredictionManager Prediction { get; }
 
-        public Hero Target { get; set;}
+        public Sleeper Sleeper { get; }
 
-        public Mode(
-            IServiceContext context, 
-            Key key,
-            Config config) : base(context, key)
+        public Mode(IServiceContext context, Key key, Config config) : base(context, key)
         {
             Config = config;
-            Main = config.SkywrathMagePlus;
+            Menu = config.Menu;
+            Main = config.Main;
             TargetSelector = context.TargetSelector;
             Prediction = context.Prediction;
+
+            Sleeper = new Sleeper();
         }
 
         public override async Task ExecuteAsync(CancellationToken token)
         {
-            if (Config.TargetItem.Value.SelectedValue.Contains("Lock") 
-                && (Target == null || !Target.IsValid || !Target.IsAlive))
+            var target = Config.UpdateMode.Target;
+
+            if (target != null && (!Menu.BladeMailItem || !target.HasModifier("modifier_item_blade_mail_reflect")))
             {
-                if (!TargetSelector.IsActive)
+                var StunDebuff = target.Modifiers.FirstOrDefault(x => x.IsStunDebuff);
+                var HexDebuff = target.Modifiers.FirstOrDefault(x => x.IsValid && x.Name == "modifier_sheepstick_debuff");
+                var AtosDebuff = target.Modifiers.FirstOrDefault(x => x.IsValid && x.Name == "modifier_rod_of_atos_debuff");
+
+                // Blink
+                var Blink = Main.Blink;
+                if (Blink != null
+                    && Menu.ItemsToggler.Value.IsEnabled(Blink.ToString())
+                    && Owner.Distance2D(Game.MousePosition) > Menu.BlinkActivationItem
+                    && Owner.Distance2D(target) > 600
+                    && Blink.CanBeCasted)
                 {
-                    TargetSelector.Activate();
+                    var blinkPos = target.Position.Extend(Game.MousePosition, Menu.BlinkDistanceEnemyItem);
+                    if (Owner.Distance2D(blinkPos) < Blink.CastRange)
+                    {
+                        Blink.UseAbility(blinkPos);
+                        await Await.Delay(Blink.GetCastDelay(blinkPos), token);
+                    }
                 }
 
-                if (TargetSelector.IsActive)
+                if (!Config.Extensions.Cancel(target))
                 {
-                    Target = TargetSelector.Active.GetTargets().FirstOrDefault() as Hero;
-                }
-
-                if (Target != null)
-                {
-                    if (TargetSelector.IsActive)
+                    if (!target.IsLinkensProtected() && !Config.Extensions.AntimageShield(target))
                     {
-                        TargetSelector.Deactivate();
-                    }
-                }
-            }
-            else if (Config.TargetItem.Value.SelectedValue.Contains("Default") && TargetSelector.IsActive)
-            {
-                Target = TargetSelector.Active.GetTargets().FirstOrDefault() as Hero;
-            }
-
-            if (Target != null
-                && (!Config.BladeMailItem || !Target.HasModifier("modifier_item_blade_mail_reflect")) 
-                && !Config.Data.CancelCombo(Target))
-            {
-                var IsStun = Target.Modifiers.FirstOrDefault(x => x.IsStunDebuff);
-                var IsDebuff = Target.Modifiers.FirstOrDefault(x => x.IsDebuff && x.Name == "modifier_rod_of_atos_debuff");
-
-                if (!Target.IsMagicImmune() && !Target.IsLinkensProtected() && !Config.Data.AntimageShield(Target))
-                {
-                    // Hex
-                    if (Main.Hex != null
-                        && Config.ItemsToggler.Value.IsEnabled(Main.Hex.Item.Name)
-                        && Main.Hex.CanBeCasted
-                        && Main.Hex.CanHit(Target)
-                        && (IsStun == null || IsStun.RemainingTime <= 0.3))
-                    {
-                        Main.Hex.UseAbility(Target);
-                        await Await.Delay(Main.Hex.GetCastDelay(Target), token);
-                    }
-
-                    // Orchid
-                    if (Main.Orchid != null
-                        && Config.ItemsToggler.Value.IsEnabled(Main.Orchid.Item.Name)
-                        && Main.Orchid.CanBeCasted
-                        && Main.Orchid.CanHit(Target))
-                    {
-                        Main.Orchid.UseAbility(Target);
-                        await Await.Delay(Main.Orchid.GetCastDelay(Target), token);
-                    }
-
-                    // Bloodthorn
-                    if (Main.Bloodthorn != null
-                        && Config.ItemsToggler.Value.IsEnabled(Main.Bloodthorn.Item.Name)
-                        && Main.Bloodthorn.CanBeCasted
-                        && Main.Bloodthorn.CanHit(Target))
-                    {
-                        Main.Bloodthorn.UseAbility(Target);
-                        await Await.Delay(Main.Bloodthorn.GetCastDelay(Target), token);
-                    }
-                    
-                    // MysticFlare
-                    if (Main.MysticFlare != null
-                        && Config.AbilityToggler.Value.IsEnabled(Main.MysticFlare.Ability.Name)
-                        && Main.MysticFlare.CanBeCasted
-                        && Main.MysticFlare.CanHit(Target)
-                        && Config.Data.Active(Target, IsStun))
-                    {
-                        var CheckHero = EntityManager<Hero>.Entities.Where(
-                            x =>
-                            !x.IsIllusion &&
-                            x.IsAlive &&
-                            x.IsVisible &&
-                            x.IsValid &&
-                            x.Team != Owner.Team &&
-                            x.Distance2D(Owner) <= Main.MysticFlare.CastRange);
-
-                        var UltimateScepter = Owner.HasAghanimsScepter();
-                        var DubleMysticFlare = UltimateScepter && CheckHero.Count() == 1;
-
-                        var Input =
-                            new PredictionInput(
-                                Owner,
-                                Target,
-                                0,
-                                float.MaxValue,
-                                Main.MysticFlare.CastRange,
-                                DubleMysticFlare ? -250 : -100,
-                                PredictionSkillshotType.SkillshotCircle,
-                                true)
-                            {
-                                CollisionTypes = CollisionTypes.None
-                            };
-
-                        var Output = Prediction.GetPrediction(Input);
-
-                        Main.MysticFlare.UseAbility(Output.CastPosition);
-                        await Await.Delay(Main.MysticFlare.GetCastDelay(Target), token);
-                    }
-
-                    // RodofAtos
-                    if (Main.RodofAtos != null
-                        && Config.ItemsToggler.Value.IsEnabled(Main.RodofAtos.Item.Name)
-                        && Main.RodofAtos.CanBeCasted
-                        && Main.RodofAtos.CanHit(Target)
-                        && (IsStun == null || IsStun.RemainingTime <= 0.5)
-                        && (IsDebuff == null || IsDebuff.RemainingTime <= 0.5))
-                    {
-                        Main.RodofAtos.UseAbility(Target);
-                        await Await.Delay(Main.RodofAtos.GetCastDelay(Target), token);
-                    }
-
-                    // AncientSeal
-                    if (Main.AncientSeal != null
-                        && Config.AbilityToggler.Value.IsEnabled(Main.AncientSeal.Ability.Name)
-                        && Main.AncientSeal.CanBeCasted
-                        && Main.AncientSeal.CanHit(Target))
-                    {
-                        Main.AncientSeal.UseAbility(Target);
-                        await Await.Delay(Main.AncientSeal.GetCastDelay(Target), token);
-                    }
-
-                    // ConcussiveShot
-                    if (Main.ConcussiveShot != null
-                        && Config.AbilityToggler.Value.IsEnabled(Main.ConcussiveShot.Ability.Name)
-                        && (!Config.WTargetItem
-                        || (Target == Config.UpdateMode.WShow
-                        || (Config.UpdateMode.WShow != null && Target.Distance2D(Config.UpdateMode.WShow) <= 250)))
-                        && Main.ConcussiveShot.CanBeCasted
-                        && Owner.Distance2D(Target.Position) <= Config.WRadiusItem + 25)
-                    {
-                        Main.ConcussiveShot.UseAbility();
-                        await Await.Delay(Main.ConcussiveShot.GetCastDelay(), token);
-                    }
-
-                    // ArcaneBolt
-                    if (Main.ArcaneBolt != null
-                        && Config.AbilityToggler.Value.IsEnabled(Main.ArcaneBolt.Ability.Name)
-                        && Main.ArcaneBolt.CanBeCasted
-                        && Main.ArcaneBolt.CanHit(Target))
-                    {
-                        Main.ArcaneBolt.UseAbility(Target);
-                        await Await.Delay(Main.ArcaneBolt.GetCastDelay(Target), token);
-                    }
-
-                    // Veil
-                    if (Main.Veil != null
-                        && Config.ItemsToggler.Value.IsEnabled(Main.Veil.Item.Name)
-                        && Main.Veil.CanBeCasted
-                        && Main.Veil.CanHit(Target))
-                    {
-                        Main.Veil.UseAbility(Target.Position);
-                        await Await.Delay(Main.Veil.GetCastDelay(Target), token);
-                    }
-
-                    // Ethereal
-                    if (Main.Ethereal != null
-                        && Config.ItemsToggler.Value.IsEnabled(Main.Ethereal.Item.Name)
-                        && Main.Ethereal.CanBeCasted
-                        && Main.Ethereal.CanHit(Target))
-                    {
-                        Main.Ethereal.UseAbility(Target);
-                        await Await.Delay(Main.Ethereal.GetCastDelay(Target), token);
-                    }
-
-                    // Dagon
-                    if (Main.Dagon != null
-                        && Config.ItemsToggler.Value.IsEnabled("item_dagon_5")
-                        && Main.Dagon.CanBeCasted
-                        && Main.Dagon.CanHit(Target)
-                        && (Main.AncientSeal == null || (Target.HasModifier("modifier_skywrath_mage_ancient_seal") && !Main.AncientSeal.CanBeCasted)
-                        || !Config.AbilityToggler.Value.IsEnabled(Main.AncientSeal.Ability.Name))
-                        && (Main.Ethereal == null || (Target.IsEthereal() && !Main.Ethereal.CanBeCasted)
-                        || !Config.ItemsToggler.Value.IsEnabled(Main.Ethereal.Item.Name)))
-                    {
-                        Main.Dagon.UseAbility(Target);
-                        await Await.Delay(Main.Dagon.GetCastDelay(Target), token);
-                    }
-                }
-                else
-                {
-                    await Config.LinkenBreaker.Breaker(token, Target);
-                }
-                
-                if (Target == null || Target.IsAttackImmune() || Target.IsInvulnerable())
-                {
-                    if (!Orbwalker.Settings.Move)
-                    {
-                        Orbwalker.Settings.Move.Item.SetValue(true);
-                    }
-
-                    Orbwalker.Move(Game.MousePosition);
-                }
-                else if (Target != null)
-                {
-                    if (Owner.Distance2D(Target) <= Config.MinDisInOrbwalk
-                        && Target.Distance2D(Game.MousePosition) <= Config.MinDisInOrbwalk)
-                    {
-                        if (Orbwalker.Settings.Move)
+                        // Hex
+                        var Hex = Main.Hex;
+                        if (Hex != null
+                            && Menu.ItemsToggler.Value.IsEnabled(Hex.ToString())
+                            && Hex.CanBeCasted
+                            && Hex.CanHit(target)
+                            && (StunDebuff == null || StunDebuff.RemainingTime <= 0.3f)
+                            && (HexDebuff == null || HexDebuff.RemainingTime <= 0.3f))
                         {
-                            Orbwalker.Settings.Move.Item.SetValue(false);
+                            Hex.UseAbility(target);
+                            await Await.Delay(Hex.GetCastDelay(target), token);
                         }
 
-                        Orbwalker.OrbwalkTo(Target);
+                        // Orchid
+                        var Orchid = Main.Orchid;
+                        if (Orchid != null
+                            && Menu.ItemsToggler.Value.IsEnabled(Orchid.ToString())
+                            && Orchid.CanBeCasted
+                            && Orchid.CanHit(target))
+                        {
+                            Main.Orchid.UseAbility(target);
+                            await Await.Delay(Main.Orchid.GetCastDelay(target), token);
+                        }
+
+                        // Bloodthorn
+                        var Bloodthorn = Main.Bloodthorn;
+                        if (Bloodthorn != null
+                            && Menu.ItemsToggler.Value.IsEnabled(Bloodthorn.ToString())
+                            && Bloodthorn.CanBeCasted
+                            && Bloodthorn.CanHit(target))
+                        {
+                            Bloodthorn.UseAbility(target);
+                            await Await.Delay(Bloodthorn.GetCastDelay(target), token);
+                        }
+
+                        // MysticFlare
+                        var MysticFlare = Main.MysticFlare;
+                        if (Menu.AbilitiesToggler.Value.IsEnabled(MysticFlare.ToString())
+                            && Main.MysticFlare.CanBeCasted
+                            && Main.MysticFlare.CanHit(target)
+                            && Config.Extensions.Active(target))
+                        {
+                            var enemies = EntityManager<Hero>.Entities.Where(x =>
+                                                                             x.IsVisible &&
+                                                                             x.IsAlive &&
+                                                                             x.IsValid &&
+                                                                             !x.IsIllusion &&
+                                                                             x.IsEnemy(Owner) &&
+                                                                             x.Distance2D(Owner) <= Main.MysticFlare.CastRange).ToList();
+
+                            var ultimateScepter = Owner.HasAghanimsScepter();
+                            var dubleMysticFlare = ultimateScepter && enemies.Count() == 1;
+
+                            var Input =
+                                new PredictionInput(
+                                    Owner,
+                                    target,
+                                    0,
+                                    float.MaxValue,
+                                    MysticFlare.CastRange,
+                                    dubleMysticFlare ? -250 : -100,
+                                    PredictionSkillshotType.SkillshotCircle,
+                                    true)
+                                {
+                                    CollisionTypes = CollisionTypes.None
+                                };
+
+                            var Output = Prediction.GetPrediction(Input);
+
+                            MysticFlare.UseAbility(Output.CastPosition);
+                            await Await.Delay(MysticFlare.GetCastDelay(Output.CastPosition), token);
+                        }
+
+                        // RodofAtos
+                        var RodofAtos = Main.RodofAtos;
+                        if (RodofAtos != null
+                            && Menu.ItemsToggler.Value.IsEnabled(RodofAtos.ToString())
+                            && RodofAtos.CanBeCasted
+                            && RodofAtos.CanHit(target)
+                            && (StunDebuff == null || StunDebuff.RemainingTime <= 0.5f)
+                            && (AtosDebuff == null || AtosDebuff.RemainingTime <= 0.5f))
+                        {
+                            RodofAtos.UseAbility(target);
+                            await Await.Delay(RodofAtos.GetCastDelay(target), token);
+                        }
+
+                        // AncientSeal
+                        var AncientSeal = Main.AncientSeal;
+                        if (Menu.AbilitiesToggler.Value.IsEnabled(AncientSeal.ToString())
+                            && AncientSeal.CanBeCasted
+                            && AncientSeal.CanHit(target))
+                        {
+                            AncientSeal.UseAbility(target);
+                            await Await.Delay(AncientSeal.GetCastDelay(target), token);
+                            return;
+                        }
+
+                        // Veil
+                        var Veil = Main.Veil;
+                        if (Veil != null
+                            && Menu.ItemsToggler.Value.IsEnabled(Veil.ToString())
+                            && Veil.CanBeCasted
+                            && Veil.CanHit(target))
+                        {
+                            Veil.UseAbility(target.Position);
+                            await Await.Delay(Veil.GetCastDelay(target.Position), token);
+                        }
+
+                        // Ethereal
+                        var Ethereal = Main.Ethereal;
+                        if (Ethereal != null
+                            && Menu.ItemsToggler.Value.IsEnabled(Ethereal.ToString())
+                            && Ethereal.CanBeCasted
+                            && Ethereal.CanHit(target))
+                        {
+                            Ethereal.UseAbility(target);
+                            Sleeper.Sleep(Ethereal.GetHitTime(target));
+                            await Await.Delay(Ethereal.GetCastDelay(target), token);
+                        }
+
+                        // Shivas
+                        var Shivas = Main.Shivas;
+                        if (Shivas != null
+                            && Menu.ItemsToggler.Value.IsEnabled(Shivas.ToString())
+                            && Shivas.CanBeCasted
+                            && Shivas.CanHit(target))
+                        {
+                            Shivas.UseAbility();
+                            await Await.Delay(Shivas.GetCastDelay(), token);
+                        }
+
+                        if (!Sleeper.Sleeping || target.IsEthereal())
+                        {
+                            // ConcussiveShot
+                            var ConcussiveShot = Main.ConcussiveShot;
+                            if (Menu.AbilitiesToggler.Value.IsEnabled(ConcussiveShot.ToString())
+                                && (!Menu.WTargetItem
+                                || (target == Config.UpdateMode.WShowTarget
+                                || (Config.UpdateMode.WShowTarget != null && target.Distance2D(Config.UpdateMode.WShowTarget) < 250)))
+                                && ConcussiveShot.CanBeCasted
+                                && Owner.Distance2D(target) < Menu.WRadiusItem - Owner.HullRadius)
+                            {
+                                ConcussiveShot.UseAbility();
+                                await Await.Delay(ConcussiveShot.GetCastDelay(), token);
+                            }
+
+                            // ArcaneBolt
+                            var ArcaneBolt = Main.ArcaneBolt;
+                            if (Menu.AbilitiesToggler.Value.IsEnabled(ArcaneBolt.ToString())
+                                && ArcaneBolt.CanBeCasted
+                                && ArcaneBolt.CanHit(target))
+                            {
+                                ArcaneBolt.UseAbility(target);
+                                await Await.Delay(ArcaneBolt.GetCastDelay(target), token);
+                                return;
+                            }
+
+                            // Dagon
+                            var Dagon = Main.Dagon;
+                            if (Dagon != null
+                                && Menu.ItemsToggler.Value.IsEnabled("item_dagon_5")
+                                && Dagon.CanBeCasted
+                                && Dagon.CanHit(target))
+                            {
+                                Dagon.UseAbility(target);
+                                await Await.Delay(Dagon.GetCastDelay(target), token);
+                                return;
+                            }
+                        }
                     }
                     else
                     {
-                        if (!Orbwalker.Settings.Move)
-                        {
-                            Orbwalker.Settings.Move.Item.SetValue(true);
-                        }
+                        Config.LinkenBreaker.Handler.RunAsync();
+                    }
+                }
 
-                        Orbwalker.OrbwalkTo(Target);
+                if (target.IsInvulnerable() || target.IsAttackImmune())
+                {
+                    Orbwalker.Move(Game.MousePosition);
+                }
+                else
+                {
+                    if (Menu.OrbwalkerItem.Value.SelectedValue.Contains("Default"))
+                    {
+                        Orbwalker.OrbwalkingPoint = Vector3.Zero;
+                        Orbwalker.OrbwalkTo(target);
+                    }
+                    else if (Menu.OrbwalkerItem.Value.SelectedValue.Contains("Distance"))
+                    {
+                        var ownerDis = Math.Min(Owner.Distance2D(Game.MousePosition), 230);
+                        var ownerPos = Owner.Position.Extend(Game.MousePosition, ownerDis);
+                        var pos = target.Position.Extend(ownerPos, Menu.MinDisInOrbwalkItem);
+
+                        Orbwalker.OrbwalkTo(target);
+                        Orbwalker.OrbwalkingPoint = pos;
+                    }
+                    else if (Menu.OrbwalkerItem.Value.SelectedValue.Contains("Free"))
+                    {
+                        if (Owner.Distance2D(target) < Owner.AttackRange(target) && target.Distance2D(Game.MousePosition) < Owner.AttackRange(target))
+                        {
+                            Orbwalker.OrbwalkingPoint = Vector3.Zero;
+                            Orbwalker.OrbwalkTo(target);
+                        }
+                        else
+                        {
+                            Orbwalker.Move(Game.MousePosition);
+                        }
                     }
                 }
             }
             else
             {
-                if (!Orbwalker.Settings.Move)
-                {
-                    Orbwalker.Settings.Move.Item.SetValue(true);
-                }
-                
                 Orbwalker.Move(Game.MousePosition);
             }
-        }
-
-        protected override void OnActivate()
-        {
-            base.OnActivate();
-        }
-
-        protected override void OnDeactivate()
-        {
-            base.OnDeactivate();
         }
     }
 }

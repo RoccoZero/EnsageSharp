@@ -20,13 +20,15 @@ namespace SkywrathMagePlus
         name: "SkywrathMagePlus",
         mode: StartupMode.Auto,
         author: "YEEEEEEE", 
-        version: "1.2.1.1",
+        version: "1.3.0.0",
         units: HeroId.npc_dota_hero_skywrath_mage)]
     internal class SkywrathMagePlus : Plugin
     {
         private Config Config { get; set; }
 
         public IServiceContext Context { get; }
+
+        private AbilityFactory AbilityFactory { get; }
 
         public ILog Log = AssemblyLogs.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -36,8 +38,6 @@ namespace SkywrathMagePlus
             Context = context;
             AbilityFactory = context.AbilityFactory;
         }
-
-        private AbilityFactory AbilityFactory { get; }
 
         public skywrath_mage_arcane_bolt ArcaneBolt { get; set; }
 
@@ -94,23 +94,29 @@ namespace SkywrathMagePlus
         [ItemBinding]
         public item_cyclone Eul { get; set; }
 
+        [ItemBinding]
+        public item_blink Blink { get; set; }
+
+        [ItemBinding]
+        public item_shivas_guard Shivas { get; set; }
+
         protected override void OnActivate()
         {
-            Config = new Config(this);
-
             ArcaneBolt = AbilityFactory.GetAbility<skywrath_mage_arcane_bolt>();
             ConcussiveShot = AbilityFactory.GetAbility<skywrath_mage_concussive_shot>();
             AncientSeal = AbilityFactory.GetAbility<skywrath_mage_ancient_seal>();
             MysticFlare = AbilityFactory.GetAbility<skywrath_mage_mystic_flare>();
 
             Context.Inventory.Attach(this);
+
+            Config = new Config(this);
         }
 
         protected override void OnDeactivate()
         {
-            Context.Inventory.Detach(this);
-
             Config?.Dispose();
+
+            Context.Inventory.Detach(this);
         }
     }
 }

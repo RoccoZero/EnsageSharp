@@ -1,14 +1,14 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.ComponentModel;
 
 using Ensage;
 using Ensage.Common.Threading;
+using Ensage.SDK.Extensions;
 using Ensage.SDK.Handlers;
 using Ensage.SDK.Helpers;
-using Ensage.SDK.Service;
 
 namespace SkywrathMagePlus.Features
 {
@@ -16,7 +16,9 @@ namespace SkywrathMagePlus.Features
     {
         private Config Config { get; }
 
-        private IServiceContext Context { get; }
+        private MenuManager Menu { get; }
+
+        private Unit Owner { get; }
 
         private SkywrathMagePlus Main { get; }
 
@@ -25,24 +27,25 @@ namespace SkywrathMagePlus.Features
         public AutoDisable(Config config)
         {
             Config = config;
-            Context = config.SkywrathMagePlus.Context;
-            Main = config.SkywrathMagePlus;
+            Menu = config.Menu;
+            Main = config.Main;
+            Owner = config.Main.Context.Owner;
 
             Handler = UpdateManager.Run(ExecuteAsync, true, false);
 
-            if (config.AutoDisableItem)
+            if (config.Menu.AutoDisableItem)
             {
                 Handler.RunAsync();
             }
 
-            config.AutoDisableItem.PropertyChanged += AutoDisableChanged;
+            config.Menu.AutoDisableItem.PropertyChanged += AutoDisableChanged;
         }
 
         public void Dispose()
         {
-            Config.AutoDisableItem.PropertyChanged -= AutoDisableChanged;
+            Menu.AutoDisableItem.PropertyChanged -= AutoDisableChanged;
 
-            if (Config.AutoDisableItem)
+            if (Menu.AutoDisableItem)
             {
                 Handler?.Cancel();
             }
@@ -50,7 +53,7 @@ namespace SkywrathMagePlus.Features
 
         private void AutoDisableChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (Config.AutoDisableItem)
+            if (Menu.AutoDisableItem)
             {
                 Handler.RunAsync();
             }
@@ -64,58 +67,69 @@ namespace SkywrathMagePlus.Features
         {
             try
             {
-                var Hero = 
-                    EntityManager<Hero>.Entities.Where(
-                        x => !x.IsIllusion &&
-                        x.IsAlive &&
-                        x.IsVisible &&
-                        x.IsValid &&
-                        x.Team != Context.Owner.Team).ToList();
-
-                foreach (var Target in Hero)
+                if (Game.IsPaused || !Owner.IsValid || !Owner.IsAlive || Owner.IsStunned())
                 {
-                    if (Config.Data.Disable(Target))
-                    {
-                        // Hex
-                        if (Main.Hex != null
-                            && Config.AutoDisableToggler.Value.IsEnabled(Main.Hex.Item.Name)
-                            && Main.Hex.CanBeCasted
-                            && Main.Hex.CanHit(Target))
-                        {
-                            Main.Hex.UseAbility(Target);
-                            await Await.Delay(Main.Hex.GetCastDelay(Target), token);
-                        }
+                    return;
+                }
 
-                        // Orchid
-                        if (Main.Orchid != null
-                            && Config.AutoDisableToggler.Value.IsEnabled(Main.Orchid.Item.Name)
-                            && Main.Orchid.CanBeCasted
-                            && Main.Orchid.CanHit(Target))
-                        {
-                            Main.Orchid.UseAbility(Target);
-                            await Await.Delay(Main.Orchid.GetCastDelay(Target), token);
-                        }
+                var target = EntityManager<Hero>.Entities.FirstOrDefault(x =>
+                                                                         x.IsVisible &&
+                                                                         x.IsAlive &&
+                                                                         !x.IsIllusion &&
+                                                                         x.IsValid &&
+                                                                         x.IsEnemy(Owner) &&
+                                                                         Config.Extensions.Disable(x));
 
-                        // Bloodthorn
-                        if (Main.Bloodthorn != null
-                            && Config.AutoDisableToggler.Value.IsEnabled(Main.Bloodthorn.Item.Name)
-                            && Main.Bloodthorn.CanBeCasted
-                            && Main.Bloodthorn.CanHit(Target))
-                        {
-                            Main.Bloodthorn.UseAbility(Target);
-                            await Await.Delay(Main.Bloodthorn.GetCastDelay(Target), token);
-                        }
+                if (target == null)
+                {
+                    return;
+                }
 
-                        // AncientSeal
-                        if (Main.AncientSeal != null
-                            && Config.AutoDisableToggler.Value.IsEnabled(Main.AncientSeal.Ability.Name)
-                            && Main.AncientSeal.CanBeCasted
-                            && Main.AncientSeal.CanHit(Target))
-                        {
-                            Main.AncientSeal.UseAbility(Target);
-                            await Await.Delay(Main.AncientSeal.GetCastDelay(Target), token);
-                        }
-                    }
+                // Hex
+                var Hex = Main.Hex;
+                if (Hex != null
+                    && Menu.AutoDisableToggler.Value.IsEnabled(Hex.ToString())
+                    && Hex.CanBeCasted
+                    && Hex.CanHit(target))
+                {
+                    Hex.UseAbility(target);
+                    await Await.Delay(Hex.GetCastDelay(target), token);
+                    return;
+                }
+
+                // Orchid
+                var Orchid = Main.Orchid;
+                if (Orchid != null
+                    && Menu.AutoDisableToggler.Value.IsEnabled(Orchid.ToString())
+                    && Orchid.CanBeCasted
+                    && Orchid.CanHit(target))
+                {
+                    Orchid.UseAbility(target);
+                    await Await.Delay(Orchid.GetCastDelay(target), token);
+                    return;
+                }
+
+                // Bloodthorn
+                var Bloodthorn = Main.Bloodthorn;
+                if (Bloodthorn != null
+                    && Menu.AutoDisableToggler.Value.IsEnabled(Bloodthorn.ToString())
+                    && Bloodthorn.CanBeCasted
+                    && Bloodthorn.CanHit(target))
+                {
+                    Bloodthorn.UseAbility(target);
+                    await Await.Delay(Bloodthorn.GetCastDelay(target), token);
+                    return;
+                }
+
+                // AncientSeal
+                var AncientSeal = Main.AncientSeal;
+                if (Menu.AutoDisableToggler.Value.IsEnabled(AncientSeal.ToString())
+                    && AncientSeal.CanBeCasted
+                    && AncientSeal.CanHit(target))
+                {
+                    AncientSeal.UseAbility(target);
+                    await Await.Delay(AncientSeal.GetCastDelay(target), token);
+                    return;
                 }
             }
             catch (TaskCanceledException)

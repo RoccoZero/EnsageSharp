@@ -1,17 +1,18 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Ensage;
 using Ensage.Common.Threading;
+using Ensage.SDK.Extensions;
 using Ensage.SDK.Handlers;
 using Ensage.SDK.Helpers;
+using Ensage.SDK.Orbwalker;
 using Ensage.SDK.Service;
-using Ensage.SDK.Extensions;
 
 using SharpDX;
-using System;
 
 namespace SkywrathMagePlus
 {
@@ -19,9 +20,15 @@ namespace SkywrathMagePlus
     {
         private Config Config { get; }
 
+        private MenuManager Menu { get; }
+
         private SkywrathMagePlus Main { get; }
 
         private IServiceContext Context { get; }
+
+        private IOrbwalkerManager Orbwalker { get; }
+
+        private Unit Owner { get; }
 
         private TaskHandler Handler { get; set; }
 
@@ -30,91 +37,75 @@ namespace SkywrathMagePlus
         public SpamMode(Config config)
         {
             Config = config;
-            Main = config.SkywrathMagePlus;
-            Context = config.SkywrathMagePlus.Context;
+            Menu = config.Menu;
+            Main = config.Main;
+            Context = config.Main.Context;
+            Orbwalker = config.Main.Context.Orbwalker;
+            Owner = config.Main.Context.Owner;
 
-            config.SpamKeyItem.PropertyChanged += SpamKeyChanged;
+            config.Menu.SpamKeyItem.PropertyChanged += SpamKeyChanged;
 
             Handler = UpdateManager.Run(ExecuteAsync, true, false);
         }
 
         public void Dispose()
         {
-            Config.SpamKeyItem.PropertyChanged -= SpamKeyChanged;
+            Menu.SpamKeyItem.PropertyChanged -= SpamKeyChanged;
         }
 
         private void SpamKeyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (Config.SpamKeyItem)
+            if (Menu.SpamKeyItem)
             {
                 Handler.RunAsync();
+                Target = null;
             }
             else
             {
                 Handler?.Cancel();
 
-                if (Target != null)
-                {
-                    if (!Context.TargetSelector.IsActive)
-                    {
-                        Context.TargetSelector.Activate();
-                    }
-
-                    Target = null;
-                }
-
                 Context.Particle.Remove("SpamTarget");
             }
         }
 
-        public async Task ExecuteAsync(CancellationToken token)
+        private async Task ExecuteAsync(CancellationToken token)
         {
             try
             {
                 if (Target == null || !Target.IsValid || !Target.IsAlive)
                 {
-                    if (!Context.TargetSelector.IsActive)
+                    if (Menu.SpamUnitItem)
                     {
-                        Context.TargetSelector.Activate();
+                        Target =
+                            EntityManager<Unit>.Entities.Where(x =>
+                                                               (x.NetworkName == "CDOTA_BaseNPC_Creep_Neutral" ||
+                                                               x.NetworkName == "CDOTA_BaseNPC_Invoker_Forged_Spirit" ||
+                                                               x.NetworkName == "CDOTA_BaseNPC_Warlock_Golem" ||
+                                                               x.NetworkName == "CDOTA_BaseNPC_Creep" ||
+                                                               x.NetworkName == "CDOTA_BaseNPC_Creep_Lane" ||
+                                                               x.NetworkName == "CDOTA_BaseNPC_Creep_Siege" ||
+                                                               x.NetworkName == "CDOTA_Unit_Hero_Beastmaster_Boar" ||
+                                                               x.NetworkName == "CDOTA_Unit_SpiritBear" ||
+                                                               x.NetworkName == "CDOTA_Unit_Broodmother_Spiderling") &&
+                                                               x.IsVisible &&
+                                                               x.IsAlive &&
+                                                               !x.IsIllusion &&
+                                                               x.IsSpawned &&
+                                                               x.IsValid &&
+                                                               x.IsEnemy(Owner) &&
+                                                               x.Distance2D(Game.MousePosition) <= 100).OrderBy(x => x.Distance2D(Game.MousePosition)).FirstOrDefault();
                     }
 
-                    if (Context.TargetSelector.IsActive)
+                    if (Target == null)
                     {
-                        if (Config.SpamUnitItem)
-                        {
-                            Target = 
-                                EntityManager<Unit>.Entities.OrderBy(
-                                    order => order.Distance2D(Game.MousePosition)).FirstOrDefault(
-                                    x => !x.IsIllusion &&
-                                    x.IsAlive &&
-                                    x.IsVisible &&
-                                    x.IsValid &&
-                                    (x.IsNeutral ||
-                                    x.Name == "npc_dota_roshan" ||
-                                    (x.Team != Context.Owner.Team &&
-                                    x as Creep != null && x.IsSpawned))
-                                    && x.Distance2D(Game.MousePosition) <= 100);
-                        }
-
-                        if (Target == null)
-                        {
-                            Target = Context.TargetSelector.Active.GetTargets().FirstOrDefault();
-                        }
-                    }
-
-                    if (Target != null)
-                    {
-                        if (Context.TargetSelector.IsActive)
-                        {
-                            Context.TargetSelector.Deactivate();
-                        }
+                        Target = Config.UpdateMode.Target;
                     }
                 }
 
                 if (Target != null)
                 {
                     Context.Particle.DrawTargetLine(
-                        Context.Owner,
+                        Owner,
                         "SpamTarget",
                         Target.Position,
                         Color.Green);
@@ -122,54 +113,51 @@ namespace SkywrathMagePlus
                     if (!Target.IsMagicImmune())
                     {
                         // ArcaneBolt
-                        if (Main.ArcaneBolt != null
-                            && Main.ArcaneBolt.CanBeCasted
-                            && Main.ArcaneBolt.CanHit(Target))
+                        var ArcaneBolt = Main.ArcaneBolt;
+                        if (ArcaneBolt.CanBeCasted && ArcaneBolt.CanHit(Target))
                         {
-                            Main.ArcaneBolt.UseAbility(Target);
-                            await Await.Delay(Main.ArcaneBolt.GetCastDelay(), token);
+                            ArcaneBolt.UseAbility(Target);
+                            await Await.Delay(ArcaneBolt.GetCastDelay(Target), token);
                         }
                     }
-                    if (Target == null || Target.IsAttackImmune() || Target.IsInvulnerable())
-                    {
-                        if (!Context.Orbwalker.Settings.Move)
-                        {
-                            Context.Orbwalker.Settings.Move.Item.SetValue(true);
-                        }
 
-                        Context.Orbwalker.Move(Game.MousePosition);
+                    if (Target.IsInvulnerable() || Target.IsAttackImmune())
+                    {
+                        Orbwalker.Move(Game.MousePosition);
                     }
-                    else if (Target != null)
+                    else
                     {
-                        if (Context.Owner.Distance2D(Target) <= Config.MinDisInOrbwalk
-                            && Target.Distance2D(Game.MousePosition) <= Config.MinDisInOrbwalk)
+                        if (Menu.OrbwalkerItem.Value.SelectedValue.Contains("Default"))
                         {
-                            if (Context.Orbwalker.Settings.Move)
-                            {
-                                Context.Orbwalker.Settings.Move.Item.SetValue(false);
-                            }
-
-                            Context.Orbwalker.OrbwalkTo(Target);
+                            Orbwalker.OrbwalkingPoint = Vector3.Zero;
+                            Orbwalker.OrbwalkTo(Target);
                         }
-                        else
+                        else if (Menu.OrbwalkerItem.Value.SelectedValue.Contains("Distance"))
                         {
-                            if (!Context.Orbwalker.Settings.Move)
-                            {
-                                Context.Orbwalker.Settings.Move.Item.SetValue(true);
-                            }
+                            var ownerDis = Math.Min(Owner.Distance2D(Game.MousePosition), 230);
+                            var ownerPos = Owner.Position.Extend(Game.MousePosition, ownerDis);
+                            var pos = Target.Position.Extend(ownerPos, Menu.MinDisInOrbwalkItem);
 
-                            Context.Orbwalker.OrbwalkTo(Target);
+                            Orbwalker.OrbwalkTo(Target);
+                            Orbwalker.OrbwalkingPoint = pos;
+                        }
+                        else if (Menu.OrbwalkerItem.Value.SelectedValue.Contains("Free"))
+                        {
+                            if (Owner.Distance2D(Target) < Owner.AttackRange(Target) && Target.Distance2D(Game.MousePosition) < Owner.AttackRange(Target))
+                            {
+                                Orbwalker.OrbwalkingPoint = Vector3.Zero;
+                                Orbwalker.OrbwalkTo(Target);
+                            }
+                            else
+                            {
+                                Orbwalker.Move(Game.MousePosition);
+                            }
                         }
                     }
                 }
                 else
                 {
-                    if (!Context.Orbwalker.Settings.Move)
-                    {
-                        Context.Orbwalker.Settings.Move.Item.SetValue(true);
-                    }
-
-                    Context.Orbwalker.Move(Game.MousePosition);
+                    Orbwalker.Move(Game.MousePosition);
                     Context.Particle.Remove("SpamTarget");
                 }
             }

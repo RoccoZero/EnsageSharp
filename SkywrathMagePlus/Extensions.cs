@@ -1,12 +1,16 @@
-﻿using Ensage;
+﻿using System.Linq;
+
+using Ensage;
 using Ensage.SDK.Extensions;
 
 namespace SkywrathMagePlus
 {
-    internal class Data
+    internal class Extensions
     {
-        public bool Active(Hero target, Modifier isstun)
+        public bool Active(Hero target)
         {
+            var stunDebuff = target.Modifiers.FirstOrDefault(x => x.IsStunDebuff);
+
             var BorrowedTime = target.GetAbilityById(AbilityId.abaddon_borrowed_time);
             var PowerCogs = target.GetAbilityById(AbilityId.rattletrap_power_cogs);
             var BlackHole = target.GetAbilityById(AbilityId.enigma_black_hole);
@@ -14,7 +18,7 @@ namespace SkywrathMagePlus
             var DeathWard = target.GetAbilityById(AbilityId.witch_doctor_death_ward);
 
             return (target.MovementSpeed < 240
-                || (isstun != null && isstun.Duration >= 1)
+                || (stunDebuff != null && stunDebuff.Duration >= 1)
                 || target.HasModifier("modifier_skywrath_mystic_flare_aura_effect")
                 || target.HasModifier("modifier_rod_of_atos_debuff")
                 || target.HasModifier("modifier_crystal_maiden_frostbite")
@@ -80,27 +84,19 @@ namespace SkywrathMagePlus
                 || (LagunaBlade != null && LagunaBlade.IsInAbilityPhase);
         }
 
-        public bool CancelCombo(Hero target)
+        public bool Cancel(Hero target)
         {
-            return target.HasModifier("modifier_eul_cyclone")
+            return target.IsMagicImmune()
+                || target.IsInvulnerable()
                 || target.HasModifier("modifier_abaddon_borrowed_time")
-                || target.HasModifier("modifier_brewmaster_storm_cyclone")
-                || target.HasModifier("modifier_shadow_demon_disruption")
-                || target.HasModifier("modifier_obsidian_destroyer_astral_imprisonment_prison")
-                || target.HasModifier("modifier_tusk_snowball_movement")
-                || target.HasModifier("modifier_bane_nightmare")
-                || target.HasModifier("modifier_invoker_tornado")
-                || target.HasModifier("modifier_winter_wyvern_winters_curse");
+                || target.HasAnyModifiers("modifier_winter_wyvern_winters_curse_aura", "modifier_winter_wyvern_winters_curse");
         }
 
-        public bool AntimageShield(Hero target)
+        public bool AntimageShield(Hero Target)
         {
-            var Shield = target.GetAbilityById(AbilityId.antimage_spell_shield);
+            var Shield = Target.GetAbilityById(AbilityId.antimage_spell_shield);
 
-            return Shield != null
-                && Shield.Cooldown == 0
-                && Shield.Level > 0
-                && target.HasAghanimsScepter();
+            return Shield != null && Shield.Cooldown == 0 && Shield.Level > 0 && Target.HasAghanimsScepter();
         }
     }
 }

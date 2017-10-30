@@ -11,7 +11,6 @@ using Ensage.SDK.Handlers;
 using Ensage.SDK.Helpers;
 using Ensage.SDK.Prediction;
 using Ensage.SDK.Prediction.Collision;
-using Ensage.SDK.Service;
 
 namespace SkywrathMagePlus.Features
 {
@@ -19,11 +18,11 @@ namespace SkywrathMagePlus.Features
     {
         private Config Config { get; }
 
-        public Mode Mode { get; }
+        private MenuManager Menu { get; }
 
-        public SkywrathMagePlus Main { get; }
+        private SkywrathMagePlus Main { get; }
 
-        private IServiceContext Context { get; }
+        private Unit Owner { get; }
 
         private IPredictionManager Prediction { get; }
 
@@ -32,26 +31,26 @@ namespace SkywrathMagePlus.Features
         public AutoCombo(Config config)
         {
             Config = config;
-            Context = config.SkywrathMagePlus.Context;
-            Main = config.SkywrathMagePlus;
-            Mode = config.Mode;
-            Prediction = config.SkywrathMagePlus.Context.Prediction;
+            Menu = config.Menu;
+            Main = config.Main;
+            Owner = config.Main.Context.Owner;
+            Prediction = config.Main.Context.Prediction;
 
             Handler = UpdateManager.Run(ExecuteAsync, true, false);
 
-            if (config.AutoComboItem)
+            if (config.Menu.AutoComboItem)
             {
                 Handler.RunAsync();
             }
-            
-            config.AutoComboItem.PropertyChanged += AutoComboChanged;
+
+            config.Menu.AutoComboItem.PropertyChanged += AutoComboChanged;
         }
 
         public void Dispose()
         {
-            Config.AutoComboItem.PropertyChanged -= AutoComboChanged;
+            Menu.AutoComboItem.PropertyChanged -= AutoComboChanged;
 
-            if (Config.AutoComboItem)
+            if (Menu.AutoComboItem)
             {
                 Handler?.Cancel();
             }
@@ -59,7 +58,7 @@ namespace SkywrathMagePlus.Features
 
         private void AutoComboChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (Config.AutoComboItem)
+            if (Menu.AutoComboItem)
             {
                 Handler.RunAsync();
             }
@@ -73,180 +72,211 @@ namespace SkywrathMagePlus.Features
         {
             try
             {
-                if (Config.ComboKeyItem)
+                if (Game.IsPaused || !Owner.IsValid || !Owner.IsAlive || Owner.IsStunned() || Menu.ComboKeyItem)
                 {
                     return;
                 }
 
-                var Hero = EntityManager<Hero>.Entities.Where(
-                    x => !x.IsIllusion &&
-                    x.IsAlive &&
-                    x.IsVisible &&
-                    x.IsValid &&
-                    x.Team != Context.Owner.Team).ToList();
+                var target = EntityManager<Hero>.Entities.FirstOrDefault(x =>
+                                                                         x.IsVisible &&
+                                                                         x.IsAlive &&
+                                                                         !x.IsIllusion &&
+                                                                         x.IsValid &&
+                                                                         x.IsEnemy(Owner) &&
+                                                                         Config.Extensions.Active(x));
 
-                foreach (var Target in Hero)
+                if (target == null)
                 {
-                    var IsStun = Target.Modifiers.FirstOrDefault(x => x.IsStunDebuff);
-                    var IsDebuff = Target.Modifiers.FirstOrDefault(x => x.IsDebuff && x.Name == "modifier_rod_of_atos_debuff");
-                    if (Config.Data.Active(Target, IsStun) && !Config.Data.CancelCombo(Target))
+                    return;
+                }
+
+                if (!Menu.BladeMailItem || !target.HasModifier("modifier_item_blade_mail_reflect"))
+                {
+                    var StunDebuff = target.Modifiers.FirstOrDefault(x => x.IsStunDebuff);
+                    var HexDebuff = target.Modifiers.FirstOrDefault(x => x.IsValid && x.Name == "modifier_sheepstick_debuff");
+                    var AtosDebuff = target.Modifiers.FirstOrDefault(x => x.IsValid && x.Name == "modifier_rod_of_atos_debuff");
+                    var Sleeper = Config.Mode.Sleeper;
+
+                    if (Config.Extensions.Cancel(target) || Owner.IsInvisible())
                     {
-                        if (!Target.IsMagicImmune() && !Target.IsLinkensProtected() && !Config.Data.AntimageShield(Target))
+                        return;
+                    }
+
+                    if (!target.IsLinkensProtected() && !Config.Extensions.AntimageShield(target))
+                    {
+                        // Hex
+                        var Hex = Main.Hex;
+                        if (Hex != null
+                            && Menu.AutoItemsToggler.Value.IsEnabled(Hex.ToString())
+                            && Hex.CanBeCasted
+                            && Hex.CanHit(target)
+                            && (StunDebuff == null || StunDebuff.RemainingTime <= 0.3f)
+                            && (HexDebuff == null || HexDebuff.RemainingTime <= 0.3f))
                         {
-                            var QueenofPainBlink = Target.GetAbilityById(AbilityId.queenofpain_blink);
-                            var AntiMageBlink = Target.GetAbilityById(AbilityId.antimage_blink);
+                            Hex.UseAbility(target);
+                            await Await.Delay(Hex.GetCastDelay(target), token);
+                        }
 
-                            // Hex
-                            if (Main.Hex != null
-                                && Config.AutoItemsToggler.Value.IsEnabled(Main.Hex.Item.Name)
-                                && Main.Hex.CanBeCasted
-                                && Main.Hex.CanHit(Target)
-                                && (IsStun == null || IsStun.RemainingTime <= 0.3))
-                            {
-                                Main.Hex.UseAbility(Target);
-                                await Await.Delay(Main.Hex.GetCastDelay(Target), token);
-                            }
+                        // Orchid
+                        var Orchid = Main.Orchid;
+                        if (Orchid != null
+                            && Menu.AutoItemsToggler.Value.IsEnabled(Orchid.ToString())
+                            && Orchid.CanBeCasted
+                            && Orchid.CanHit(target))
+                        {
+                            Main.Orchid.UseAbility(target);
+                            await Await.Delay(Main.Orchid.GetCastDelay(target), token);
+                        }
 
-                            // Orchid
-                            if (Main.Orchid != null
-                                && Config.AutoItemsToggler.Value.IsEnabled(Main.Orchid.Item.Name)
-                                && Main.Orchid.CanBeCasted
-                                && Main.Orchid.CanHit(Target))
-                            {
-                                Main.Orchid.UseAbility(Target);
-                                await Await.Delay(Main.Orchid.GetCastDelay(Target), token);
-                            }
+                        // Bloodthorn
+                        var Bloodthorn = Main.Bloodthorn;
+                        if (Bloodthorn != null
+                            && Menu.AutoItemsToggler.Value.IsEnabled(Bloodthorn.ToString())
+                            && Bloodthorn.CanBeCasted
+                            && Bloodthorn.CanHit(target))
+                        {
+                            Bloodthorn.UseAbility(target);
+                            await Await.Delay(Bloodthorn.GetCastDelay(target), token);
+                        }
 
-                            // Bloodthorn
-                            if (Main.Bloodthorn != null
-                                && Config.AutoItemsToggler.Value.IsEnabled(Main.Bloodthorn.Item.Name)
-                                && Main.Bloodthorn.CanBeCasted
-                                && Main.Bloodthorn.CanHit(Target))
-                            {
-                                Main.Bloodthorn.UseAbility(Target);
-                                await Await.Delay(Main.Bloodthorn.GetCastDelay(Target), token);
-                            }
+                        // MysticFlare
+                        var MysticFlare = Main.MysticFlare;
+                        if (Menu.AutoAbilitiesToggler.Value.IsEnabled(MysticFlare.ToString())
+                            && Main.MysticFlare.CanBeCasted
+                            && Main.MysticFlare.CanHit(target)
+                            && Config.Extensions.Active(target))
+                        {
+                            var enemies = EntityManager<Hero>.Entities.Where(x =>
+                                                                             x.IsVisible &&
+                                                                             x.IsAlive &&
+                                                                             x.IsValid &&
+                                                                             !x.IsIllusion &&
+                                                                             x.IsEnemy(Owner) &&
+                                                                             x.Distance2D(Owner) <= Main.MysticFlare.CastRange).ToList();
 
-                            // AncientSeal
-                            if (Main.AncientSeal != null
-                                && Config.AutoAbilitiesToggler.Value.IsEnabled(Main.AncientSeal.Ability.Name)
-                                && Main.AncientSeal.CanBeCasted
-                                && Main.AncientSeal.CanHit(Target))
-                            {
-                                Main.AncientSeal.UseAbility(Target);
-                                await Await.Delay(Main.AncientSeal.GetCastDelay(Target), token);
-                            }
+                            var ultimateScepter = Owner.HasAghanimsScepter();
+                            var dubleMysticFlare = ultimateScepter && enemies.Count() == 1;
 
-                            // MysticFlare
-                            if (Main.MysticFlare != null
-                                && Config.AutoAbilitiesToggler.Value.IsEnabled(Main.MysticFlare.Ability.Name)
-                                && Main.MysticFlare.CanBeCasted
-                                && Main.MysticFlare.CanHit(Target))
-                            {
-                                var CheckHero = EntityManager<Hero>.Entities.Where(
-                                    x => !x.IsIllusion &&
-                                    x.IsAlive &&
-                                    x.IsVisible &&
-                                    x.IsValid &&
-                                    x.Team != Context.Owner.Team &&
-                                    x.Distance2D(Context.Owner) <= Main.MysticFlare.CastRange);
+                            var Input =
+                                new PredictionInput(
+                                    Owner,
+                                    target,
+                                    0,
+                                    float.MaxValue,
+                                    MysticFlare.CastRange,
+                                    dubleMysticFlare ? -250 : -100,
+                                    PredictionSkillshotType.SkillshotCircle,
+                                    true)
+                                {
+                                    CollisionTypes = CollisionTypes.None
+                                };
 
-                                var UltimateScepter = Context.Owner.HasAghanimsScepter();
-                                var DubleMysticFlare = UltimateScepter && CheckHero.Count() == 1;
+                            var Output = Prediction.GetPrediction(Input);
 
-                                var Input =
-                                    new PredictionInput(
-                                        Context.Owner,
-                                        Target,
-                                        0,
-                                        float.MaxValue,
-                                        Main.MysticFlare.CastRange,
-                                        DubleMysticFlare ? -250 : -100,
-                                        PredictionSkillshotType.SkillshotCircle,
-                                        true)
-                                    {
-                                        CollisionTypes = CollisionTypes.None
-                                    };
+                            MysticFlare.UseAbility(Output.CastPosition);
+                            await Await.Delay(MysticFlare.GetCastDelay(Output.CastPosition), token);
+                        }
 
-                                var Output = Prediction.GetPrediction(Input);
+                        // RodofAtos
+                        var RodofAtos = Main.RodofAtos;
+                        if (RodofAtos != null
+                            && Menu.AutoItemsToggler.Value.IsEnabled(RodofAtos.ToString())
+                            && RodofAtos.CanBeCasted
+                            && RodofAtos.CanHit(target)
+                            && (StunDebuff == null || StunDebuff.RemainingTime <= 0.5f)
+                            && (AtosDebuff == null || AtosDebuff.RemainingTime <= 0.5f))
+                        {
+                            RodofAtos.UseAbility(target);
+                            await Await.Delay(RodofAtos.GetCastDelay(target), token);
+                        }
 
-                                Main.MysticFlare.UseAbility(Output.CastPosition);
-                                await Await.Delay(Main.MysticFlare.GetCastDelay(Target), token);
-                            }
+                        // AncientSeal
+                        var AncientSeal = Main.AncientSeal;
+                        if (Menu.AutoAbilitiesToggler.Value.IsEnabled(AncientSeal.ToString())
+                            && AncientSeal.CanBeCasted
+                            && AncientSeal.CanHit(target))
+                        {
+                            AncientSeal.UseAbility(target);
+                            await Await.Delay(AncientSeal.GetCastDelay(target), token);
+                            return;
+                        }
 
-                            // RodofAtos
-                            if (Main.RodofAtos != null
-                                && Config.AutoItemsToggler.Value.IsEnabled(Main.RodofAtos.Item.Name)
-                                && Main.RodofAtos.CanBeCasted
-                                && Main.RodofAtos.CanHit(Target)
-                                && (IsStun == null || IsStun.RemainingTime <= 0.5)
-                                && (IsDebuff == null || IsDebuff.RemainingTime <= 0.5))
-                            {
-                                Main.RodofAtos.UseAbility(Target);
-                                await Await.Delay(Main.RodofAtos.GetCastDelay(Target), token);
-                            }
+                        // Veil
+                        var Veil = Main.Veil;
+                        if (Veil != null
+                            && Menu.AutoItemsToggler.Value.IsEnabled(Veil.ToString())
+                            && Veil.CanBeCasted
+                            && Veil.CanHit(target))
+                        {
+                            Veil.UseAbility(target.Position);
+                            await Await.Delay(Veil.GetCastDelay(target.Position), token);
+                        }
 
+                        // Ethereal
+                        var Ethereal = Main.Ethereal;
+                        if (Ethereal != null
+                            && Menu.AutoItemsToggler.Value.IsEnabled(Ethereal.ToString())
+                            && Ethereal.CanBeCasted
+                            && Ethereal.CanHit(target))
+                        {
+                            Ethereal.UseAbility(target);
+                            Sleeper.Sleep(Ethereal.GetHitTime(target));
+                            await Await.Delay(Ethereal.GetCastDelay(target), token);
+                        }
+
+                        // Shivas
+                        var Shivas = Main.Shivas;
+                        if (Shivas != null
+                            && Menu.AutoItemsToggler.Value.IsEnabled(Shivas.ToString())
+                            && Shivas.CanBeCasted
+                            && Shivas.CanHit(target))
+                        {
+                            Shivas.UseAbility();
+                            await Await.Delay(Shivas.GetCastDelay(), token);
+                        }
+
+                        if (!Sleeper.Sleeping || target.IsEthereal())
+                        {
                             // ConcussiveShot
-                            if (Main.ConcussiveShot != null
-                                && Config.AutoAbilitiesToggler.Value.IsEnabled(Main.ConcussiveShot.Ability.Name)
-                                && (!Config.WTargetItem
-                                || (Target == Config.UpdateMode.WShow
-                                || (Config.UpdateMode.WShow != null && Target.Distance2D(Config.UpdateMode.WShow) <= 250)))
-                                && Main.ConcussiveShot.CanBeCasted
-                                && Context.Owner.Distance2D(Target.Position) <= Config.WRadiusItem + 25)
+                            var ConcussiveShot = Main.ConcussiveShot;
+                            if (Menu.AutoAbilitiesToggler.Value.IsEnabled(ConcussiveShot.ToString())
+                                && (!Menu.WTargetItem
+                                || (target == Config.UpdateMode.WShowTarget
+                                || (Config.UpdateMode.WShowTarget != null && target.Distance2D(Config.UpdateMode.WShowTarget) < 250)))
+                                && ConcussiveShot.CanBeCasted
+                                && Owner.Distance2D(target) < Menu.WRadiusItem - Owner.HullRadius)
                             {
-                                Main.ConcussiveShot.UseAbility();
-                                await Await.Delay(Main.ConcussiveShot.GetCastDelay(), token);
+                                ConcussiveShot.UseAbility();
+                                await Await.Delay(ConcussiveShot.GetCastDelay(), token);
                             }
 
                             // ArcaneBolt
-                            if (Main.ArcaneBolt != null
-                                && Config.AutoAbilitiesToggler.Value.IsEnabled(Main.ArcaneBolt.Ability.Name)
-                                && Main.ArcaneBolt.CanBeCasted
-                                && Main.ArcaneBolt.CanHit(Target))
+                            var ArcaneBolt = Main.ArcaneBolt;
+                            if (Menu.AutoAbilitiesToggler.Value.IsEnabled(ArcaneBolt.ToString())
+                                && ArcaneBolt.CanBeCasted
+                                && ArcaneBolt.CanHit(target))
                             {
-                                Main.ArcaneBolt.UseAbility(Target);
-                                await Await.Delay(Main.ArcaneBolt.GetCastDelay(Target), token);
-                            }
-
-                            // Veil
-                            if (Main.Veil != null
-                                && Config.AutoItemsToggler.Value.IsEnabled(Main.Veil.Item.Name)
-                                && Main.Veil.CanBeCasted
-                                && Main.Veil.CanHit(Target))
-                            {
-                                Main.Veil.UseAbility(Target.Position);
-                                await Await.Delay(Main.Veil.GetCastDelay(Target), token);
-                            }
-
-                            // Ethereal
-                            if (Main.Ethereal != null
-                                && Config.AutoItemsToggler.Value.IsEnabled(Main.Ethereal.Item.Name)
-                                && Main.Ethereal.CanBeCasted
-                                && Main.Ethereal.CanHit(Target))
-                            {
-                                Main.Ethereal.UseAbility(Target);
-                                await Await.Delay(Main.Ethereal.GetCastDelay(Target), token);
+                                ArcaneBolt.UseAbility(target);
+                                await Await.Delay(ArcaneBolt.GetCastDelay(target), token);
+                                return;
                             }
 
                             // Dagon
-                            if (Main.Dagon != null
-                                && Config.AutoItemsToggler.Value.IsEnabled("item_dagon_5")
-                                && Main.Dagon.CanBeCasted
-                                && Main.Dagon.CanHit(Target)
-                                && (Main.AncientSeal == null || (Target.HasModifier("modifier_skywrath_mage_ancient_seal") && !Main.AncientSeal.CanBeCasted)
-                                || !Config.AutoAbilitiesToggler.Value.IsEnabled(Main.AncientSeal.Ability.Name))
-                                && (Main.Ethereal == null || (Target.IsEthereal() && !Main.Ethereal.CanBeCasted)
-                                || !Config.AutoItemsToggler.Value.IsEnabled(Main.Ethereal.Item.Name)))
+                            var Dagon = Main.Dagon;
+                            if (Dagon != null
+                                && Menu.AutoItemsToggler.Value.IsEnabled("item_dagon_5")
+                                && Dagon.CanBeCasted
+                                && Dagon.CanHit(target))
                             {
-                                Main.Dagon.UseAbility(Target);
-                                await Await.Delay(Main.Dagon.GetCastDelay(Target), token);
+                                Dagon.UseAbility(target);
+                                await Await.Delay(Dagon.GetCastDelay(target), token);
+                                return;
                             }
                         }
-                        else
-                        {
-                            await Config.LinkenBreaker.Breaker(token, Target);
-                        }
+                    }
+                    else
+                    {
+                        Config.LinkenBreaker.Handler.RunAsync();
                     }
                 }
             }

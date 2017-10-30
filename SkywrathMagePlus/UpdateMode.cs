@@ -13,137 +13,204 @@ namespace SkywrathMagePlus
 {
     internal class UpdateMode
     {
-        private Config Config { get; }
+        public MenuManager Menu { get; }
 
         private SkywrathMagePlus Main { get; }
 
         private IServiceContext Context { get; }
 
-        public Hero WShow { get; set; }
+        private Unit Owner { get; }
 
-        private Hero OffTarget { get; set; }
+        public Hero WShowTarget { get; set; }
 
-        private bool WRadius { get; set; }
-
-        private int Count { get; set; }
+        public Hero Target { get; set; }
 
         public UpdateMode(Config config)
         {
-            Config = config;
-            Main = config.SkywrathMagePlus;
-            Context = config.SkywrathMagePlus.Context;
+            Menu = config.Menu;
+            Main = config.Main;
+            Context = config.Main.Context;
+            Owner = config.Main.Context.Owner;
 
             UpdateManager.Subscribe(OnUpdate, 25);
-            Config.WRadiusItem.PropertyChanged += CShotRadiusChanged;
         }
 
         public void Dispose()
         {
-            Config.WRadiusItem.PropertyChanged -= CShotRadiusChanged;
             UpdateManager.Unsubscribe(OnUpdate);
-        }
-
-        private void CShotRadiusChanged(object sender, PropertyChangedEventArgs e)
-        {
-            WRadius = true;
-            Count = 0;
         }
 
         private void OnUpdate()
         {
-            if (Config.ComboRadiusItem)
+            var ArcaneBolt = Main.ArcaneBolt;
+            if (Menu.ArcaneBoltRadiusItem && ArcaneBolt.Ability.Level > 0)
             {
                 Context.Particle.DrawRange(
                     Context.Owner,
-                    "ComboRadius",
-                    Main.ArcaneBolt.CastRange,
-                    Color.Aqua);
+                    "ArcaneBolt",
+                    ArcaneBolt.CastRange,
+                    ArcaneBolt.IsReady ? Color.Aqua : Color.Gray);
             }
             else
             {
-                Context.Particle.Remove("ComboRadius");
+                Context.Particle.Remove("ArcaneBolt");
             }
 
-            if (WRadius)
+            var ConcussiveShot = Main.ConcussiveShot;
+            if (Menu.ConcussiveShotRadiusItem && ConcussiveShot.Ability.Level > 0)
             {
-                Count += 1;
-                WRadius = Count != 50;
-
-                Context.Particle.AddOrUpdate(
+                Context.Particle.DrawRange(
                     Context.Owner,
-                    "CShotRadius",
-                    "materials/ensage_ui/particles/range_display_mod.vpcf",
-                    ParticleAttachment.AbsOriginFollow,
-                    RestartType.FullRestart,
-                    1,
-                    new Vector3(Config.WRadiusItem, 255, 0),
-                    2,
-                    new Vector3(0, 255, 255));
-            }
-            else
-            {
-                Context.Particle.Remove("CShotRadius");
-            }
-
-            WShow = EntityManager<Hero>.Entities.OrderBy(
-                x => x.Distance2D(Context.Owner)).FirstOrDefault(
-                x => !x.IsIllusion &&
-                x.IsAlive &&
-                x.IsVisible &&
-                x.IsValid &&
-                x.Team != Context.Owner.Team &&
-                x.Distance2D(Context.Owner) <= Main.ConcussiveShot.Radius - 25);
-
-            if (Config.WDrawItem
-                && WShow != null
-                && Main.ConcussiveShot
-                && Main.ConcussiveShot.Ability.Cooldown <= 1)
-            {
-                Context.Particle.AddOrUpdate(
-                    WShow,
                     "ConcussiveShot",
-                    "particles/units/heroes/hero_skywrath_mage/skywrath_mage_concussive_shot.vpcf",
-                    ParticleAttachment.AbsOrigin,
-                    RestartType.None,
-                    0,
-                    WShow.Position + new Vector3(0, 200, WShow.HealthBarOffset),
-                    1,
-                    WShow.Position + new Vector3(0, 200, WShow.HealthBarOffset),
-                    2,
-                    new Vector3(1000));
+                    ConcussiveShot.Radius,
+                    ConcussiveShot.IsReady ? Color.Aqua : Color.Gray);
             }
             else
             {
                 Context.Particle.Remove("ConcussiveShot");
             }
 
-            if (Context.TargetSelector.IsActive 
-                || OffTarget == null || !OffTarget.IsValid || !OffTarget.IsAlive)
+            var AncientSeal = Main.AncientSeal;
+            if (Menu.AncientSealRadiusItem && AncientSeal.Ability.Level > 0)
             {
-                OffTarget = Context.TargetSelector.Active.GetTargets().FirstOrDefault() as Hero;
-            }
-
-            if (OffTarget != null && !Config.SpamKeyItem)
-            {
-                Context.Particle.DrawTargetLine(
+                Context.Particle.DrawRange(
                     Context.Owner,
-                    "Target",
-                    OffTarget.Position,
-                    Config.Mode.CanExecute ? Color.Red : Color.Aqua);
+                    "AncientSeal",
+                    AncientSeal.CastRange,
+                    AncientSeal.IsReady ? Color.Aqua : Color.Gray);
             }
             else
             {
-                Context.Particle.Remove("Target");
+                Context.Particle.Remove("AncientSeal");
             }
 
-            if (!Config.Mode.CanExecute && Config.Mode.Target != null)
+            var MysticFlare = Main.MysticFlare;
+            if (Menu.MysticFlareRadiusItem && MysticFlare.Ability.Level > 0)
             {
-                if (!Context.TargetSelector.IsActive)
+                Context.Particle.DrawRange(
+                    Context.Owner,
+                    "MysticFlare",
+                    MysticFlare.CastRange,
+                    MysticFlare.IsReady ? Color.Aqua : Color.Gray);
+            }
+            else
+            {
+                Context.Particle.Remove("MysticFlare");
+            }
+
+            var Blink = Main.Blink;
+            if (Menu.BlinkRadiusItem && Blink != null)
+            {
+                var color = Color.Red;
+                if (!Blink.IsReady)
                 {
-                    Context.TargetSelector.Activate();
+                    color = Color.Gray;
+                }
+                else if (Context.Owner.Distance2D(Game.MousePosition) > Menu.BlinkActivationItem)
+                {
+                    color = Color.Aqua;
                 }
 
-                Config.Mode.Target = null;
+                Context.Particle.DrawRange(
+                    Context.Owner,
+                    "Blink",
+                    Blink.CastRange,
+                    color);
+            }
+            else
+            {
+                Context.Particle.Remove("Blink");
+            }
+
+            if (Menu.WDrawItem)
+            {
+                WShowTarget = EntityManager<Hero>.Entities.Where(x =>
+                                                                 x.IsAlive &&
+                                                                 x.IsVisible &&
+                                                                 !x.IsIllusion &&
+                                                                 x.IsValid &&
+                                                                 x.IsEnemy(Owner) &&
+                                                                 x.Distance2D(Owner) <= ConcussiveShot.Radius - 25).OrderBy(x => 
+                                                                                                                            x.Distance2D(Context.Owner)).FirstOrDefault();
+
+                if (WShowTarget != null && ConcussiveShot && ConcussiveShot.Ability.Cooldown <= 1)
+                {
+                    Context.Particle.AddOrUpdate(
+                        WShowTarget,
+                        "ConcussiveShotEffect",
+                        "particles/units/heroes/hero_skywrath_mage/skywrath_mage_concussive_shot.vpcf",
+                        ParticleAttachment.AbsOrigin,
+                        RestartType.None,
+                        0,
+                        WShowTarget.Position + new Vector3(0, 200, WShowTarget.HealthBarOffset),
+                        1,
+                        WShowTarget.Position + new Vector3(0, 200, WShowTarget.HealthBarOffset),
+                        2,
+                        new Vector3(1000));
+                }
+                else
+                {
+                    Context.Particle.Remove("ConcussiveShotEffect");
+                }
+            }
+            else
+            {
+                Context.Particle.Remove("ConcussiveShotEffect");
+            }
+
+            if (Menu.TargetItem.Value.SelectedValue.Contains("Lock") && Context.TargetSelector.IsActive
+                && (!Menu.ComboKeyItem || Target == null || !Target.IsValid || !Target.IsAlive))
+            {
+                Target = Context.TargetSelector.Active.GetTargets().FirstOrDefault() as Hero;
+            }
+            else if (Menu.TargetItem.Value.SelectedValue.Contains("Default") && Context.TargetSelector.IsActive)
+            {
+                Target = Context.TargetSelector.Active.GetTargets().FirstOrDefault() as Hero;
+            }
+
+            if (Target != null && !Menu.SpamKeyItem && Menu.DrawOffTargetItem && !Menu.ComboKeyItem || Menu.DrawTargetItem && Menu.ComboKeyItem)
+            {
+                switch (Menu.TargetEffectTypeItem.Value.SelectedIndex)
+                {
+                    case 0:
+                        Context.Particle.DrawTargetLine(
+                            Context.Owner,
+                            "SkywrathMagePlusTarget",
+                            Target.Position,
+                            Menu.ComboKeyItem
+                            ? new Color(Menu.TargetRedItem, Menu.TargetGreenItem, Menu.TargetBlueItem)
+                            : new Color(Menu.OffTargetRedItem, Menu.OffTargetGreenItem, Menu.OffTargetBlueItem));
+                        break;
+
+                    case 1:
+                        Context.Particle.DrawDangerLine(
+                            Context.Owner,
+                            "SkywrathMagePlusTarget",
+                            Target.Position,
+                            Menu.ComboKeyItem
+                            ? new Color(Menu.TargetRedItem, Menu.TargetGreenItem, Menu.TargetBlueItem)
+                            : new Color(Menu.OffTargetRedItem, Menu.OffTargetGreenItem, Menu.OffTargetBlueItem));
+                        break;
+
+                    default:
+                        Context.Particle.AddOrUpdate(
+                            Target,
+                            "SkywrathMagePlusTarget",
+                            Menu.Effects[Menu.TargetEffectTypeItem.Value.SelectedIndex],
+                            ParticleAttachment.AbsOriginFollow,
+                            RestartType.NormalRestart,
+                            1,
+                            Menu.ComboKeyItem
+                            ? new Color(Menu.TargetRedItem, Menu.TargetGreenItem, Menu.TargetBlueItem)
+                            : new Color(Menu.OffTargetRedItem, Menu.OffTargetGreenItem, Menu.OffTargetBlueItem),
+                            2,
+                            new Vector3(255));
+                        break;
+                }
+            }
+            else
+            {
+                Context.Particle.Remove("SkywrathMagePlusTarget");
             }
         }
     }
