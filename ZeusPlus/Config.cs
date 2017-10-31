@@ -43,8 +43,8 @@ namespace ZeusPlus
 
             Menu = new MenuManager(this);
             UpdateMode = new UpdateMode(this);
-            LinkenBreaker = new LinkenBreaker(this);
             DamageCalculation = new DamageCalculation(this);
+            LinkenBreaker = new LinkenBreaker(this);
             AutoKillSteal = new AutoKillSteal(this);
             TeleportBreaker = new TeleportBreaker(this);
             FarmMode = new FarmMode(this, main.Context);

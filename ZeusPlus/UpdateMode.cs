@@ -114,7 +114,7 @@ namespace ZeusPlus
                 Target = Context.TargetSelector.Active.GetTargets().FirstOrDefault() as Hero;
             }
 
-            if (Target != null && ((Menu.DrawOffTargetItem && !Menu.ComboKeyItem) || (Menu.DrawTargetItem && Menu.ComboKeyItem)))
+            if (Target != null && (Menu.DrawOffTargetItem && !Menu.ComboKeyItem || Menu.DrawTargetItem && Menu.ComboKeyItem))
             {
                 switch (Menu.TargetEffectTypeItem.Value.SelectedIndex)
                 {

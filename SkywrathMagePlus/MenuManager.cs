@@ -94,7 +94,7 @@ namespace SkywrathMagePlus
 
         public MenuItem<StringList> TargetItem { get; }
 
-        public MenuItem<bool> StartComboItem { get; }
+        public MenuItem<KeyBind> StartComboKeyItem { get; }
 
         public MenuItem<KeyBind> AutoQKeyItem { get; }
 
@@ -281,21 +281,18 @@ namespace SkywrathMagePlus
 
             CalculationItem = DrawingMenu.Item("Damage Calculation", true);
             CalculationXItem = DrawingMenu.Item("X", "calculation_x", new Slider(0, 0, (int)config.Screen.X + 65));
-            CalculationYItem = DrawingMenu.Item("Y", "calculation_y", new Slider(500, 0, (int)config.Screen.Y - 90));
-            TextItem = DrawingMenu.Item("Text", true);
-            TextXItem = DrawingMenu.Item("X", new Slider(0, 0, (int)config.Screen.X + 65));
-            TextYItem = DrawingMenu.Item("Y", new Slider(500, 0, (int)config.Screen.Y - 90));
+            CalculationYItem = DrawingMenu.Item("Y", "calculation_y", new Slider((int)config.Screen.Y - 260, 0, (int)config.Screen.Y - 200));
 
             TextItem = DrawingMenu.Item("Text", true);
-            TextXItem = DrawingMenu.Item("X", new Slider(0, 0, (int)config.Screen.X + 65));
-            TextYItem = DrawingMenu.Item("Y", new Slider(500, 0, (int)config.Screen.Y - 90));
+            TextXItem = DrawingMenu.Item("X", new Slider((int)config.Screen.X - 50, 0, (int)config.Screen.X - 50));
+            TextYItem = DrawingMenu.Item("Y", new Slider(0, 0, (int)config.Screen.Y - 280));
 
             ComboKeyItem = Factory.Item("Combo Key", new KeyBind('D'));
             OrbwalkerItem = Factory.Item("Orbwalker", new StringList("Default", "Distance", "Free"));
             MinDisInOrbwalkItem = Factory.Item("Min Distance In Orbwalker", new Slider(600, 200, 600));
             TargetItem = Factory.Item("Target", new StringList("Lock", "Default"));
-            StartComboItem = Factory.Item("Start Combo With Mute", false);
-            StartComboItem.Item.SetTooltip("Start Combo With Hex or Ancient Seal");
+            StartComboKeyItem = Factory.Item("Start Combo With Mute", new KeyBind('0', KeyBindType.Toggle, false));
+            StartComboKeyItem.Item.SetTooltip("Start Combo With Hex or Ancient Seal");
 
             AutoQKeyItem = Factory.Item("Auto Q Key", new KeyBind('F', KeyBindType.Toggle, false));
             AutoQKeyItem.Item.SetValue(new KeyBind(AutoQKeyItem.Item.GetValue<KeyBind>().Key, KeyBindType.Toggle, false));

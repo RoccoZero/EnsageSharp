@@ -67,13 +67,13 @@ namespace ZeusPlus
 
         private void OnDraw(EventArgs args)
         {
-            var i = 0;
-            foreach (var Data in Config.DamageCalculation.DamageList)
-            {
-                var setPos = new Vector2(
+            var setPos = new Vector2(
                     Math.Min((Config.Screen.X - 20) - Menu.OnDrawXItem, Config.Screen.X - 20),
                     Math.Min(Menu.OnDrawYItem - 100, Config.Screen.Y - 90));
 
+            var i = 0;
+            foreach (var Data in Config.DamageCalculation.DamageList)
+            {
                 var pos = new Vector2(Config.Screen.X, Config.Screen.Y * 0.65f + i) - setPos;
 
                 var hero = Data.GetHero;

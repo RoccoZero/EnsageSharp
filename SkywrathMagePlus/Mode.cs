@@ -292,7 +292,7 @@ namespace SkywrathMagePlus
 
         private bool StartCombo(Hero target)
         {
-            if (!Menu.StartComboItem)
+            if (!Menu.StartComboKeyItem)
             {
                 return true;
             }

@@ -46,36 +46,39 @@ namespace SkywrathMagePlus
             if (Menu.TextItem)
             {
                 var setPosText = new Vector2(
-                    Math.Min((Config.Screen.X - 20) - Menu.TextXItem, Config.Screen.X - 20),
-                    Math.Min(Menu.TextYItem - 200, Config.Screen.Y - 90));
+                    (Config.Screen.X) - Menu.TextXItem - 10,
+                    Menu.TextYItem - 20);
 
                 var posText = new Vector2(Config.Screen.X, Config.Screen.Y * 0.65f) - setPosText;
 
                 Text($"Combo { (Menu.ComboKeyItem ? "ON" : "OFF") }", posText, Menu.ComboKeyItem ? Color.Aqua : Color.Yellow);
-                    Text($"Spam Q { (Menu.SpamKeyItem ? "ON" : "OFF") }", posText - new Vector2(0, 20), Menu.SpamKeyItem ? Color.Aqua : Color.Yellow);
-                    Text($"Auto Q { (!Menu.ComboKeyItem && !Menu.SpamKeyItem && Menu.AutoQKeyItem ? "ON" : "OFF") }",
-                        posText - new Vector2(0, 40),
-                        !Menu.ComboKeyItem && !Menu.SpamKeyItem && Menu.AutoQKeyItem ? Color.Aqua : Color.Yellow);
+                Text($"Spam Q { (Menu.SpamKeyItem ? "ON" : "OFF") }", posText + new Vector2(0, 30), Menu.SpamKeyItem ? Color.Aqua : Color.Yellow);
+                Text($"Auto Q { (!Menu.ComboKeyItem && !Menu.SpamKeyItem && Menu.AutoQKeyItem ? "ON" : "OFF") }",
+                    posText + new Vector2(0, 60),
+                    !Menu.ComboKeyItem && !Menu.SpamKeyItem && Menu.AutoQKeyItem ? Color.Aqua : Color.Yellow);
 
-                    var i = 0;
-                    if (Menu.AutoComboItem)
-                    {
-                        i += 20;
-                        Text($"Auto Combo { (!Menu.ComboKeyItem ? "ON" : "OFF") }", posText - new Vector2(0, 40 + i), !Menu.ComboKeyItem ? Color.Aqua : Color.Yellow);
-                    }
+                var i = 0;
+                if (Menu.AutoComboItem)
+                {
+                    i += 30;
+                    Text($"Auto Combo { (!Menu.ComboKeyItem ? "ON" : "OFF") }", posText + new Vector2(0, 60 + i), !Menu.ComboKeyItem ? Color.Aqua : Color.Yellow);
+                }
 
-                    if (Menu.AutoDisableItem)
-                    {
-                        i += 20;
-                        Text("Auto Disable ON", posText - new Vector2(0, 40 + i), Color.Aqua);
-                    }
+                if (Menu.AutoDisableItem)
+                {
+                    i += 30;
+                    Text("Auto Disable ON", posText + new Vector2(0, 60 + i), Color.Aqua);
+                }
+
+                i += 30;
+                Text($"Start Combo Mute { (Menu.StartComboKeyItem ? "ON" : "OFF") }", posText + new Vector2(0, 60 + i), Menu.StartComboKeyItem ? Color.Aqua : Color.Yellow);
             }
             
             if (Menu.CalculationItem)
             {
                 var setPosTexture = new Vector2(
-                    Math.Min((Config.Screen.X - 20) - Menu.CalculationXItem, Config.Screen.X - 20),
-                    Math.Min(Menu.CalculationYItem - 100, Config.Screen.Y - 90));
+                    Config.Screen.X - Menu.CalculationXItem - 20,
+                    Menu.CalculationYItem - 110);
 
                 var x = 0;
                 foreach (var Data in Config.DamageCalculation.DamageList)
