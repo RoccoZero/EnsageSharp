@@ -25,14 +25,14 @@ namespace ZeusPlus.Features
 
         private Unit Owner { get; }
 
-        public Sleeper Sleeper { get; }
+        public MultiSleeper MultiSleeper { get; }
 
         private DamageCalculation.Damage Damage { get; set; }
 
         private TaskHandler Handler { get; }
 
         private IUpdateHandler Update { get; set; }
-        
+
         public AutoKillSteal(Config config)
         {
             Config = config;
@@ -41,7 +41,7 @@ namespace ZeusPlus.Features
             DamageCalculation = config.DamageCalculation;
             Owner = config.Main.Context.Owner;
 
-            Sleeper = new Sleeper();
+            MultiSleeper = new MultiSleeper();
 
             Handler = UpdateManager.Run(ExecuteAsync, true, false);
 
@@ -107,6 +107,24 @@ namespace ZeusPlus.Features
                 {
                     return;
                 }
+                
+                if (Menu.MoveCameraItem)
+                {
+                    if (target.Distance2D(Owner) > 2000 && !MultiSleeper.Sleeping("camera"))
+                    {
+                        var consolePosition = $"{ target.Position.X } { target.Position.Z }";
+                        Game.ExecuteCommand($"dota_camera_set_lookatpos { consolePosition }");
+
+                        UpdateManager.BeginInvoke(
+                                () =>
+                                {
+                                    Game.ExecuteCommand("+dota_camera_center_on_hero");
+                                },
+                                2000);
+
+                        MultiSleeper.Sleep(3000, "camera");
+                    }
+                }
 
                 if (!target.IsLinkensProtected() && !Config.LinkenBreaker.AntimageShield(target))
                 {
@@ -129,7 +147,7 @@ namespace ZeusPlus.Features
                         && Ethereal.CanHit(target))
                     {
                         Ethereal.UseAbility(target);
-                        Sleeper.Sleep(Ethereal.GetHitTime(target));
+                        MultiSleeper.Sleep(Ethereal.GetHitTime(target), "Ethereal");
                         await Await.Delay(Ethereal.GetCastDelay(target), token);
                     }
 
@@ -144,7 +162,7 @@ namespace ZeusPlus.Features
                         await Await.Delay(Shivas.GetCastDelay(), token);
                     }
 
-                    if (!Sleeper.Sleeping || target.IsEthereal())
+                    if (!MultiSleeper.Sleeping("Ethereal") || target.IsEthereal())
                     {
                         // Lightning Bolt
                         var LightningBolt = Main.LightningBolt;
@@ -214,11 +232,24 @@ namespace ZeusPlus.Features
 
         private bool Cancel(Hero target)
         {
+            var duelAghanimsScepter = false;
+            if (target.HasModifier("modifier_legion_commander_duel"))
+            {
+                duelAghanimsScepter = EntityManager<Hero>.Entities.Any(x => 
+                                                                       x.HeroId == HeroId.npc_dota_hero_legion_commander &&
+                                                                       x.IsVisible &&
+                                                                       x.IsAlive &&
+                                                                       x.IsValid &&
+                                                                       x.HasAghanimsScepter());
+            }
+
             var reincarnation = target.GetAbilityById(AbilityId.skeleton_king_reincarnation);
 
-            return target.IsMagicImmune()
+            return Owner.IsInvisible()
+                || target.IsMagicImmune()
                 || target.IsInvulnerable()
-                || target.HasAnyModifiers("modifier_dazzle_shallow_grave")
+                || target.HasAnyModifiers("modifier_dazzle_shallow_grave", "modifier_necrolyte_reapers_scythe")
+                || duelAghanimsScepter
                 || (reincarnation != null && reincarnation.Cooldown == 0 && reincarnation.Level > 0);
         }
 

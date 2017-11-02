@@ -41,7 +41,7 @@ namespace ZeusPlus
                 var StunDebuff = target.Modifiers.FirstOrDefault(x => x.IsStunDebuff);
                 var HexDebuff = target.Modifiers.FirstOrDefault(x => x.IsValid && x.Name =="modifier_sheepstick_debuff");
                 var AtosDebuff = target.Modifiers.FirstOrDefault(x => x.IsValid && x.Name == "modifier_rod_of_atos_debuff");
-                var Sleeper = Config.AutoKillSteal.Sleeper;
+                var MultiSleeper = Config.AutoKillSteal.MultiSleeper;
 
                 // Blink
                 var Blink = Main.Blink;
@@ -132,7 +132,7 @@ namespace ZeusPlus
                             && Ethereal.CanHit(target))
                         {
                             Ethereal.UseAbility(target);
-                            Sleeper.Sleep(Ethereal.GetHitTime(target));
+                            MultiSleeper.Sleep(Ethereal.GetHitTime(target), "Ethereal");
                             await Await.Delay(Ethereal.GetCastDelay(target), token);
                         }
 
@@ -147,7 +147,7 @@ namespace ZeusPlus
                             await Await.Delay(Shivas.GetCastDelay(), token);
                         }
 
-                        if (!Sleeper.Sleeping || target.IsEthereal())
+                        if (!MultiSleeper.Sleeping("Ethereal") || target.IsEthereal())
                         {
                             // LightningBolt
                             var LightningBolt = Main.LightningBolt;

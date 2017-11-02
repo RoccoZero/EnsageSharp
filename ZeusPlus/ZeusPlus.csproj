@@ -50,7 +50,7 @@
     <Compile Include="Features\AutoKillSteal.cs" />
     <Compile Include="Features\DamageCalculation.cs" />
     <Compile Include="Features\LinkenBreaker.cs" />
-    <Compile Include="Features\TeleportBreaker.cs" />
+    <Compile Include="Features\AbilityBreaker.cs" />
     <Compile Include="MenuManager.cs" />
     <Compile Include="Mode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

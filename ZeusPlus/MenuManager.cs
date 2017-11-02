@@ -26,6 +26,8 @@ namespace ZeusPlus
 
         public MenuItem<bool> AutoKillStealItem { get; }
 
+        public MenuItem<bool> MoveCameraItem { get; }
+
         public MenuItem<AbilityToggler> AutoKillStealToggler { get; }
 
         public MenuItem<AbilityToggler> LinkenBreakerToggler { get; }
@@ -42,7 +44,17 @@ namespace ZeusPlus
 
         public MenuItem<AbilityToggler> TeleportBreakerToggler { get; }
 
-        public MenuItem<Slider> NimbusRangeItem { get; }
+        public MenuItem<bool> NimbusVisibleTeleportItem { get; }
+
+        public MenuItem<Slider> TeleportNimbusRangeItem { get; }
+
+        public MenuItem<bool> AbilityBreakerItem { get; }
+
+        public MenuItem<AbilityToggler> AbilityBreakerToggler { get; }
+
+        public MenuItem<AbilityToggler> AbilityWeakBreakerToggler { get; }
+
+        public MenuItem<Slider> AbilityNimbusRangeItem { get; }
 
         public MenuItem<StringList> TargetEffectTypeItem { get; }
 
@@ -122,6 +134,7 @@ namespace ZeusPlus
 
             var AutoKillStealMenu = Factory.Menu("Auto Kill Steal");
             AutoKillStealItem = AutoKillStealMenu.Item("Enable", true);
+            MoveCameraItem = AutoKillStealMenu.Item("Move Camera On Enemy", false);
             AutoKillStealToggler = AutoKillStealMenu.Item("Use: ", "AutoKillStealToggler", new AbilityToggler(new Dictionary<string, bool>
             {
                 { "zuus_thundergods_wrath", true },
@@ -185,16 +198,34 @@ namespace ZeusPlus
             UseOnlyFromRangeItem = LinkenBreakerMenu.Item("Use Only From Range", false);
             UseOnlyFromRangeItem.Item.SetTooltip("Use only from the Range and do not use another Ability");
 
-            var TeleportBreakerMenu = Factory.MenuWithTexture("Teleport Breaker", "item_tpscroll");
+            var AbilityBreakerMenu = Factory.Menu("Ability Breaker");
+            var TeleportBreakerMenu = AbilityBreakerMenu.MenuWithTexture("Teleport", "item_tpscroll");
             TeleportBreakerItem = TeleportBreakerMenu.Item("Enable", true);
-            TeleportBreakerToggler = TeleportBreakerMenu.Item("Use: ", "linkentoggler", new AbilityToggler(new Dictionary<string, bool>
+            TeleportBreakerToggler = TeleportBreakerMenu.Item("Use: ", "teleportbreakertoggler", new AbilityToggler(new Dictionary<string, bool>
+            {
+                { "zuus_cloud", true },
+                { "zuus_lightning_bolt", true }
+            }));
+
+            NimbusVisibleTeleportItem = TeleportBreakerMenu.Item("Nimbus Only Visible Teleport", false);
+            TeleportNimbusRangeItem = TeleportBreakerMenu.Item("Nimbus Range", new Slider(3000, 1000, 6000));
+
+            AbilityBreakerItem = AbilityBreakerMenu.Item("Enable", true);
+            AbilityBreakerToggler = AbilityBreakerMenu.Item("Use: ", "abilitybreakertoggler", new AbilityToggler(new Dictionary<string, bool>
+            {
+                { "zuus_cloud", true },
+                { "zuus_lightning_bolt", true }
+            }));
+
+            AbilityWeakBreakerToggler = AbilityBreakerMenu.Item("Charge and Shackles", "abilityweakbreakertoggler", new AbilityToggler(new Dictionary<string, bool>
             {
                 { "zuus_cloud", false },
                 { "zuus_lightning_bolt", true }
             }));
+            AbilityWeakBreakerToggler.Item.SetTooltip("Breaks the Abilities Shadow Shaman Shackles and Spirit Breaker Charge of Darkness");
 
-            NimbusRangeItem = TeleportBreakerMenu.Item("Nimbus Range", new Slider(2500, 1000, 5000));
-            
+            AbilityNimbusRangeItem = AbilityBreakerMenu.Item("Nimbus Range", new Slider(3500, 1000, 6000));
+
             var DrawingMenu = Factory.Menu("Drawing");
             var TargetMenu = DrawingMenu.Menu("Target");
             TargetEffectTypeItem = TargetMenu.Item("Target Effect Type", new StringList(EffectsName));
@@ -219,8 +250,8 @@ namespace ZeusPlus
             BlinkRadiusItem = DrawingMenu.Item("Blink Radius", true);
 
             OnDrawItem = DrawingMenu.Item("On Draw", true);
-            OnDrawXItem = DrawingMenu.Item("X", new Slider(0, 0, (int)config.Screen.X + 65));
-            OnDrawYItem = DrawingMenu.Item("Y", new Slider(500, 0, (int)config.Screen.Y - 90));
+            OnDrawXItem = DrawingMenu.Item("X", "calculation_x", new Slider(0, 0, (int)config.Screen.X + 65));
+            OnDrawYItem = DrawingMenu.Item("Y", "calculation_y", new Slider((int)config.Screen.Y - 260, 0, (int)config.Screen.Y - 200));
 
             ComboKeyItem = Factory.Item("Combo Key", new KeyBind('D'));
             OrbwalkerItem = Factory.Item("Orbwalker", new StringList("Free", "Distance", "Default"));
@@ -236,6 +267,7 @@ namespace ZeusPlus
             AbilitiesToggler.PropertyChanged += Changed;
             ItemsToggler.PropertyChanged += Changed;
             TeleportBreakerToggler.PropertyChanged += Changed;
+            AbilityBreakerToggler.PropertyChanged += Changed;
             DrawTargetItem.PropertyChanged += Changed;
             DrawOffTargetItem.PropertyChanged += Changed;
             OrbwalkerItem.PropertyChanged += Changed;
@@ -272,11 +304,21 @@ namespace ZeusPlus
             // Teleport Breaker
             if (TeleportBreakerToggler.Value.IsEnabled("zuus_cloud"))
             {
-                NimbusRangeItem.Item.ShowItem = true;
+                TeleportNimbusRangeItem.Item.ShowItem = true;
             }
             else
             {
-                NimbusRangeItem.Item.ShowItem = false;
+                TeleportNimbusRangeItem.Item.ShowItem = false;
+            }
+
+            // Ability Breaker
+            if (AbilityBreakerToggler.Value.IsEnabled("zuus_cloud"))
+            {
+                AbilityNimbusRangeItem.Item.ShowItem = true;
+            }
+            else
+            {
+                AbilityNimbusRangeItem.Item.ShowItem = false;
             }
 
             // Draw Target
@@ -359,6 +401,7 @@ namespace ZeusPlus
             OrbwalkerItem.PropertyChanged -= Changed;
             DrawOffTargetItem.PropertyChanged -= Changed;
             DrawTargetItem.PropertyChanged -= Changed;
+            AbilityBreakerToggler.PropertyChanged -= Changed;
             TeleportBreakerToggler.PropertyChanged -= Changed;
             ItemsToggler.PropertyChanged -= Changed;
             AbilitiesToggler.PropertyChanged -= Changed;

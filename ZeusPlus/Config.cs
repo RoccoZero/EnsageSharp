@@ -26,7 +26,7 @@ namespace ZeusPlus
 
         public LinkenBreaker LinkenBreaker { get; }
 
-        private TeleportBreaker TeleportBreaker { get; }
+        private AbilityBreaker AbilityBreaker { get; }
 
         private FarmMode FarmMode { get; }
 
@@ -46,7 +46,7 @@ namespace ZeusPlus
             DamageCalculation = new DamageCalculation(this);
             LinkenBreaker = new LinkenBreaker(this);
             AutoKillSteal = new AutoKillSteal(this);
-            TeleportBreaker = new TeleportBreaker(this);
+            AbilityBreaker = new AbilityBreaker(this);
             FarmMode = new FarmMode(this, main.Context);
             Main.Context.Orbwalker.RegisterMode(FarmMode);
 
@@ -89,7 +89,7 @@ namespace ZeusPlus
                 Main.Context.Orbwalker.UnregisterMode(Mode);
                 Menu.ComboKeyItem.Item.ValueChanged -= ComboKeyChanged;
                 Main.Context.Orbwalker.UnregisterMode(FarmMode);
-                TeleportBreaker.Dispose();
+                AbilityBreaker.Dispose();
                 AutoKillSteal.Dispose();
                 DamageCalculation.Dispose();
                 UpdateMode.Dispose();

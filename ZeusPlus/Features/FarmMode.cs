@@ -86,14 +86,15 @@ namespace ZeusPlus.Features
                                                                    x.NetworkName == "CDOTA_Unit_Hero_Beastmaster_Boar" ||
                                                                    x.NetworkName == "CDOTA_Unit_SpiritBear" ||
                                                                    x.NetworkName == "CDOTA_Unit_Broodmother_Spiderling") &&
-                                                                   x.IsValid &&
                                                                    x.IsVisible &&
                                                                    x.IsAlive &&
                                                                    x.IsSpawned &&
                                                                    !x.IsIllusion &&
                                                                    x.IsEnemy(Owner) &&
+                                                                   x.IsValid &&
                                                                    x.Distance2D(Owner) < ArcLightning.CastRange &&
                                                                    x.Health < ArcLightning.GetDamage(x));
+
             // Arc Lightning
             if (unit != null && ArcLightning.CanBeCasted && ArcLightning.CanHit(unit))
             {

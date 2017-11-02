@@ -62,14 +62,14 @@ namespace ZeusPlus
             Drawing.DrawRect(
                 pos,
                 size,
-                Drawing.GetTexture($"materials/ensage_ui/{texture}.vmat"));
+                Drawing.GetTexture($"materials/ensage_ui/{ texture }.vmat"));
         }
 
         private void OnDraw(EventArgs args)
         {
             var setPos = new Vector2(
-                    Math.Min((Config.Screen.X - 20) - Menu.OnDrawXItem, Config.Screen.X - 20),
-                    Math.Min(Menu.OnDrawYItem - 100, Config.Screen.Y - 90));
+                    Config.Screen.X - Menu.OnDrawXItem - 20,
+                    Menu.OnDrawYItem - 110);
 
             var i = 0;
             foreach (var Data in Config.DamageCalculation.DamageList)
