@@ -237,9 +237,9 @@ namespace ZeusPlus.Features
             {
                 duelAghanimsScepter = EntityManager<Hero>.Entities.Any(x => 
                                                                        x.HeroId == HeroId.npc_dota_hero_legion_commander &&
+                                                                       x.IsValid &&
                                                                        x.IsVisible &&
                                                                        x.IsAlive &&
-                                                                       x.IsValid &&
                                                                        x.HasAghanimsScepter());
             }
 

@@ -2,9 +2,9 @@
 using System.ComponentModel;
 
 using Ensage;
+using Ensage.SDK.Extensions;
 
 using SharpDX;
-using Ensage.SDK.Extensions;
 
 namespace ZeusPlus
 {

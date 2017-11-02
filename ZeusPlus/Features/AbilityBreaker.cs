@@ -1,16 +1,15 @@
-﻿using System.ComponentModel;
+﻿using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Ensage;
+using Ensage.Common.Threading;
 using Ensage.SDK.Extensions;
 using Ensage.SDK.Handlers;
 using Ensage.SDK.Helpers;
 
 using SharpDX;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Ensage.Common.Threading;
 
 namespace ZeusPlus.Features
 {
@@ -65,11 +64,11 @@ namespace ZeusPlus.Features
 
                     var ignore = EntityManager<Hero>.Entities.Any(x =>
                                                                   x.IsValid &&
-                                                                  (x.IsAlly(Owner) && 
-                                                                  x.Distance2D(Position) < 50) || 
-                                                                  (x.IsEnemy(Owner) &&
                                                                   x.IsVisible &&
-                                                                  x.IsMagicImmune()));
+                                                                  x.IsMagicImmune() &&
+                                                                  (x.IsAlly(Owner) &&
+                                                                  x.Distance2D(Position) < 50) ||
+                                                                  (x.IsEnemy(Owner)));
 
                     if (!ignore)
                     {
@@ -99,10 +98,10 @@ namespace ZeusPlus.Features
                 if (Menu.AbilityBreakerItem)
                 {
                     var target = EntityManager<Hero>.Entities.Where(x =>
+                                                                    x.IsValid &&
                                                                     x.IsVisible &&
                                                                     x.IsAlive &&
                                                                     x.IsEnemy(Owner) &&
-                                                                    x.IsValid &&
                                                                     Disable(x)).OrderBy(x => x.Distance2D(Owner)).FirstOrDefault();
 
                     if (target != null)
@@ -164,10 +163,10 @@ namespace ZeusPlus.Features
                 {
                     var visibleTarget = 
                         EntityManager<Hero>.Entities.Where(x =>
+                                                           x.IsValid &&
                                                            x.IsVisible &&
                                                            x.IsAlive &&
                                                            x.IsEnemy(Owner) &&
-                                                           x.IsValid &&
                                                            x.HasModifier("modifier_teleporting")).OrderBy(x => x.Distance2D(Owner)).FirstOrDefault();
 
                     if (visibleTarget != null)

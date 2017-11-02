@@ -35,7 +35,7 @@ namespace ZeusPlus.Features
 
         private void OnUpdate()
         {
-            var heroes = EntityManager<Hero>.Entities.Where(x => !x.IsIllusion && x.IsValid).ToList();
+            var heroes = EntityManager<Hero>.Entities.Where(x => x.IsValid && !x.IsIllusion).ToList();
 
             DamageList.Clear();
 
