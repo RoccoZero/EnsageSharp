@@ -4,8 +4,6 @@ using System.ComponentModel.Composition;
 using System.Linq;
 
 using Ensage;
-using SharpDX;
-
 using Ensage.Common;
 using Ensage.SDK.Extensions;
 using Ensage.SDK.Helpers;
@@ -13,14 +11,16 @@ using Ensage.SDK.Renderer;
 using Ensage.SDK.Service;
 using Ensage.SDK.Service.Metadata;
 
+using SharpDX;
+
 using Color = System.Drawing.Color;
 
 namespace JungleScanPlus
 {
-    [ExportPlugin("JungleScanPlus", StartupMode.Auto, "YEEEEEEE", "2.0.0.0")]
+    [ExportPlugin("JungleScanPlus", StartupMode.Auto, "YEEEEEEE", "2.0.0.1")]
     public class JungleScanPlus : Plugin
     {
-        private JungleScanPlusConfig Config { get; set; }
+        private Config Config { get; set; }
 
         private Lazy<IRendererManager> RendererManager { get; }
 
@@ -31,14 +31,14 @@ namespace JungleScanPlus
         private int ExtraSize { get; set; }
 
         [ImportingConstructor]
-        public JungleScanPlus([Import] Lazy<IRendererManager> renderermanager)
+        public JungleScanPlus([Import] Lazy<IRendererManager> rendererManager)
         {
-            RendererManager = renderermanager;
+            RendererManager = rendererManager;
         }
 
         protected override void OnActivate()
         {
-            Config = new JungleScanPlusConfig();
+            Config = new Config();
 
             if (Drawing.RenderMode == RenderMode.Dx9)
             {
@@ -63,44 +63,35 @@ namespace JungleScanPlus
             Config?.Dispose();
         }
 
-        private bool Bool(ParticleEffect particle)
-        {
-            return particle.Owner == null
-                || !particle.IsValid
-                || particle.Owner.IsVisible;
-        }
-
         private void OnParticleEvent(Entity sender, ParticleEffectAddedEventArgs args)
         {
-            if (Bool(args.ParticleEffect))
+            if (args.ParticleEffect.Owner == null || !args.ParticleEffect.IsValid || args.ParticleEffect.Owner.IsVisible)
             {
                 return;
             }
 
-            if (sender.Name.Contains("npc_dota_neutral_"))
+            if (!sender.Name.Contains("npc_dota_neutral_") || args.Name.Contains("generic_creep_sleep"))
             {
-                UpdateManager.BeginInvoke(
+                return;
+            }
+
+            UpdateManager.BeginInvoke(
                     () =>
                     {
-                        var RawGameTime = Game.RawGameTime;
+                        var rawGameTime = Game.RawGameTime;
 
-                        Pos.RemoveAll(
-                            x =>
-                            x.GetPos.Distance(args.ParticleEffect.GetControlPoint(0)) < 500);
+                        Pos.RemoveAll(x => x.GetPos.Distance(args.ParticleEffect.GetControlPoint(0)) < 500);
 
                         Pos.Add(new Position(args.ParticleEffect.GetControlPoint(0)));
 
                         UpdateManager.BeginInvoke(
                             () =>
                             {
-                                Pos.RemoveAll(
-                                    x =>
-                                    x.GetGameTime == RawGameTime);
+                                Pos.RemoveAll(x => x.GetGameTime == rawGameTime);
                             },
                             Config.TimerItem.Value * 1000);
                     },
                     20);
-            }
         }
 
         private void OnDraw(object sender, EventArgs e)
@@ -110,10 +101,7 @@ namespace JungleScanPlus
                 RendererManager.Value.DrawText(
                     pos.GetPos.WorldToMinimap() - ExtraPos,
                     "○",
-                    Color.FromArgb(
-                        Config.RedItem,
-                        Config.GreenItem,
-                        Config.BlueItem),
+                    Color.FromArgb(Config.RedItem, Config.GreenItem, Config.BlueItem),
                     ExtraSize,
                     "Arial Black");
 
@@ -122,11 +110,7 @@ namespace JungleScanPlus
                     RendererManager.Value.DrawText(
                         Drawing.WorldToScreen(pos.GetPos),
                         "Enemy",
-                        Color.FromArgb(
-                            Config.AlphaItem,
-                            Config.RedItem, 
-                            Config.GreenItem, 
-                            Config.BlueItem),
+                        Color.FromArgb(Config.AlphaItem, Config.RedItem, Config.GreenItem, Config.BlueItem),
                         35,
                         "Arial Black");
                 }

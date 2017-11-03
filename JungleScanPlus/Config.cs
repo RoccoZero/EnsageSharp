@@ -1,21 +1,21 @@
 ﻿using System;
 
-using SharpDX;
-
 using Ensage.Common.Menu;
 using Ensage.SDK.Menu;
 
+using SharpDX;
+
 namespace JungleScanPlus
 {
-    internal class JungleScanPlusConfig : IDisposable
+    internal class Config : IDisposable
     {
         private bool Disposed { get; set; }
 
-        public MenuFactory Factory { get; }
+        private MenuFactory Factory { get; }
 
         public MenuItem<bool> DrawWorldItem { get; }
 
-        public MenuItem<Slider> RedItem { get; set; }
+        public MenuItem<Slider> RedItem { get; }
 
         public MenuItem<Slider> GreenItem { get; }
 
@@ -25,7 +25,7 @@ namespace JungleScanPlus
 
         public MenuItem<Slider> TimerItem { get; }
 
-        public JungleScanPlusConfig()
+        public Config()
         {
             Factory = MenuFactory.CreateWithTexture("JungleScanPlus", "junglescanplus");
             Factory.Target.SetFontColor(Color.Aqua);
