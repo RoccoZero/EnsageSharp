@@ -442,20 +442,20 @@ namespace TinkerFastComboPlus
 
             Vector3 safe = GetClosestToVector(TinkerCords.SafePos, me);
 
-            //Castrange Calculation (Tinker Talent20 and Aether Lens)
+            //Castrange Calculation (Tinker talent10 and Aether Lens)
             castrange = 0;
 
-            var aetherLens = me.Inventory.Items.FirstOrDefault(x => x.ClassId == ClassId.CDOTA_Item_Aether_Lens);
+            var aetherLens = me.Inventory.Items.FirstOrDefault(x => x.Id == AbilityId.item_aether_lens);
 
             if (aetherLens != null)
             {
                 castrange += (int)aetherLens.AbilitySpecialData.First(x => x.Name == "cast_range_bonus").Value;
             }
 
-            var talent20 = me.Spellbook.Spells.First(x => x.Name == "special_bonus_cast_range_75");
-            if (talent20.Level > 0)
+            var talent10 = me.Spellbook.Spells.First(x => x.Name == "special_bonus_cast_range_75");
+            if (talent10.Level > 0)
             {
-                castrange += (int)talent20.AbilitySpecialData.First(x => x.Name == "value").Value;
+                castrange += (int)talent10.AbilitySpecialData.First(x => x.Name == "value").Value;
             }
 
             //Print safespots into console
@@ -1486,20 +1486,19 @@ namespace TinkerFastComboPlus
             //atos = me.FindItem("item_rod_of_atos");
             FindItems();
 
-            //Castrange Calculation (Tinker Talent20 and Aether Lens)
+            //Castrange Calculation (Tinker talent10 and Aether Lens)
             castrange = 0;
 
-            var aetherLens = me.Inventory.Items.FirstOrDefault(x => x.ClassId == ClassId.CDOTA_Item_Aether_Lens);
-
+            var aetherLens = me.Inventory.Items.FirstOrDefault(x => x.Id == AbilityId.item_aether_lens);
             if (aetherLens != null)
             {
                 castrange += (int)aetherLens.AbilitySpecialData.First(x => x.Name == "cast_range_bonus").Value;
             }
 
-            var talent20 = me.Spellbook.Spells.First(x => x.Name == "special_bonus_cast_range_75");
-            if (talent20.Level > 0)
+            var talent10 = me.Spellbook.Spells.First(x => x.Name == "special_bonus_cast_range_75");
+            if (talent10.Level > 0)
             {
-                castrange += (int)talent20.AbilitySpecialData.First(x => x.Name == "value").Value;
+                castrange += (int)talent10.AbilitySpecialData.First(x => x.Name == "value").Value;
             }
 
             if (bottle != null && !me.IsInvisible() && !me.IsChanneling() && !me.Spellbook.Spells.Any(x => x.IsInAbilityPhase) && !March.IsInAbilityPhase && me.Modifiers.Any(x => x.Name == "modifier_fountain_aura_buff") && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(bottle.Name) && Utils.SleepCheck("bottle1"))
@@ -2312,17 +2311,17 @@ namespace TinkerFastComboPlus
 
             castrange = 0;
 
-            var aetherLens = me.Inventory.Items.FirstOrDefault(x => x.ClassId == ClassId.CDOTA_Item_Aether_Lens);
+            var aetherLens = me.Inventory.Items.FirstOrDefault(x => x.Id == AbilityId.item_aether_lens);
 
             if (aetherLens != null)
             {
                 castrange += (int)aetherLens.AbilitySpecialData.First(x => x.Name == "cast_range_bonus").Value;
             }
 
-            var talent20 = me.Spellbook.Spells.First(x => x.Name == "special_bonus_cast_range_75");
-            if (talent20.Level > 0)
+            var talent10 = me.Spellbook.Spells.First(x => x.Name == "special_bonus_cast_range_75");
+            if (talent10.Level > 0)
             {
-                castrange += (int)talent20.AbilitySpecialData.First(x => x.Name == "value").Value;
+                castrange += (int)talent10.AbilitySpecialData.First(x => x.Name == "value").Value;
             }
 
             if (Menu.Item("Show Direction").GetValue<bool>())
@@ -3422,19 +3421,19 @@ namespace TinkerFastComboPlus
             }
 
             //Spell Amplification Calculation (addition)
-            var talent15 = me.Spellbook.Spells.First(x => x.Name == "special_bonus_spell_amplify_4");
-            if (talent15.Level > 0)
+            var talent10 = me.Spellbook.Spells.First(x => x.Name == "special_bonus_spell_amplify_6");
+            if (talent10.Level > 0)
             {
-                totalSpellAmp += (talent15.AbilitySpecialData.First(x => x.Name == "value").Value) / 100.0f;
+                totalSpellAmp += (talent10.AbilitySpecialData.First(x => x.Name == "value").Value) / 100.0f;
             }
 
-            var aetherLens = me.Inventory.Items.FirstOrDefault(x => x.ClassId == ClassId.CDOTA_Item_Aether_Lens);
-            if (aetherLens != null)
+            var trident = me.Inventory.Items.FirstOrDefault(x => x.Id == AbilityId.item_trident);
+            if (trident != null)
             {
-                totalSpellAmp += (aetherLens.AbilitySpecialData.First(x => x.Name == "spell_amp").Value) / 100.0f;
+                totalSpellAmp += (trident.AbilitySpecialData.First(x => x.Name == "spell_amp").Value) / 100.0f;  
             }
 
-            totalSpellAmp += (100.0f + me.TotalIntelligence / 16.0f) / 100.0f;
+            totalSpellAmp += (100.0f + me.TotalIntelligence / 15.0f) / 100.0f;
 
             laserDamage *= totalSpellAmp;
 
@@ -3450,23 +3449,23 @@ namespace TinkerFastComboPlus
 
             if (rocket.Level > 0)
             {
-                rocketDamage += rocket.AbilitySpecialData.First(x => x.Name == "#AbilityDamage").GetValue(rocket.Level - 1);
+                rocketDamage += rocket.AbilitySpecialData.First(x => x.Name == "damage").GetValue(rocket.Level - 1);
             }
 
             //Spell Amplification Calculation (addition)
-            var talent15 = me.Spellbook.Spells.First(x => x.Name == "special_bonus_spell_amplify_4");
-            if (talent15.Level > 0)
+            var talent10 = me.Spellbook.Spells.First(x => x.Name == "special_bonus_spell_amplify_6");
+            if (talent10.Level > 0)
             {
-                totalSpellAmp += (talent15.AbilitySpecialData.First(x => x.Name == "value").Value) / 100.0f;
+                totalSpellAmp += (talent10.AbilitySpecialData.First(x => x.Name == "value").Value) / 100.0f;
             }
 
-            var aetherLens = me.Inventory.Items.FirstOrDefault(x => x.ClassId == ClassId.CDOTA_Item_Aether_Lens);
-            if (aetherLens != null)
+            var trident = me.Inventory.Items.FirstOrDefault(x => x.Id == AbilityId.item_trident);
+            if (trident != null)
             {
-                totalSpellAmp += (aetherLens.AbilitySpecialData.First(x => x.Name == "spell_amp").Value) / 100.0f;
+                totalSpellAmp += (trident.AbilitySpecialData.First(x => x.Name == "spell_amp").Value) / 100.0f;
             }
 
-            totalSpellAmp += (100.0f + me.TotalIntelligence / 16.0f) / 100.0f;
+            totalSpellAmp += (100.0f + me.TotalIntelligence / 15.0f) / 100.0f;
 
             rocketDamage *= totalSpellAmp;
 
@@ -3486,19 +3485,19 @@ namespace TinkerFastComboPlus
             }
 
             //Spell Amplification Calculation (addition)
-            var talent15 = me.Spellbook.Spells.First(x => x.Name == "special_bonus_spell_amplify_4");
-            if (talent15.Level > 0)
+            var talent10 = me.Spellbook.Spells.First(x => x.Name == "special_bonus_spell_amplify_6");
+            if (talent10.Level > 0)
             {
-                totalSpellAmp += (talent15.AbilitySpecialData.First(x => x.Name == "value").Value) / 100.0f;
+                totalSpellAmp += (talent10.AbilitySpecialData.First(x => x.Name == "value").Value) / 100.0f;
             }
 
-            var aetherLens = me.Inventory.Items.FirstOrDefault(x => x.ClassId == ClassId.CDOTA_Item_Aether_Lens);
-            if (aetherLens != null)
+            var trident = me.Inventory.Items.FirstOrDefault(x => x.Id == AbilityId.item_trident);
+            if (trident != null)
             {
-                totalSpellAmp += (aetherLens.AbilitySpecialData.First(x => x.Name == "spell_amp").Value) / 100.0f;
+                totalSpellAmp += (trident.AbilitySpecialData.First(x => x.Name == "spell_amp").Value) / 100.0f;
             }
 
-            totalSpellAmp += (100.0f + me.TotalIntelligence / 16.0f) / 100.0f;
+            totalSpellAmp += (100.0f + me.TotalIntelligence / 15.0f) / 100.0f;
 
             dagonDamage *= totalSpellAmp;
 
@@ -3533,19 +3532,19 @@ namespace TinkerFastComboPlus
             }
 
             //Spell Amplification Calculation (addition)
-            var talent15 = me.Spellbook.Spells.First(x => x.Name == "special_bonus_spell_amplify_4");
-            if (talent15.Level > 0)
+            var talent10 = me.Spellbook.Spells.First(x => x.Name == "special_bonus_spell_amplify_6");
+            if (talent10.Level > 0)
             {
-                totalSpellAmp += (talent15.AbilitySpecialData.First(x => x.Name == "value").Value) / 100.0f;
+                totalSpellAmp += (talent10.AbilitySpecialData.First(x => x.Name == "value").Value) / 100.0f;
             }
 
-            var aetherLens = me.Inventory.Items.FirstOrDefault(x => x.ClassId == ClassId.CDOTA_Item_Aether_Lens);
-            if (aetherLens != null)
+            var trident = me.Inventory.Items.FirstOrDefault(x => x.Id == AbilityId.item_trident);
+            if (trident != null)
             {
-                totalSpellAmp += (aetherLens.AbilitySpecialData.First(x => x.Name == "spell_amp").Value) / 100.0f;
+                totalSpellAmp += (trident.AbilitySpecialData.First(x => x.Name == "spell_amp").Value) / 100.0f;
             }
 
-            totalSpellAmp += (100.0f + me.TotalIntelligence / 16.0f) / 100.0f;
+            totalSpellAmp += (100.0f + me.TotalIntelligence / 15.0f) / 100.0f;
 
             etherealBladeDamage *= totalSpellAmp;
 
