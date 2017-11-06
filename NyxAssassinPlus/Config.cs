@@ -3,6 +3,7 @@ using System.Windows.Input;
 
 using Ensage;
 using Ensage.Common.Menu;
+using Ensage.Common.Objects.UtilityObjects;
 
 using SharpDX;
 
@@ -16,6 +17,8 @@ namespace NyxAssassinPlus
 
         public Vector2 Screen { get; }
 
+        public MultiSleeper MultiSleeper { get; }
+
         public MenuManager Menu { get; }
 
         public UpdateMode UpdateMode { get; }
@@ -23,6 +26,8 @@ namespace NyxAssassinPlus
         public DamageCalculation DamageCalculation { get; }
 
         public AutoKillSteal AutoKillSteal { get; }
+
+        private MaxStunMode MaxStunMode { get; }
 
         public LinkenBreaker LinkenBreaker { get; }
 
@@ -36,12 +41,14 @@ namespace NyxAssassinPlus
         {
             Main = main;
             Screen = new Vector2(Drawing.Width - 160, Drawing.Height);
+            MultiSleeper = new MultiSleeper();
 
             Menu = new MenuManager(this);
             UpdateMode = new UpdateMode(this);
             DamageCalculation = new DamageCalculation(this);
             LinkenBreaker = new LinkenBreaker(this);
             AutoKillSteal = new AutoKillSteal(this);
+            MaxStunMode = new MaxStunMode(this);
 
             Menu.ComboKeyItem.Item.ValueChanged += ComboKeyChanged;
             var ModeKey = KeyInterop.KeyFromVirtualKey((int)Menu.ComboKeyItem.Value.Key);

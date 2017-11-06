@@ -16,10 +16,6 @@ namespace NyxAssassinPlus
 
         public MenuItem<AbilityToggler> ItemsToggler { get; }
 
-        public MenuItem<Slider> BlinkActivationItem { get; }
-
-        public MenuItem<Slider> BlinkDistanceEnemyItem { get; }
-
         public MenuItem<bool> AutoKillStealItem { get; }
 
         public MenuItem<AbilityToggler> AutoKillStealToggler { get; }
@@ -58,6 +54,8 @@ namespace NyxAssassinPlus
 
         public MenuItem<bool> BlinkRadiusItem { get; }
 
+        public MenuItem<bool> ImpaleLineItem { get; }
+
         public MenuItem<bool> OnDrawItem { get; }
 
         public MenuItem<Slider> OnDrawXItem { get; }
@@ -65,6 +63,8 @@ namespace NyxAssassinPlus
         public MenuItem<Slider> OnDrawYItem { get; }
 
         public MenuItem<KeyBind> ComboKeyItem { get; }
+
+        public MenuItem<KeyBind> MaxStunKeyItem { get; }
 
         public MenuItem<StringList> OrbwalkerItem { get; }
 
@@ -88,6 +88,8 @@ namespace NyxAssassinPlus
             ItemsToggler = ItemsMenu.Item("Use: ", "ItemsToggler", new AbilityToggler(new Dictionary<string, bool>
             {
                 { "item_blink", true },
+                { "item_spirit_vessel", true },
+                { "item_urn_of_shadows", true },
                 { "item_shivas_guard", true },
                 { "item_dagon_5", true },
                 { "item_veil_of_discord", true },
@@ -99,14 +101,10 @@ namespace NyxAssassinPlus
                 { "item_sheepstick", true }
             }));
 
-            BlinkActivationItem = ItemsMenu.Item("Blink Activation Distance Mouse", new Slider(1000, 0, 1200));
-            BlinkDistanceEnemyItem = ItemsMenu.Item("Blink Distance From Enemy", new Slider(300, 0, 500));
-
             var AutoKillStealMenu = Factory.Menu("Auto Kill Steal");
             AutoKillStealItem = AutoKillStealMenu.Item("Enable", true);
             AutoKillStealToggler = AutoKillStealMenu.Item("Use: ", "AutoKillStealToggler", new AbilityToggler(new Dictionary<string, bool>
             {
-                { "nyx_assassin_vendetta", true },
                 { "nyx_assassin_mana_burn", true },
                 { "nyx_assassin_impale", true },
                 { "item_shivas_guard", true },
@@ -182,15 +180,20 @@ namespace NyxAssassinPlus
             OffTargetBlueItem = TargetMenu.Item("Blue", "offblue", new Slider(255, 0, 255));
             OffTargetBlueItem.Item.SetFontColor(Color.Blue);
 
-            ImpaleRadiusItem = DrawingMenu.Item("Impale Radius", true);
-            ManaBurnRadiusItem = DrawingMenu.Item("Mana Burn Radius", true);
-            BlinkRadiusItem = DrawingMenu.Item("Blink Radius", true);
+            var RadiusMenu = DrawingMenu.Menu("Radius");
+            ImpaleRadiusItem = RadiusMenu.Item("Impale Radius", true);
+            ManaBurnRadiusItem = RadiusMenu.Item("Mana Burn Radius", true);
+            BlinkRadiusItem = RadiusMenu.Item("Blink Radius", true);
+
+            ImpaleLineItem = DrawingMenu.Item("Impale Line", true);
 
             OnDrawItem = DrawingMenu.Item("On Draw", true);
             OnDrawXItem = DrawingMenu.Item("X", "calculation_x", new Slider(0, 0, (int)config.Screen.X + 65));
             OnDrawYItem = DrawingMenu.Item("Y", "calculation_y", new Slider((int)config.Screen.Y - 260, 0, (int)config.Screen.Y - 200));
 
             ComboKeyItem = Factory.Item("Combo Key", new KeyBind('D'));
+            MaxStunKeyItem = Factory.Item("Max Stun Key", new KeyBind('F'));
+            MaxStunKeyItem.Item.SetTooltip("Requires Aghanims Scepter");
             OrbwalkerItem = Factory.Item("Orbwalker", new StringList("Default", "Free"));
             TargetItem = Factory.Item("Target", new StringList("Lock", "Default"));
 
@@ -206,18 +209,6 @@ namespace NyxAssassinPlus
 
         private void Changed(object sender, PropertyChangedEventArgs e)
         {
-            // Blink
-            if (ItemsToggler.Value.IsEnabled("item_blink"))
-            {
-                BlinkActivationItem.Item.ShowItem = true;
-                BlinkDistanceEnemyItem.Item.ShowItem = true;
-            }
-            else
-            {
-                BlinkActivationItem.Item.ShowItem = false;
-                BlinkDistanceEnemyItem.Item.ShowItem = false;
-            }
-
             // Draw Target
             if (DrawTargetItem)
             {

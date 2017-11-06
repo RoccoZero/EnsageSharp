@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="Features\AutoKillSteal.cs" />
     <Compile Include="Features\DamageCalculation.cs" />
+    <Compile Include="Features\MaxStunMode.cs" />
     <Compile Include="Features\LinkenBreaker.cs" />
     <Compile Include="MenuManager.cs" />
     <Compile Include="Mode.cs" />

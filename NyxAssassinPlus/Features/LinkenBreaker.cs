@@ -52,18 +52,18 @@ namespace NyxAssassinPlus.Features
                     BreakerChanger = Menu.LinkenBreakerChanger.Value.Dictionary.Where(
                         x => Menu.LinkenBreakerToggler.Value.IsEnabled(x.Key)).OrderByDescending(x => x.Value).ToList();
                 }
-                else if (AntimageShield(target))
+                else if (target.IsSpellShieldProtected())
                 {
                     BreakerChanger = Menu.AntiMageBreakerChanger.Value.Dictionary.Where(
                         x => Menu.AntiMageBreakerToggler.Value.IsEnabled(x.Key)).OrderByDescending(x => x.Value).ToList();
                 }
 
-                foreach (var Order in BreakerChanger)
+                foreach (var order in BreakerChanger)
                 {
                     // Eul
                     var Eul = Main.Eul;
                     if (Eul != null
-                        && Eul.ToString() == Order.Key
+                        && Eul.ToString() == order.Key
                         && Eul.CanBeCasted)
                     {
                         if (Eul.CanHit(target))
@@ -81,7 +81,7 @@ namespace NyxAssassinPlus.Features
                     // ForceStaff
                     var ForceStaff = Main.ForceStaff;
                     if (ForceStaff != null
-                        && ForceStaff.ToString() == Order.Key
+                        && ForceStaff.ToString() == order.Key
                         && ForceStaff.CanBeCasted)
                     {
                         if (ForceStaff.CanHit(target))
@@ -99,7 +99,7 @@ namespace NyxAssassinPlus.Features
                     // Orchid
                     var Orchid = Main.Orchid;
                     if (Orchid != null
-                        && Orchid.ToString() == Order.Key
+                        && Orchid.ToString() == order.Key
                         && Orchid.CanBeCasted)
                     {
                         if (Orchid.CanHit(target))
@@ -117,7 +117,7 @@ namespace NyxAssassinPlus.Features
                     // Bloodthorn
                     var Bloodthorn = Main.Bloodthorn;
                     if (Bloodthorn != null
-                        && Bloodthorn.ToString() == Order.Key
+                        && Bloodthorn.ToString() == order.Key
                         && Bloodthorn.CanBeCasted)
                     {
                         if (Bloodthorn.CanHit(target))
@@ -135,7 +135,7 @@ namespace NyxAssassinPlus.Features
                     // Nullifier
                     var Nullifier = Main.Nullifier;
                     if (Nullifier != null
-                        && Nullifier.ToString() == Order.Key
+                        && Nullifier.ToString() == order.Key
                         && Nullifier.CanBeCasted)
                     {
                         if (Nullifier.CanHit(target))
@@ -153,7 +153,7 @@ namespace NyxAssassinPlus.Features
                     // RodofAtos
                     var RodofAtos = Main.RodofAtos;
                     if (RodofAtos != null
-                        && RodofAtos.ToString() == Order.Key
+                        && RodofAtos.ToString() == order.Key
                         && RodofAtos.CanBeCasted)
                     {
                         if (RodofAtos.CanHit(target))
@@ -171,7 +171,7 @@ namespace NyxAssassinPlus.Features
                     // Hex
                     var Hex = Main.Hex;
                     if (Hex != null
-                        && Hex.ToString() == Order.Key
+                        && Hex.ToString() == order.Key
                         && Hex.CanBeCasted)
                     {
                         if (Hex.CanHit(target))
@@ -188,7 +188,7 @@ namespace NyxAssassinPlus.Features
 
                     // ManaBurn
                     var ManaBurn = Main.ManaBurn;
-                    if (ManaBurn.ToString() == Order.Key
+                    if (ManaBurn.ToString() == order.Key
                         && ManaBurn.CanBeCasted)
                     {
                         if (ManaBurn.CanHit(target))
@@ -212,13 +212,6 @@ namespace NyxAssassinPlus.Features
             {
                 Main.Log.Error(e);
             }
-        }
-
-        public bool AntimageShield(Hero Target)
-        {
-            var Shield = Target.GetAbilityById(AbilityId.antimage_spell_shield);
-
-            return Shield != null && Shield.Cooldown == 0 && Shield.Level > 0 && Target.HasAghanimsScepter();
         }
     }
 }

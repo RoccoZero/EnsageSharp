@@ -6,6 +6,7 @@ using System.Windows.Input;
 using Ensage;
 using Ensage.Common.Threading;
 using Ensage.SDK.Extensions;
+using Ensage.SDK.Geometry;
 using Ensage.SDK.Orbwalker.Modes;
 using Ensage.SDK.Service;
 
@@ -24,45 +25,49 @@ namespace NyxAssassinPlus
 
         private NyxAssassinPlus Main { get; }
 
+        private UpdateMode UpdateMode { get; }
+
         public Mode(IServiceContext context, Key key, Config config) : base(context, key)
         {
             Config = config;
             Menu = config.Menu;
             Main = config.Main;
+            UpdateMode = config.UpdateMode;
         }
 
         public override async Task ExecuteAsync(CancellationToken token)
         {
-            var target = Config.UpdateMode.Target;
+            var target = UpdateMode.Target;
 
             if (target != null && (!Menu.BladeMailItem || !target.HasModifier("modifier_item_blade_mail_reflect")))
             {
                 var StunDebuff = target.Modifiers.FirstOrDefault(x => x.IsStunDebuff);
-                var HexDebuff = target.Modifiers.FirstOrDefault(x => x.IsValid && x.Name =="modifier_sheepstick_debuff");
-                var AtosDebuff = target.Modifiers.FirstOrDefault(x => x.IsValid && x.Name == "modifier_rod_of_atos_debuff");
-                var MultiSleeper = Config.AutoKillSteal.MultiSleeper;
+                var HexDebuff = target.Modifiers.FirstOrDefault(x => x.Name =="modifier_sheepstick_debuff");
+                var AtosDebuff = target.Modifiers.FirstOrDefault(x => x.Name == "modifier_rod_of_atos_debuff");
+                var MultiSleeper = Config.MultiSleeper;
 
-                // Blink
-                var Blink = Main.Blink;
-                if (Blink != null
-                    && Menu.ItemsToggler.Value.IsEnabled(Blink.ToString())
-                    && Owner.Distance2D(Game.MousePosition) > Menu.BlinkActivationItem
-                    && Owner.Distance2D(target) > 600
-                    && Blink.CanBeCasted)
-                {
-                    var blinkPos = target.Position.Extend(Game.MousePosition, Menu.BlinkDistanceEnemyItem);
-                    if (Owner.Distance2D(blinkPos) < Blink.CastRange)
-                    {
-                        Blink.UseAbility(blinkPos);
-                        await Await.Delay(Blink.GetCastDelay(blinkPos), token);
-                    }
-                }
-
-                if (!target.IsMagicImmune() && !target.IsInvulnerable() && !Owner.IsInvisible()
+                if (!target.IsMagicImmune() && !target.IsInvulnerable() && (!Owner.IsInvisible() || !Main.Burrow.CanBeCasted)
                     && !target.HasAnyModifiers("modifier_abaddon_borrowed_time", "modifier_item_combo_breaker_buff")
                     && !target.HasAnyModifiers("modifier_winter_wyvern_winters_curse_aura", "modifier_winter_wyvern_winters_curse"))
                 {
-                    if (!target.IsLinkensProtected() && !Config.LinkenBreaker.AntimageShield(target))
+                    // Blink
+                    var Impale = Main.Impale;
+                    var Blink = Main.Blink;
+                    if (Blink != null
+                        && Menu.ItemsToggler.Value.IsEnabled(Blink.ToString())
+                        && Blink.CanBeCasted
+                        && Blink.CanHit(target)
+                        && Impale.CanBeCasted)
+                    {
+                        var blinkPos = !UpdateMode.BlinkPos.IsZero ? UpdateMode.BlinkPos : target.Position;
+                        if (blinkPos.Distance2D(Owner.Position) >= 200)
+                        {
+                            Blink.UseAbility(blinkPos);
+                            await Await.Delay(Blink.GetCastDelay(blinkPos), token);
+                        }
+                    }
+
+                    if (!target.IsBlockingAbilities())
                     {
                         // Hex
                         var Hex = Main.Hex;
@@ -70,11 +75,12 @@ namespace NyxAssassinPlus
                             && Menu.ItemsToggler.Value.IsEnabled(Hex.ToString())
                             && Hex.CanBeCasted
                             && Hex.CanHit(target)
-                            && (StunDebuff == null || StunDebuff.RemainingTime <= 0.3f)
-                            && (HexDebuff == null || HexDebuff.RemainingTime <= 0.3f))
+                            && (StunDebuff == null || !StunDebuff.IsValid || StunDebuff.RemainingTime <= 0.3f)
+                            && (HexDebuff == null || !HexDebuff.IsValid || HexDebuff.RemainingTime <= 0.3f))
                         {
                             Hex.UseAbility(target);
                             await Await.Delay(Hex.GetCastDelay(target), token);
+                            return;
                         }
 
                         // Orchid
@@ -104,7 +110,9 @@ namespace NyxAssassinPlus
                         if (Nullifier != null
                             && Menu.ItemsToggler.Value.IsEnabled(Nullifier.ToString())
                             && Nullifier.CanBeCasted
-                            && Nullifier.CanHit(target))
+                            && Nullifier.CanHit(target)
+                            && (StunDebuff == null || !StunDebuff.IsValid || StunDebuff.RemainingTime <= 0.5f)       
+                            && (HexDebuff == null || !HexDebuff.IsValid || HexDebuff.RemainingTime <= 0.5f))
                         {
                             Nullifier.UseAbility(target);
                             await Await.Delay(Nullifier.GetCastDelay(target), token);
@@ -116,8 +124,8 @@ namespace NyxAssassinPlus
                             && Menu.ItemsToggler.Value.IsEnabled(RodofAtos.ToString())
                             && RodofAtos.CanBeCasted
                             && RodofAtos.CanHit(target)
-                            && (StunDebuff == null || StunDebuff.RemainingTime <= 0.5f)
-                            && (AtosDebuff == null || AtosDebuff.RemainingTime <= 0.5f))
+                            && (StunDebuff == null || !StunDebuff.IsValid || StunDebuff.RemainingTime <= 0.5f)
+                            && (AtosDebuff == null || !AtosDebuff.IsValid || AtosDebuff.RemainingTime <= 0.5f))
                         {
                             RodofAtos.UseAbility(target);
                             await Await.Delay(RodofAtos.GetCastDelay(target), token);
@@ -160,21 +168,28 @@ namespace NyxAssassinPlus
                         if (!MultiSleeper.Sleeping("Ethereal") || target.IsEthereal())
                         {
                             // Impale
-                            var Impale = Main.Impale;
                             if (Menu.AbilitiesToggler.Value.IsEnabled(Impale.ToString())
                                 && Impale.CanBeCasted
-                                && Impale.CanHit(target))
+                                && Impale.CanHit(target)
+                                && (StunDebuff == null || !StunDebuff.IsValid || StunDebuff.RemainingTime <= 0.5f)
+                                && (HexDebuff == null || !HexDebuff.IsValid || HexDebuff.RemainingTime <= 0.5f))
                             {
-                                var Output = Impale.GetPredictionOutput(Impale.GetPredictionInput(target));
-                                Impale.UseAbility(Output.CastPosition);
-                                await Await.Delay(Impale.GetCastDelay(Output.CastPosition), token);
+                                var impalePos = Impale.GetPredictionOutput(Impale.GetPredictionInput(target)).CastPosition;
+                                if (Owner.Distance2D(UpdateMode.BlinkPos) <= 200 && !UpdateMode.ImpalePos.IsZero)
+                                {
+                                    impalePos = UpdateMode.ImpalePos;
+                                }
+
+                                Impale.UseAbility(impalePos);
+                                await Await.Delay(Impale.GetCastDelay(impalePos), token);
                             }
 
                             // ManaBurn
                             var ManaBurn = Main.ManaBurn;
                             if (Menu.AbilitiesToggler.Value.IsEnabled(ManaBurn.ToString())
                                 && ManaBurn.CanBeCasted
-                                && ManaBurn.CanHit(target))
+                                && ManaBurn.CanHit(target)
+                                && target.Mana > 80)
                             {
                                 ManaBurn.UseAbility(target);
                                 await Await.Delay(ManaBurn.GetCastDelay(target), token);
@@ -191,9 +206,48 @@ namespace NyxAssassinPlus
                                 await Await.Delay(Dagon.GetCastDelay(target), token);
                             }
                         }
+
+                        // UrnOfShadows
+                        var UrnOfShadows = Main.UrnOfShadows;
+                        if (UrnOfShadows != null
+                            && Menu.ItemsToggler.Value.IsEnabled(UrnOfShadows.ToString())
+                            && UrnOfShadows.CanBeCasted
+                            && UrnOfShadows.CanHit(target))
+                        {
+                            UrnOfShadows.UseAbility(target);
+                            await Await.Delay(UrnOfShadows.GetCastDelay(target), token);
+                        }
+
+                        // SpiritVessel
+                        var SpiritVessel = Main.SpiritVessel;
+                        if (SpiritVessel != null
+                            && Menu.ItemsToggler.Value.IsEnabled(SpiritVessel.ToString())
+                            && SpiritVessel.CanBeCasted
+                            && SpiritVessel.CanHit(target))
+                        {
+                            SpiritVessel.UseAbility(target);
+                            await Await.Delay(SpiritVessel.GetCastDelay(target), token);
+                        }
                     }
                     else
                     {
+                        // Impale
+                        if (Menu.AbilitiesToggler.Value.IsEnabled(Impale.ToString())
+                            && Impale.CanBeCasted
+                            && Impale.CanHit(target)
+                            && (StunDebuff == null || !StunDebuff.IsValid || StunDebuff.RemainingTime <= 0.5f)
+                            && (HexDebuff == null || !HexDebuff.IsValid || HexDebuff.RemainingTime <= 0.5f))
+                        {
+                            var impalePos = Impale.GetPredictionOutput(Impale.GetPredictionInput(target)).CastPosition;
+                            if (Owner.Distance2D(UpdateMode.BlinkPos) <= 200 && !UpdateMode.ImpalePos.IsZero)
+                            {
+                                impalePos = UpdateMode.ImpalePos;
+                            }
+
+                            Impale.UseAbility(impalePos);
+                            await Await.Delay(Impale.GetCastDelay(impalePos), token);
+                        }
+
                         Config.LinkenBreaker.Handler.RunAsync();
                     }
                 }

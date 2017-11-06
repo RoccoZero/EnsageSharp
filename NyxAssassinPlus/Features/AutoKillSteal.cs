@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Ensage;
-using Ensage.Common.Objects.UtilityObjects;
 using Ensage.Common.Threading;
 using Ensage.SDK.Extensions;
 using Ensage.SDK.Handlers;
@@ -25,10 +24,6 @@ namespace NyxAssassinPlus.Features
 
         private Unit Owner { get; }
 
-        public MultiSleeper MultiSleeper { get; }
-
-        private DamageCalculation.Damage Damage { get; set; }
-
         private TaskHandler Handler { get; }
 
         public AutoKillSteal(Config config)
@@ -38,8 +33,6 @@ namespace NyxAssassinPlus.Features
             Main = config.Main;
             DamageCalculation = config.DamageCalculation;
             Owner = config.Main.Context.Owner;
-
-            MultiSleeper = new MultiSleeper();
 
             Handler = UpdateManager.Run(ExecuteAsync, true, false);
 
@@ -83,7 +76,7 @@ namespace NyxAssassinPlus.Features
                 }
 
                 var damageCalculation = DamageCalculation.DamageList.OrderByDescending(x => x.GetHealth).OrderByDescending(x => x.GetHero.Player.Kills).ToList();
-                var damage = damageCalculation.FirstOrDefault(x => (x.GetHealth - x.GetDamage) / x.GetHero.MaximumHealth <= 0.0f);               
+                var damage = damageCalculation.FirstOrDefault(x => (x.GetHealth - x.GetDamage) / x.GetHero.MaximumHealth <= 0.0f);
 
                 if (damage == null)
                 {
@@ -97,7 +90,7 @@ namespace NyxAssassinPlus.Features
                     return;
                 }
 
-                if (!target.IsLinkensProtected() && !Config.LinkenBreaker.AntimageShield(target))
+                if (!target.IsBlockingAbilities())
                 {
                     // Veil
                     var Veil = Main.Veil;
@@ -118,7 +111,7 @@ namespace NyxAssassinPlus.Features
                         && Ethereal.CanHit(target))
                     {
                         Ethereal.UseAbility(target);
-                        MultiSleeper.Sleep(Ethereal.GetHitTime(target), "Ethereal");
+                        Config.MultiSleeper.Sleep(Ethereal.GetHitTime(target), "Ethereal");
                         await Await.Delay(Ethereal.GetCastDelay(target), token);
                     }
 
@@ -133,7 +126,7 @@ namespace NyxAssassinPlus.Features
                         await Await.Delay(Shivas.GetCastDelay(), token);
                     }
 
-                    if (!MultiSleeper.Sleeping("Ethereal") || target.IsEthereal())
+                    if (!Config.MultiSleeper.Sleeping("Ethereal") || target.IsEthereal())
                     {
                         // Impale
                         var Impale = Main.Impale;
@@ -145,11 +138,12 @@ namespace NyxAssassinPlus.Features
                             await Await.Delay(Impale.GetCastDelay(target.Position), token);
                         }
 
-                        // Arc Lightning
+                        // Mana Burn
                         var ManaBurn = Main.ManaBurn;
                         if (Menu.AutoKillStealToggler.Value.IsEnabled(ManaBurn.ToString())
                             && ManaBurn.CanBeCasted
-                            && ManaBurn.CanHit(target))
+                            && ManaBurn.CanHit(target)
+                            && target.Mana > 80)
                         {
                             ManaBurn.UseAbility(target);
                             await Await.Delay(ManaBurn.GetCastDelay(target), token);

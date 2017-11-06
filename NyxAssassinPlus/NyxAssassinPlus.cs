@@ -20,7 +20,7 @@ namespace NyxAssassinPlus
         name: "NyxAssassinPlus",
         mode: StartupMode.Auto,
         author: "YEEEEEEE", 
-        version: "1.0.0.0",
+        version: "1.1.0.0",
         units: HeroId.npc_dota_hero_nyx_assassin)]
     internal class NyxAssassinPlus : Plugin
     {
@@ -42,6 +42,12 @@ namespace NyxAssassinPlus
         public nyx_assassin_impale Impale { get; set; }
 
         public nyx_assassin_mana_burn ManaBurn { get; set; }
+
+        public nyx_assassin_spiked_carapace SpikedCarapace { get; set; }
+
+        public nyx_assassin_burrow Burrow { get; set; }
+
+        public nyx_assassin_unburrow UnBurrow { get; set; }
 
         public nyx_assassin_vendetta Vendetta { get; set; }
 
@@ -101,10 +107,19 @@ namespace NyxAssassinPlus
         [ItemBinding]
         public item_nullifier Nullifier { get; set; }
 
+        [ItemBinding]
+        public item_urn_of_shadows UrnOfShadows { get; set; }
+
+        [ItemBinding]
+        public item_spirit_vessel SpiritVessel { get; set; }
+
         protected override void OnActivate()
         {
             Impale = AbilityFactory.GetAbility<nyx_assassin_impale>();
             ManaBurn = AbilityFactory.GetAbility<nyx_assassin_mana_burn>();
+            SpikedCarapace = AbilityFactory.GetAbility<nyx_assassin_spiked_carapace>();
+            Burrow = AbilityFactory.GetAbility<nyx_assassin_burrow>();
+            UnBurrow = AbilityFactory.GetAbility<nyx_assassin_unburrow>();
             Vendetta = AbilityFactory.GetAbility<nyx_assassin_vendetta>();
 
             Context.Inventory.Attach(this);

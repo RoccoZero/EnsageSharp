@@ -79,7 +79,7 @@ namespace NyxAssassinPlus.Features
 
                     // ManaBurn
                     var ManaBurn = Main.ManaBurn;
-                    if (ManaBurn.Ability.Level > 0 && Menu.AutoKillStealToggler.Value.IsEnabled(ManaBurn.ToString()))
+                    if (ManaBurn.Ability.Level > 0 && Menu.AutoKillStealToggler.Value.IsEnabled(ManaBurn.ToString()) && target.Mana > 80)
                     {
                         abilities.Add(ManaBurn);
                     }
@@ -93,14 +93,13 @@ namespace NyxAssassinPlus.Features
 
                     // Vendetta
                     var Vendetta = Main.Vendetta;
-                    if (Vendetta.Ability.Level > 0 && Menu.AutoKillStealToggler.Value.IsEnabled(Vendetta.ToString()))
+                    if (Vendetta.Ability.Level > 0)
                     {
                         if (Owner.HasModifier(Vendetta.ModifierName))
                         {
                             damage += Vendetta.GetDamage(target);
                         }
-
-                        if (Vendetta.CanBeCasted)
+                        else if (Vendetta.CanBeCasted)
                         {
                             readyDamage += Vendetta.GetDamage(target);
                         }
