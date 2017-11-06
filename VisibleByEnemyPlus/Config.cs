@@ -1,9 +1,9 @@
 ﻿using System;
 
-using SharpDX;
-
 using Ensage.SDK.Menu;
 using Ensage.Common.Menu;
+
+using SharpDX;
 
 namespace VisibleByEnemyPlus
 {

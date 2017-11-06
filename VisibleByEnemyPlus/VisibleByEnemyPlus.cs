@@ -6,17 +6,18 @@ using System.Linq;
 
 using Ensage;
 using Ensage.Common;
+using Ensage.SDK.Extensions;
 using Ensage.SDK.Helpers;
+using Ensage.SDK.Renderer;
 using Ensage.SDK.Renderer.Particle;
 using Ensage.SDK.Service;
 using Ensage.SDK.Service.Metadata;
-using Ensage.SDK.Renderer;
 
 using SharpDX;
 
 namespace VisibleByEnemyPlus
 {
-    [ExportPlugin("VisibleByEnemyPlus", StartupMode.Auto, "YEEEEEEE", "3.0.0.6")]
+    [ExportPlugin("VisibleByEnemyPlus", StartupMode.Auto, "YEEEEEEE", "3.0.1.0")]
     public class VisibleByEnemyPlus : Plugin
     {
         private Unit Owner { get; }
@@ -27,7 +28,7 @@ namespace VisibleByEnemyPlus
 
         private Config Config { get; set; }
 
-        private List<Vector3> PosShrine { get; } = new List<Vector3>();
+        private List<Vector3> PosShrines { get; } = new List<Vector3>();
 
         private bool AddEffectType { get; set; }
 
@@ -151,14 +152,6 @@ namespace VisibleByEnemyPlus
             return sender.ClassId == ClassId.CDOTA_BaseNPC_Healer;
         }
 
-        private bool IsPos(Vector3 pos)
-        {
-            return pos == new Vector3(-4224, 1279.969f, 384)
-                || pos == new Vector3(639.9688f, -2560, 384)
-                || pos == new Vector3(4191.969f, -1600, 385.1875f)
-                || pos == new Vector3(-128.0313f, 2528, 385.1875f);
-        }
-
         private bool IsNeutral(Unit sender)
         {
             return sender.ClassId == ClassId.CDOTA_BaseNPC_Creep_Neutral;
@@ -255,7 +248,7 @@ namespace VisibleByEnemyPlus
                 return;
             }
 
-            if (visible && unit.IsAlive)
+            if (visible && unit.IsAlive && unit.Position.IsOnScreen())
             {
                 ParticleManager.Value.AddOrUpdate(
                     unit,
@@ -267,25 +260,31 @@ namespace VisibleByEnemyPlus
                     new Vector3(Red, Green, Blue),
                     2,
                     new Vector3(Alpha));
-
-                if (!PosShrine.Any(x => x == unit.Position))
-                {
-                    if (IsPos(unit.Position))
-                    {
-                        PosShrine.Add(unit.Position);
-                    }
-                }
             }
             else if (AddEffectType)
             {
-                ParticleManager.Value.Remove($"unit_{unit.Handle}");
-                PosShrine.Remove(unit.Position);
+                ParticleManager.Value.Remove($"unit_{ unit.Handle }");
+            }
+
+            if (visible && unit.IsAlive)
+            {
+                if (!PosShrines.Any(x => x == unit.Position))
+                {
+                    if (IsShrine(unit))
+                    {
+                        PosShrines.Add(unit.Position);
+                    }
+                }
+            }
+            else
+            {
+                PosShrines.Remove(unit.Position);
             }
         }
 
         private void OnDraw(object sender, EventArgs e)
         {
-            foreach (var pos in PosShrine.ToList())
+            foreach (var pos in PosShrines.ToList())
             {
                 RendererManager.Value.DrawText(
                     pos.WorldToMinimap() - ExtraPos,
