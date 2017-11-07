@@ -193,7 +193,7 @@ namespace NyxAssassinPlus.Features
 
             var reincarnation = target.GetAbilityById(AbilityId.skeleton_king_reincarnation);
 
-            return Owner.IsInvisible()
+            return (Owner.IsInvisible() && !Owner.HasModifier(Main.Burrow.ModifierName))
                 || target.IsMagicImmune()
                 || target.IsInvulnerable()
                 || target.HasAnyModifiers("modifier_dazzle_shallow_grave", "modifier_necrolyte_reapers_scythe")

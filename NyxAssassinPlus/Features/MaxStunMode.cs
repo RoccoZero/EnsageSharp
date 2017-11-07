@@ -74,7 +74,7 @@ namespace NyxAssassinPlus.Features
                     var MultiSleeper = Config.MultiSleeper;
                     var SpikedCarapace = Main.SpikedCarapace;
 
-                    if (!target.IsMagicImmune() && !target.IsInvulnerable() && (!Owner.IsInvisible() || !Main.Burrow.CanBeCasted)
+                    if (!target.IsMagicImmune() && !target.IsInvulnerable() && (!Owner.IsInvisible() || Owner.HasModifier(Main.Burrow.ModifierName))
                         && !target.HasAnyModifiers("modifier_abaddon_borrowed_time", "modifier_item_combo_breaker_buff")
                         && !target.HasAnyModifiers("modifier_winter_wyvern_winters_curse_aura", "modifier_winter_wyvern_winters_curse")
                         && SpikedCarapace.CanBeCasted)

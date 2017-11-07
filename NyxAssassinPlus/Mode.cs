@@ -46,7 +46,7 @@ namespace NyxAssassinPlus
                 var AtosDebuff = target.Modifiers.FirstOrDefault(x => x.Name == "modifier_rod_of_atos_debuff");
                 var MultiSleeper = Config.MultiSleeper;
 
-                if (!target.IsMagicImmune() && !target.IsInvulnerable() && (!Owner.IsInvisible() || !Main.Burrow.CanBeCasted)
+                if (!target.IsMagicImmune() && !target.IsInvulnerable() && (!Owner.IsInvisible() || Owner.HasModifier(Main.Burrow.ModifierName))
                     && !target.HasAnyModifiers("modifier_abaddon_borrowed_time", "modifier_item_combo_breaker_buff")
                     && !target.HasAnyModifiers("modifier_winter_wyvern_winters_curse_aura", "modifier_winter_wyvern_winters_curse"))
                 {
@@ -231,6 +231,11 @@ namespace NyxAssassinPlus
                     }
                     else
                     {
+                        Config.LinkenBreaker.Handler.RunAsync();
+                    }
+
+                    if (Config.LinkenBreaker.NoBreak)
+                    {
                         // Impale
                         if (Menu.AbilitiesToggler.Value.IsEnabled(Impale.ToString())
                             && Impale.CanBeCasted
@@ -247,8 +252,6 @@ namespace NyxAssassinPlus
                             Impale.UseAbility(impalePos);
                             await Await.Delay(Impale.GetCastDelay(impalePos), token);
                         }
-
-                        Config.LinkenBreaker.Handler.RunAsync();
                     }
                 }
 

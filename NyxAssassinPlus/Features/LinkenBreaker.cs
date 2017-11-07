@@ -24,6 +24,8 @@ namespace NyxAssassinPlus.Features
 
         public TaskHandler Handler { get; }
 
+        public bool NoBreak { get; set; }
+
         public LinkenBreaker(Config config)
         {
             Config = config;
@@ -57,6 +59,8 @@ namespace NyxAssassinPlus.Features
                     BreakerChanger = Menu.AntiMageBreakerChanger.Value.Dictionary.Where(
                         x => Menu.AntiMageBreakerToggler.Value.IsEnabled(x.Key)).OrderByDescending(x => x.Value).ToList();
                 }
+
+                NoBreak = false;
 
                 foreach (var order in BreakerChanger)
                 {
@@ -203,6 +207,8 @@ namespace NyxAssassinPlus.Features
                         }
                     }
                 }
+
+                NoBreak = true;
             }
             catch (TaskCanceledException)
             {
