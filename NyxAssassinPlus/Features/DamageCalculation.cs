@@ -86,7 +86,7 @@ namespace NyxAssassinPlus.Features
 
                     // Dagon
                     var Dagon = Main.Dagon;
-                    if (Dagon != null && Dagon.Ability.IsValid && Menu.AutoKillStealToggler.Value.IsEnabled(Dagon.ToString()))
+                    if (Dagon != null && Dagon.Ability.IsValid && Menu.AutoKillStealToggler.Value.IsEnabled("item_dagon_5"))
                     {
                         abilities.Add(Dagon);
                     }
@@ -116,9 +116,9 @@ namespace NyxAssassinPlus.Features
                 readyDamage += DamageHelpers.GetSpellDamage(damageCalculation.GetDamage(target, true, false) + damageBlock, 0, damageReduction);
                 totalDamage += DamageHelpers.GetSpellDamage(damageCalculation.GetDamage(target, false, false) + damageBlock, 0, damageReduction);
 
-                damage -= LivingArmor(target, heroes, damageCalculation.Abilities);
-                readyDamage -= LivingArmor(target, heroes, damageCalculation.Abilities);
-                totalDamage -= LivingArmor(target, heroes, damageCalculation.Abilities);
+                damage -= LivingArmor(target, heroes, damageCalculation.Abilities, damage);
+                readyDamage -= LivingArmor(target, heroes, damageCalculation.Abilities, readyDamage);
+                totalDamage -= LivingArmor(target, heroes, damageCalculation.Abilities, totalDamage);
 
                 if (target.HasAnyModifiers("modifier_abaddon_borrowed_time", "modifier_item_combo_breaker_buff") 
                     || target.HasModifier("modifier_templar_assassin_refraction_absorb")
@@ -133,7 +133,7 @@ namespace NyxAssassinPlus.Features
             }
         }
 
-        private float LivingArmor(Hero hero, List<Hero> heroes, IReadOnlyCollection<BaseAbility> abilities)
+        private float LivingArmor(Hero hero, List<Hero> heroes, IReadOnlyCollection<BaseAbility> abilities, float vendettaDamage)
         {
             if (!hero.HasModifier("modifier_treant_living_armor"))
             {
@@ -145,6 +145,11 @@ namespace NyxAssassinPlus.Features
             var block = ability.GetAbilitySpecialData("damage_block");
 
             var count = abilities.Where(x => x.GetDamage(hero) > block).Count();
+
+            if (vendettaDamage > block)
+            {
+                count += 2;
+            }
 
             return count * block;
         }
@@ -195,7 +200,7 @@ namespace NyxAssassinPlus.Features
                 var wisp = heroes.FirstOrDefault(x => x.IsEnemy(Owner) && x.HeroId == HeroId.npc_dota_hero_wisp);
                 var ability = wisp.GetAbilityById(AbilityId.wisp_overcharge);
 
-                value -= ability.GetAbilitySpecialData("bonus_damage_pct") / 100f;
+                value += ability.GetAbilitySpecialData("bonus_damage_pct") / 100f;
             }
 
             // Modifier Bloodseeker Bloodrage

@@ -20,7 +20,7 @@ namespace NyxAssassinPlus
         name: "NyxAssassinPlus",
         mode: StartupMode.Auto,
         author: "YEEEEEEE", 
-        version: "1.1.0.1",
+        version: "1.1.0.2",
         units: HeroId.npc_dota_hero_nyx_assassin)]
     internal class NyxAssassinPlus : Plugin
     {
