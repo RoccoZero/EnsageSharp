@@ -20,7 +20,7 @@ namespace EnchantressPlus
         name: "EnchantressPlus",
         mode: StartupMode.Auto,
         author: "YEEEEEEE", 
-        version: "1.1.0.0",
+        version: "2.0.0.0",
         units: HeroId.npc_dota_hero_enchantress)]
     internal class EnchantressPlus : Plugin
     {
@@ -118,15 +118,27 @@ namespace EnchantressPlus
         [ItemBinding]
         public item_heavens_halberd HeavensHalberd { get; set; }
 
+        [ItemBinding]
+        public item_blink Blink { get; set; }
+
+        [ItemBinding]
+        public item_nullifier Nullifier { get; set; }
+
+        [ItemBinding]
+        public item_urn_of_shadows UrnOfShadows { get; set; }
+
+        [ItemBinding]
+        public item_spirit_vessel SpiritVessel { get; set; }
+
         protected override void OnActivate()
         {
-            Config = new Config(this);
-
             Enchant = AbilityFactory.GetAbility<enchantress_enchant>();
             NaturesAttendants = AbilityFactory.GetAbility<enchantress_natures_attendants>();
             Impetus = AbilityFactory.GetAbility<enchantress_impetus>();
 
             Context.Inventory.Attach(this);
+
+            Config = new Config(this);
         }
 
         protected override void OnDeactivate()

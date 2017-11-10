@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -10,6 +11,8 @@ using Ensage.SDK.Orbwalker.Modes;
 using Ensage.SDK.Service;
 using Ensage.SDK.TargetSelector;
 
+using SharpDX;
+
 using PlaySharp.Toolkit.Helper.Annotations;
 
 namespace EnchantressPlus
@@ -19,7 +22,11 @@ namespace EnchantressPlus
     {
         private Config Config { get; }
 
+        private MenuManager Menu { get; }
+
         private EnchantressPlus Main { get; }
+
+        private UpdateMode UpdateMode { get; }
 
         private ITargetSelectorManager TargetSelector { get; }
 
@@ -31,148 +38,205 @@ namespace EnchantressPlus
             Config config) : base(context, key)
         {
             Config = config;
+            Menu = config.Menu;
             Main = config.Main;
+            UpdateMode = config.UpdateMode;
         }
 
         public override async Task ExecuteAsync(CancellationToken token)
         {
-            var Target = Config.UpdateMode.Target;
+            var target = UpdateMode.Target;
 
-            if (Target != null
-                && (!Config.BladeMailItem || !Target.HasModifier("modifier_item_blade_mail_reflect")))
+            if (target != null && (!Menu.BladeMailItem || !target.HasModifier("modifier_item_blade_mail_reflect")))
             {
-                var StunDebuff = Target.Modifiers.FirstOrDefault(x => x.IsStunDebuff);
-                var HexDebuff = Target.Modifiers.FirstOrDefault(x => x.IsValid && x.Name =="modifier_sheepstick_debuff");
-                var AtosDebuff = Target.Modifiers.FirstOrDefault(x => x.IsValid && x.Name == "modifier_rod_of_atos_debuff");
+                var StunDebuff = target.Modifiers.FirstOrDefault(x => x.IsStunDebuff);
+                var HexDebuff = target.Modifiers.FirstOrDefault(x => x.Name == "modifier_sheepstick_debuff");
+                var AtosDebuff = target.Modifiers.FirstOrDefault(x => x.Name == "modifier_rod_of_atos_debuff");
+                var MultiSleeper = Config.MultiSleeper;
 
-                if (!Target.IsMagicImmune() && !Target.IsInvulnerable() && !Target.HasModifier("modifier_winter_wyvern_winters_curse"))
+                // Blink
+                var Blink = Main.Blink;
+                if (Blink != null
+                    && Menu.ItemsToggler.Value.IsEnabled(Blink.ToString())
+                    && Owner.Distance2D(Game.MousePosition) > Menu.BlinkActivationItem
+                    && Owner.Distance2D(target) > 600
+                    && Blink.CanBeCasted)
                 {
-                    if (!Target.IsLinkensProtected() && !Config.LinkenBreaker.AntimageShield(Target))
+                    var blinkPos = target.Position.Extend(Game.MousePosition, Menu.BlinkDistanceEnemyItem);
+                    if (Owner.Distance2D(blinkPos) < Blink.CastRange)
+                    {
+                        Blink.UseAbility(blinkPos);
+                        await Await.Delay(Blink.GetCastDelay(blinkPos), token);
+                    }
+                }
+
+                if (!target.IsMagicImmune() && !target.IsInvulnerable()
+                    && !target.HasAnyModifiers("modifier_abaddon_borrowed_time", "modifier_item_combo_breaker_buff")
+                    && !target.HasAnyModifiers("modifier_winter_wyvern_winters_curse_aura", "modifier_winter_wyvern_winters_curse"))
+                {
+                    if (!target.IsBlockingAbilities())
                     {
                         // Hex
                         var Hex = Main.Hex;
                         if (Hex != null
-                            && Config.ItemsToggler.Value.IsEnabled(Hex.ToString())
+                            && Menu.ItemsToggler.Value.IsEnabled(Hex.ToString())
                             && Hex.CanBeCasted
-                            && Hex.CanHit(Target)
-                            && (StunDebuff == null || StunDebuff.RemainingTime <= 0.3)
-                            && (HexDebuff == null || HexDebuff.RemainingTime <= 0.3))
+                            && Hex.CanHit(target)
+                            && (StunDebuff == null || !StunDebuff.IsValid || StunDebuff.RemainingTime <= 0.3f)
+                            && (HexDebuff == null || !HexDebuff.IsValid || HexDebuff.RemainingTime <= 0.3f))
                         {
-                            Hex.UseAbility(Target);
-                            await Await.Delay(Hex.GetCastDelay(Target), token);
+                            Hex.UseAbility(target);
+                            await Await.Delay(Hex.GetCastDelay(target), token);
                         }
 
                         // Orchid
                         var Orchid = Main.Orchid;
                         if (Orchid != null
-                            && Config.ItemsToggler.Value.IsEnabled(Orchid.ToString())
+                            && Menu.ItemsToggler.Value.IsEnabled(Orchid.ToString())
                             && Orchid.CanBeCasted
-                            && Orchid.CanHit(Target))
+                            && Orchid.CanHit(target))
                         {
-                            Main.Orchid.UseAbility(Target);
-                            await Await.Delay(Main.Orchid.GetCastDelay(Target), token);
+                            Main.Orchid.UseAbility(target);
+                            await Await.Delay(Main.Orchid.GetCastDelay(target), token);
                         }
 
                         // Bloodthorn
                         var Bloodthorn = Main.Bloodthorn;
                         if (Bloodthorn != null
-                            && Config.ItemsToggler.Value.IsEnabled(Bloodthorn.ToString())
+                            && Menu.ItemsToggler.Value.IsEnabled(Bloodthorn.ToString())
                             && Bloodthorn.CanBeCasted
-                            && Bloodthorn.CanHit(Target))
+                            && Bloodthorn.CanHit(target))
                         {
-                            Bloodthorn.UseAbility(Target);
-                            await Await.Delay(Bloodthorn.GetCastDelay(Target), token);
+                            Bloodthorn.UseAbility(target);
+                            await Await.Delay(Bloodthorn.GetCastDelay(target), token);
+                        }
+
+                        // Nullifier
+                        var Nullifier = Main.Nullifier;
+                        if (Nullifier != null
+                            && Menu.ItemsToggler.Value.IsEnabled(Nullifier.ToString())
+                            && Nullifier.CanBeCasted
+                            && Nullifier.CanHit(target)
+                            && (StunDebuff == null || !StunDebuff.IsValid || StunDebuff.RemainingTime <= 0.5f)
+                            && (HexDebuff == null || !HexDebuff.IsValid || HexDebuff.RemainingTime <= 0.5f))
+                        {
+                            Nullifier.UseAbility(target);
+                            await Await.Delay(Nullifier.GetCastDelay(target), token);
                         }
 
                         // RodofAtos
                         var RodofAtos = Main.RodofAtos;
                         if (RodofAtos != null
-                            && Config.ItemsToggler.Value.IsEnabled(RodofAtos.ToString())
+                            && Menu.ItemsToggler.Value.IsEnabled(RodofAtos.ToString())
                             && RodofAtos.CanBeCasted
-                            && RodofAtos.CanHit(Target)
-                            && (StunDebuff == null || StunDebuff.RemainingTime <= 0.5)
-                            && (AtosDebuff == null || AtosDebuff.RemainingTime <= 0.5))
+                            && RodofAtos.CanHit(target)
+                            && (StunDebuff == null || !StunDebuff.IsValid || StunDebuff.RemainingTime <= 0.5f)
+                            && (AtosDebuff == null || !AtosDebuff.IsValid || AtosDebuff.RemainingTime <= 0.5f))
                         {
-                            RodofAtos.UseAbility(Target);
-                            await Await.Delay(RodofAtos.GetCastDelay(Target), token);
+                            RodofAtos.UseAbility(target);
+                            await Await.Delay(RodofAtos.GetCastDelay(target), token);
                         }
 
                         // Enchant
                         var Enchant = Main.Enchant;
-                        if (Config.AbilityToggler.Value.IsEnabled(Enchant.ToString())
+                        if (Menu.AbilityToggler.Value.IsEnabled(Enchant.ToString())
                             && Enchant.CanBeCasted
-                            && Enchant.CanHit(Target))
+                            && Enchant.CanHit(target))
                         {
-                            Enchant.UseAbility(Target);
-                            await Await.Delay(Enchant.GetCastDelay(Target), token);
+                            Enchant.UseAbility(target);
+                            await Await.Delay(Enchant.GetCastDelay(target), token);
                         }
 
                         // HurricanePike
                         var HurricanePike = Main.HurricanePike;
                         if (HurricanePike != null
-                            && Config.ItemsToggler.Value.IsEnabled(HurricanePike.ToString())
+                            && Menu.ItemsToggler.Value.IsEnabled(HurricanePike.ToString())
                             && HurricanePike.CanBeCasted
-                            && Owner.Distance2D(Target) < 400)
+                            && HurricanePike.CanHit(target))
                         {
-                            HurricanePike.UseAbility(Target);
-                            await Await.Delay(HurricanePike.GetCastDelay(Target), token);
+                            HurricanePike.UseAbility(target);
+                            await Await.Delay(HurricanePike.GetCastDelay(target), token);
                         }
 
                         // HeavensHalberd
                         var HeavensHalberd = Main.HeavensHalberd;
                         if (HeavensHalberd != null
-                            && Config.ItemsToggler.Value.IsEnabled(HeavensHalberd.ToString())
+                            && Menu.ItemsToggler.Value.IsEnabled(HeavensHalberd.ToString())
                             && HeavensHalberd.CanBeCasted
-                            && HeavensHalberd.CanHit(Target))
+                            && HeavensHalberd.CanHit(target))
                         {
-                            HeavensHalberd.UseAbility(Target);
-                            await Await.Delay(HeavensHalberd.GetCastDelay(Target), token);
+                            HeavensHalberd.UseAbility(target);
+                            await Await.Delay(HeavensHalberd.GetCastDelay(target), token);
                         }
 
                         // Veil
                         var Veil = Main.Veil;
                         if (Veil != null
-                            && Config.ItemsToggler.Value.IsEnabled(Veil.ToString())
+                            && Menu.ItemsToggler.Value.IsEnabled(Veil.ToString())
                             && Veil.CanBeCasted
-                            && Veil.CanHit(Target))
+                            && Veil.CanHit(target))
                         {
-                            Veil.UseAbility(Target.Position);
-                            await Await.Delay(Veil.GetCastDelay(Target), token);
-                        }
-
-                        // Shivas
-                        var Shivas = Main.Shivas;
-                        if (Shivas != null
-                            && Config.ItemsToggler.Value.IsEnabled(Shivas.ToString())
-                            && Shivas.CanBeCasted
-                            && Owner.Distance2D(Target) <= Shivas.Radius)
-                        {
-                            Shivas.UseAbility();
-                            await Await.Delay(Shivas.GetCastDelay(), token);
+                            Veil.UseAbility(target.Position);
+                            await Await.Delay(Veil.GetCastDelay(target), token);
                         }
 
                         // Ethereal
                         var Ethereal = Main.Ethereal;
                         if (Ethereal != null
-                            && Config.ItemsToggler.Value.IsEnabled(Ethereal.ToString())
+                            && Menu.ItemsToggler.Value.IsEnabled(Ethereal.ToString())
                             && Ethereal.CanBeCasted
-                            && Ethereal.CanHit(Target))
+                            && Ethereal.CanHit(target))
                         {
-                            Ethereal.UseAbility(Target);
-                            await Await.Delay(Ethereal.GetCastDelay(Target), token);
+                            Ethereal.UseAbility(target);
+                            MultiSleeper.Sleep(Ethereal.GetHitTime(target), "Ethereal");
+                            await Await.Delay(Ethereal.GetCastDelay(target), token);
                         }
 
-                        // Dagon
-                        var Dagon = Main.Dagon;
-                        if (Dagon != null
-                            && Config.ItemsToggler.Value.IsEnabled("item_dagon_5")
-                            && Dagon.CanBeCasted
-                            && Dagon.CanHit(Target)
-                            && (Ethereal == null || (Target.IsEthereal() && !Ethereal.CanBeCasted)
-                            || !Config.ItemsToggler.Value.IsEnabled(Ethereal.ToString())))
+                        // Shivas
+                        var Shivas = Main.Shivas;
+                        if (Shivas != null
+                            && Menu.ItemsToggler.Value.IsEnabled(Shivas.ToString())
+                            && Shivas.CanBeCasted
+                            && Owner.Distance2D(target) <= Shivas.Radius)
                         {
-                            Dagon.UseAbility(Target);
-                            await Await.Delay(Dagon.GetCastDelay(Target), token);
+                            Shivas.UseAbility();
+                            await Await.Delay(Shivas.GetCastDelay(), token);
+                        }
+
+                        if (!MultiSleeper.Sleeping("Ethereal") || target.IsEthereal())
+                        {
+                            // Dagon
+                            var Dagon = Main.Dagon;
+                            if (Dagon != null
+                                && Menu.ItemsToggler.Value.IsEnabled("item_dagon_5")
+                                && Dagon.CanBeCasted
+                                && Dagon.CanHit(target))
+                            {
+                                Dagon.UseAbility(target);
+                                await Await.Delay(Dagon.GetCastDelay(target), token);
+                            }
+                        }
+
+                        // UrnOfShadows
+                        var UrnOfShadows = Main.UrnOfShadows;
+                        if (UrnOfShadows != null
+                            && Menu.ItemsToggler.Value.IsEnabled(UrnOfShadows.ToString())
+                            && UrnOfShadows.CanBeCasted
+                            && UrnOfShadows.CanHit(target))
+                        {
+                            UrnOfShadows.UseAbility(target);
+                            await Await.Delay(UrnOfShadows.GetCastDelay(target), token);
+                        }
+
+                        // SpiritVessel
+                        var SpiritVessel = Main.SpiritVessel;
+                        if (SpiritVessel != null
+                            && Menu.ItemsToggler.Value.IsEnabled(SpiritVessel.ToString())
+                            && SpiritVessel.CanBeCasted
+                            && SpiritVessel.CanHit(target))
+                        {
+                            SpiritVessel.UseAbility(target);
+                            await Await.Delay(SpiritVessel.GetCastDelay(target), token);
                         }
                     }
                     else
@@ -184,54 +248,63 @@ namespace EnchantressPlus
                 // Necronomicon
                 var Necronomicon = Main.Necronomicon;
                 if (Necronomicon != null
-                    && Config.ItemsToggler.Value.IsEnabled("item_necronomicon_3")
+                    && Menu.ItemsToggler.Value.IsEnabled("item_necronomicon_3")
                     && Necronomicon.CanBeCasted
-                    && Owner.Distance2D(Target) <= Owner.AttackRange(Context.Owner))
+                    && Owner.Distance2D(target) <= Owner.AttackRange(Context.Owner))
                 {
                     Necronomicon.UseAbility();
                     await Await.Delay(Necronomicon.GetCastDelay(), token);
                 }
 
-                if (Target.IsInvulnerable() || Target.IsAttackImmune())
+                if (target.IsInvulnerable() || target.IsAttackImmune())
                 {
-                    if (!Orbwalker.Settings.Move)
-                    {
-                        Orbwalker.Settings.Move.Item.SetValue(true);
-                    }
-
                     Orbwalker.Move(Game.MousePosition);
                 }
                 else
                 {
-                    if (Owner.Distance2D(Target) <= Config.MinDisInOrbwalkItem
-                        && Target.Distance2D(Game.MousePosition) <= Config.MinDisInOrbwalkItem)
+                    if (Menu.OrbwalkerItem.Value.SelectedValue.Contains("Default"))
                     {
-                        if (Orbwalker.Settings.Move)
-                        {
-                            Orbwalker.Settings.Move.Item.SetValue(false);
-                        }
-                    }
-                    else
-                    {
-                        if (!Orbwalker.Settings.Move)
-                        {
-                            Orbwalker.Settings.Move.Item.SetValue(true);
-                        }
-                    }
+                        Orbwalker.OrbwalkingPoint = Vector3.Zero;
 
-                    if (!ImpetusCast(Target))
+                        if (!ImpetusCast(target))
+                        {
+                            Orbwalker.OrbwalkTo(target);
+                        }
+                    }
+                    else if (Menu.OrbwalkerItem.Value.SelectedValue.Contains("Distance"))
                     {
-                        Orbwalker.OrbwalkTo(Target);
+                        var ownerDis = Math.Min(Owner.Distance2D(Game.MousePosition), 230);
+                        var ownerPos = Owner.Position.Extend(Game.MousePosition, ownerDis);
+                        var pos = target.Position.Extend(ownerPos, Menu.MinDisInOrbwalkItem);
+
+                        if (!ImpetusCast(target))
+                        {
+                            Orbwalker.OrbwalkTo(target);
+                        }
+
+                        Orbwalker.OrbwalkingPoint = pos;
+                    }
+                    else if (Menu.OrbwalkerItem.Value.SelectedValue.Contains("Free"))
+                    {
+                        if (Owner.Distance2D(target) < Owner.AttackRange(target) && target.Distance2D(Game.MousePosition) < Owner.AttackRange(target) 
+                            || Owner.HasModifier("modifier_item_hurricane_pike_range"))
+                        {
+                            Orbwalker.OrbwalkingPoint = Vector3.Zero;
+
+                            if (!ImpetusCast(target))
+                            {
+                                Orbwalker.OrbwalkTo(target);
+                            }
+                        }
+                        else
+                        {
+                            Orbwalker.Move(Game.MousePosition);
+                        }
                     }
                 }
             }
             else
             {
-                if (!Orbwalker.Settings.Move)
-                {
-                    Orbwalker.Settings.Move.Item.SetValue(true);
-                }
-
                 Orbwalker.Move(Game.MousePosition);
             }
         }
@@ -239,11 +312,11 @@ namespace EnchantressPlus
         private bool ImpetusCast(Hero target)
         {
             var Impetus = Main.Impetus;
-            var ModifierHurricanePike = Owner.HasModifier("modifier_item_hurricane_pike_range");
+            var modifierHurricanePike = Owner.HasModifier("modifier_item_hurricane_pike_range");
             
-            if (!Impetus.IsReady || Owner.IsMuted() || Owner.IsSilenced() || !Config.AbilityToggler.Value.IsEnabled(Impetus.ToString()))
+            if (!Impetus.IsReady || Owner.IsMuted() || Owner.IsSilenced() || !Menu.AbilityToggler.Value.IsEnabled(Impetus.ToString()))
             {
-                if (ModifierHurricanePike)
+                if (modifierHurricanePike)
                 {
                     return Orbwalker.Attack(target);
                 }
@@ -252,7 +325,7 @@ namespace EnchantressPlus
             }
 
             // Impetus Autocast
-            if (ModifierHurricanePike)
+            if (modifierHurricanePike)
             {
                 if (!Impetus.Ability.IsAutoCastEnabled)
                 {
@@ -267,8 +340,7 @@ namespace EnchantressPlus
             }
 
             // Impetus
-            if (Owner.Distance2D(target) < Owner.AttackRange(target)
-                && Orbwalker.CanAttack(target))
+            if (Orbwalker.CanAttack(target))
             {
                 var time = Game.RawGameTime;
                 if ((time - LastCastAttempt) > 0.1f)

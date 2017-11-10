@@ -14,6 +14,8 @@ namespace EnchantressPlus.Features
     {
         private Config Config { get; }
 
+        private MenuManager Menu { get; }
+
         private EnchantressPlus Main { get; }
 
         private Unit Owner { get; }
@@ -23,6 +25,7 @@ namespace EnchantressPlus.Features
         public AutoAbility(Config config)
         {
             Config = config;
+            Menu = config.Menu;
             Main = config.Main;
             Owner = config.Main.Context.Owner;
 
@@ -45,8 +48,8 @@ namespace EnchantressPlus.Features
 
                 // NaturesAttendants
                 var NaturesAttendants = Main.NaturesAttendants;
-                if (Config.NaturesAttendantsItem
-                    && (float)Owner.Health / Owner.MaximumHealth * 100 < Config.MinHPItem
+                if (Menu.NaturesAttendantsItem
+                    && (float)Owner.Health / Owner.MaximumHealth * 100 < Menu.MinHPItem
                     && NaturesAttendants.CanBeCasted)
                 {
                     NaturesAttendants.UseAbility();
