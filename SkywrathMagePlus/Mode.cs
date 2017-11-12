@@ -6,19 +6,19 @@ using System.Windows.Input;
 
 using Ensage;
 using Ensage.Common.Threading;
-using Ensage.Common.Objects.UtilityObjects;
 using Ensage.SDK.Extensions;
 using Ensage.SDK.Helpers;
 using Ensage.SDK.Orbwalker.Modes;
 using Ensage.SDK.Prediction;
-using Ensage.SDK.Prediction.Collision;
 using Ensage.SDK.Service;
-using Ensage.SDK.TargetSelector;
+
+using PlaySharp.Toolkit.Helper.Annotations;
 
 using SharpDX;
 
 namespace SkywrathMagePlus
 {
+    [PublicAPI]
     internal class Mode : KeyPressOrbwalkingModeAsync
     {
         private Config Config { get; }
@@ -27,21 +27,15 @@ namespace SkywrathMagePlus
 
         private SkywrathMagePlus Main { get; }
 
-        private ITargetSelectorManager TargetSelector { get; }
-
         private IPredictionManager Prediction { get; }
 
-        public Sleeper Sleeper { get; }
-
-        public Mode(IServiceContext context, Key key, Config config) : base(context, key)
+        public Mode(IServiceContext context, Key key, Config config) 
+            : base(context, key)
         {
             Config = config;
             Menu = config.Menu;
             Main = config.Main;
-            TargetSelector = context.TargetSelector;
             Prediction = context.Prediction;
-
-            Sleeper = new Sleeper();
         }
 
         public override async Task ExecuteAsync(CancellationToken token)
@@ -50,9 +44,10 @@ namespace SkywrathMagePlus
 
             if (target != null && (!Menu.BladeMailItem || !target.HasModifier("modifier_item_blade_mail_reflect")))
             {
-                var StunDebuff = target.Modifiers.FirstOrDefault(x => x.IsStunDebuff);
-                var HexDebuff = target.Modifiers.FirstOrDefault(x => x.IsValid && x.Name == "modifier_sheepstick_debuff");
-                var AtosDebuff = target.Modifiers.FirstOrDefault(x => x.IsValid && x.Name == "modifier_rod_of_atos_debuff");
+                var stunDebuff = target.Modifiers.FirstOrDefault(x => x.IsStunDebuff);
+                var hexDebuff = target.Modifiers.FirstOrDefault(x => x.Name == "modifier_sheepstick_debuff");
+                var atosDebuff = target.Modifiers.FirstOrDefault(x => x.Name == "modifier_rod_of_atos_debuff");
+                var multiSleeper = Config.MultiSleeper;
 
                 // Blink
                 var Blink = Main.Blink;
@@ -70,9 +65,9 @@ namespace SkywrathMagePlus
                     }
                 }
 
-                if (!Config.Extensions.Cancel(target) && StartCombo(target))
+                if (Config.Extensions.Cancel(target) && StartCombo(target))
                 {
-                    if (!target.IsLinkensProtected() && !Config.Extensions.AntimageShield(target))
+                    if (!target.IsBlockingAbilities())
                     {
                         // Hex
                         var Hex = Main.Hex;
@@ -80,8 +75,8 @@ namespace SkywrathMagePlus
                             && Menu.ItemsToggler.Value.IsEnabled(Hex.ToString())
                             && Hex.CanBeCasted
                             && Hex.CanHit(target)
-                            && (StunDebuff == null || StunDebuff.RemainingTime <= 0.3f)
-                            && (HexDebuff == null || HexDebuff.RemainingTime <= 0.3f))
+                            && (stunDebuff == null || !stunDebuff.IsValid || stunDebuff.RemainingTime <= 0.3f)
+                            && (hexDebuff == null || !hexDebuff.IsValid || hexDebuff.RemainingTime <= 0.3f))
                         {
                             Hex.UseAbility(target);
                             await Await.Delay(Hex.GetCastDelay(target), token);
@@ -117,9 +112,9 @@ namespace SkywrathMagePlus
                             && Config.Extensions.Active(target))
                         {
                             var enemies = EntityManager<Hero>.Entities.Where(x =>
+                                                                             x.IsValid &&
                                                                              x.IsVisible &&
                                                                              x.IsAlive &&
-                                                                             x.IsValid &&
                                                                              !x.IsIllusion &&
                                                                              x.IsEnemy(Owner) &&
                                                                              x.Distance2D(Owner) <= Main.MysticFlare.CastRange).ToList();
@@ -127,24 +122,30 @@ namespace SkywrathMagePlus
                             var ultimateScepter = Owner.HasAghanimsScepter();
                             var dubleMysticFlare = ultimateScepter && enemies.Count() == 1;
 
-                            var Input =
-                                new PredictionInput(
-                                    Owner,
-                                    target,
-                                    0,
-                                    float.MaxValue,
-                                    MysticFlare.CastRange,
-                                    dubleMysticFlare ? -250 : -100,
-                                    PredictionSkillshotType.SkillshotCircle,
-                                    true)
-                                {
-                                    CollisionTypes = CollisionTypes.None
-                                };
+                            var input = new PredictionInput
+                            {
+                                Owner = Owner,
+                                Range = MysticFlare.CastRange,
+                                Radius = dubleMysticFlare ? -250 : -100
+                            };
 
-                            var Output = Prediction.GetPrediction(Input);
+                            var output = Prediction.GetPrediction(input.WithTarget(target));
 
-                            MysticFlare.UseAbility(Output.CastPosition);
-                            await Await.Delay(MysticFlare.GetCastDelay(Output.CastPosition), token);
+                            MysticFlare.UseAbility(output.CastPosition);
+                            await Await.Delay(MysticFlare.GetCastDelay(output.CastPosition), token);
+                        }
+
+                        // Nullifier
+                        var Nullifier = Main.Nullifier;
+                        if (Nullifier != null
+                            && Menu.ItemsToggler.Value.IsEnabled(Nullifier.ToString())
+                            && Nullifier.CanBeCasted
+                            && Nullifier.CanHit(target)
+                            && (stunDebuff == null || !stunDebuff.IsValid || stunDebuff.RemainingTime <= 0.5f)
+                            && (hexDebuff == null || !hexDebuff.IsValid || hexDebuff.RemainingTime <= 0.5f))
+                        {
+                            Nullifier.UseAbility(target);
+                            await Await.Delay(Nullifier.GetCastDelay(target), token);
                         }
 
                         // RodofAtos
@@ -153,8 +154,8 @@ namespace SkywrathMagePlus
                             && Menu.ItemsToggler.Value.IsEnabled(RodofAtos.ToString())
                             && RodofAtos.CanBeCasted
                             && RodofAtos.CanHit(target)
-                            && (StunDebuff == null || StunDebuff.RemainingTime <= 0.5f)
-                            && (AtosDebuff == null || AtosDebuff.RemainingTime <= 0.5f))
+                            && (stunDebuff == null || !stunDebuff.IsValid || stunDebuff.RemainingTime <= 0.5f)
+                            && (atosDebuff == null || !atosDebuff.IsValid || atosDebuff.RemainingTime <= 0.5f))
                         {
                             RodofAtos.UseAbility(target);
                             await Await.Delay(RodofAtos.GetCastDelay(target), token);
@@ -190,7 +191,7 @@ namespace SkywrathMagePlus
                             && Ethereal.CanHit(target))
                         {
                             Ethereal.UseAbility(target);
-                            Sleeper.Sleep(Ethereal.GetHitTime(target));
+                            multiSleeper.Sleep(Ethereal.GetHitTime(target), "ethereal");
                             await Await.Delay(Ethereal.GetCastDelay(target), token);
                         }
 
@@ -205,7 +206,7 @@ namespace SkywrathMagePlus
                             await Await.Delay(Shivas.GetCastDelay(), token);
                         }
 
-                        if (!Sleeper.Sleeping || target.IsEthereal())
+                        if (!multiSleeper.Sleeping("ethereal") || target.IsEthereal())
                         {
                             // ConcussiveShot
                             var ConcussiveShot = Main.ConcussiveShot;
@@ -227,6 +228,13 @@ namespace SkywrathMagePlus
                                 && ArcaneBolt.CanHit(target))
                             {
                                 ArcaneBolt.UseAbility(target);
+
+                                UpdateManager.BeginInvoke(() =>
+                                {
+                                    multiSleeper.Sleep(ArcaneBolt.GetHitTime(target) - (ArcaneBolt.GetCastDelay(target) + 350), $"arcanebolt_{ target.Name }");
+                                }, 
+                                ArcaneBolt.GetCastDelay(target) + 50);
+
                                 await Await.Delay(ArcaneBolt.GetCastDelay(target), token);
                                 return;
                             }
@@ -242,6 +250,28 @@ namespace SkywrathMagePlus
                                 await Await.Delay(Dagon.GetCastDelay(target), token);
                                 return;
                             }
+                        }
+
+                        // UrnOfShadows
+                        var UrnOfShadows = Main.UrnOfShadows;
+                        if (UrnOfShadows != null
+                            && Menu.ItemsToggler.Value.IsEnabled(UrnOfShadows.ToString())
+                            && UrnOfShadows.CanBeCasted
+                            && UrnOfShadows.CanHit(target))
+                        {
+                            UrnOfShadows.UseAbility(target);
+                            await Await.Delay(UrnOfShadows.GetCastDelay(target), token);
+                        }
+
+                        // SpiritVessel
+                        var SpiritVessel = Main.SpiritVessel;
+                        if (SpiritVessel != null
+                            && Menu.ItemsToggler.Value.IsEnabled(SpiritVessel.ToString())
+                            && SpiritVessel.CanBeCasted
+                            && SpiritVessel.CanHit(target))
+                        {
+                            SpiritVessel.UseAbility(target);
+                            await Await.Delay(SpiritVessel.GetCastDelay(target), token);
                         }
                     }
                     else
@@ -280,6 +310,17 @@ namespace SkywrathMagePlus
                         else
                         {
                             Orbwalker.Move(Game.MousePosition);
+                        }
+                    }
+                    else if (Menu.OrbwalkerArcaneBoltItem.Value.SelectedValue.Contains("Only Attack"))
+                    {
+                        Orbwalker.Attack(target);
+                    }
+                    else if (Menu.OrbwalkerArcaneBoltItem.Value.SelectedValue.Contains("No Move"))
+                    {
+                        if (Owner.Distance2D(target) < Owner.AttackRange(target))
+                        {
+                            Orbwalker.Attack(target);
                         }
                     }
                 }

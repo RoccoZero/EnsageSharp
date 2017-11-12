@@ -67,7 +67,7 @@ namespace SkywrathMagePlus.Features
                 }
 
                 // ArcaneBolt
-                if (Menu.AutoQKeyItem && !Menu.ComboKeyItem && !Menu.SpamKeyItem)
+                if (Menu.AutoArcaneBoltKeyItem && !Menu.ComboKeyItem && !Menu.SpamArcaneBoltKeyItem)
                 {
                     var ArcaneBolt = Main.ArcaneBolt;
 
@@ -80,11 +80,18 @@ namespace SkywrathMagePlus.Features
                                                           x.IsEnemy(Owner) &&
                                                           ArcaneBolt.CanHit(x)).OrderBy(x => x.Health).FirstOrDefault();
 
-                    if (target != null && !Config.Extensions.Cancel(target) && !Owner.IsInvisible())
+                    if (target != null && Config.Extensions.Cancel(target) && !Owner.IsInvisible())
                     {
                         if (ArcaneBolt.CanBeCasted)
                         {
                             ArcaneBolt.UseAbility(target);
+
+                            UpdateManager.BeginInvoke(() =>
+                            {
+                                Config.MultiSleeper.Sleep(ArcaneBolt.GetHitTime(target) - (ArcaneBolt.GetCastDelay(target) + 350), $"arcanebolt_{ target.Name }");
+                            },
+                            ArcaneBolt.GetCastDelay(target) + 50);
+
                             await Await.Delay(ArcaneBolt.GetCastDelay(target), token);
                         }
                     }

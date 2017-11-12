@@ -86,17 +86,9 @@ namespace SkywrathMagePlus
 
         public bool Cancel(Hero target)
         {
-            return target.IsMagicImmune()
-                || target.IsInvulnerable()
-                || target.HasModifier("modifier_abaddon_borrowed_time")
-                || target.HasAnyModifiers("modifier_winter_wyvern_winters_curse_aura", "modifier_winter_wyvern_winters_curse");
-        }
-
-        public bool AntimageShield(Hero Target)
-        {
-            var Shield = Target.GetAbilityById(AbilityId.antimage_spell_shield);
-
-            return Shield != null && Shield.Cooldown == 0 && Shield.Level > 0 && Target.HasAghanimsScepter();
+            return !target.IsMagicImmune() && !target.IsInvulnerable()
+                && !target.HasAnyModifiers("modifier_abaddon_borrowed_time", "modifier_item_combo_breaker_buff")
+                && !target.HasAnyModifiers("modifier_winter_wyvern_winters_curse_aura", "modifier_winter_wyvern_winters_curse");
         }
     }
 }

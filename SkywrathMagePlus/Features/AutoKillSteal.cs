@@ -25,8 +25,6 @@ namespace SkywrathMagePlus.Features
 
         private Unit Owner { get; }
 
-        public Sleeper Sleeper { get; }
-
         private DamageCalculation.Damage Damage { get; set; }
 
         private TaskHandler Handler { get; }
@@ -40,8 +38,6 @@ namespace SkywrathMagePlus.Features
             Main = config.Main;
             DamageCalculation = config.DamageCalculation;
             Owner = config.Main.Context.Owner;
-
-            Sleeper = new Sleeper();
 
             Handler = UpdateManager.Run(ExecuteAsync, true, false);
 
@@ -86,12 +82,10 @@ namespace SkywrathMagePlus.Features
                     return;
                 }
 
-                var damageCalculation = DamageCalculation.DamageList.Where(x => (x.GetHealth - x.GetDamage) / x.GetHero.MaximumHealth <= 0.0f).ToList();
-                var damage = damageCalculation.OrderByDescending(x => x.GetHealth).OrderByDescending(x => x.GetHero.Player.Kills).FirstOrDefault();
+                var damageCalculation = DamageCalculation.DamageList.Where(x => (x.GetHealth - x.GetDamage) / x.GetTarget.MaximumHealth <= 0.0f).ToList();
+                Damage = damageCalculation.OrderByDescending(x => x.GetHealth).OrderByDescending(x => x.GetTarget.Player.Kills).FirstOrDefault();
 
-                Damage = damage;
-
-                if (damage == null)
+                if (Damage == null)
                 {
                     return;
                 }
@@ -101,14 +95,15 @@ namespace SkywrathMagePlus.Features
                     Update.IsEnabled = true;
                 }
 
-                var target = damage.GetHero;
+                var target = Damage.GetTarget;
+                var multiSleeper = Config.MultiSleeper;
 
                 if (Cancel(target))
                 {
                     return;
                 }
 
-                if (!target.IsLinkensProtected() && !Config.Extensions.AntimageShield(target))
+                if (!target.IsBlockingAbilities())
                 {
                     // AncientSeal
                     var AncientSeal = Main.AncientSeal;
@@ -140,7 +135,7 @@ namespace SkywrathMagePlus.Features
                         && Ethereal.CanHit(target))
                     {
                         Ethereal.UseAbility(target);
-                        Sleeper.Sleep(Ethereal.GetHitTime(target));
+                        multiSleeper.Sleep(Ethereal.GetHitTime(target), "ethereal");
                         await Await.Delay(Ethereal.GetCastDelay(target), token);
                     }
 
@@ -155,7 +150,7 @@ namespace SkywrathMagePlus.Features
                         await Await.Delay(Shivas.GetCastDelay(), token);
                     }
 
-                    if (!Sleeper.Sleeping || target.IsEthereal())
+                    if (!multiSleeper.Sleeping("ethereal") || target.IsEthereal())
                     {
                         // ConcussiveShot
                         var ConcussiveShot = Main.ConcussiveShot;
@@ -175,6 +170,13 @@ namespace SkywrathMagePlus.Features
                             && ArcaneBolt.CanHit(target))
                         {
                             ArcaneBolt.UseAbility(target);
+
+                            UpdateManager.BeginInvoke(() =>
+                            {
+                                multiSleeper.Sleep(ArcaneBolt.GetHitTime(target) - (ArcaneBolt.GetCastDelay(target) + 350), $"arcanebolt_{ target.Name }");
+                            },
+                            ArcaneBolt.GetCastDelay(target) + 50);
+
                             await Await.Delay(ArcaneBolt.GetCastDelay(target), token);
                             return;
                         }
@@ -226,7 +228,7 @@ namespace SkywrathMagePlus.Features
                 return;
             }
 
-            var stop = EntityManager<Hero>.Entities.Any(x => !x.IsAlive && x == Damage.GetHero);
+            var stop = EntityManager<Hero>.Entities.Any(x => !x.IsAlive && x == Damage.GetTarget);
             if (stop && Owner.Animation.Name.Contains("cast"))
             {
                 Owner.Stop();

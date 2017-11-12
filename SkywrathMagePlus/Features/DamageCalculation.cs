@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Ensage;
@@ -39,15 +40,13 @@ namespace SkywrathMagePlus.Features
 
             DamageList.Clear();
 
-            foreach (var hero in heroes.Where(x => x.IsAlive && x.IsEnemy(Owner)).ToList())
+            foreach (var target in heroes.Where(x => x.IsAlive && x.IsEnemy(Owner)).ToList())
             {
                 List<BaseAbility> abilities = new List<BaseAbility>();
 
-                var damage = 0.0f;
-                var readyDamage = 0.0f;
-                var totalDamage = 0.0f;
+                var hitArcaneBolt = 0.0f;
 
-                if (hero.IsVisible)
+                if (target.IsVisible)
                 {
                     // AncientSeal
                     var AncientSeal = Main.AncientSeal;
@@ -79,7 +78,7 @@ namespace SkywrathMagePlus.Features
 
                     // ConcussiveShot
                     var ConcussiveShot = Main.ConcussiveShot;
-                    if (ConcussiveShot.Ability.Level > 0 && Menu.AutoKillStealToggler.Value.IsEnabled(ConcussiveShot.ToString()) && hero == Config.UpdateMode.WShowTarget)
+                    if (ConcussiveShot.Ability.Level > 0 && Menu.AutoKillStealToggler.Value.IsEnabled(ConcussiveShot.ToString()) && target == Config.UpdateMode.WShowTarget)
                     {
                         abilities.Add(ConcussiveShot);
                     }
@@ -89,44 +88,46 @@ namespace SkywrathMagePlus.Features
                     if (ArcaneBolt.Ability.Level > 0 && Menu.AutoKillStealToggler.Value.IsEnabled(ArcaneBolt.ToString()))
                     {
                         abilities.Add(ArcaneBolt);
+
+                        if (Config.MultiSleeper.Sleeping($"arcanebolt_{ target.Name }"))
+                        {
+                            hitArcaneBolt += ArcaneBolt.GetDamage(target);
+                        }
                     }
 
                     // Dagon
                     var Dagon = Main.Dagon;
-                    if (Dagon != null && Dagon.Ability.IsValid && Menu.AutoKillStealToggler.Value.IsEnabled(Dagon.ToString()))
+                    if (Dagon != null && Dagon.Ability.IsValid && Menu.AutoKillStealToggler.Value.IsEnabled("item_dagon_5"))
                     {
                         abilities.Add(Dagon);
                     }
                 }
 
                 var damageCalculation = new Combo(abilities.ToArray());
-                var damageReduction = -DamageReduction(hero, heroes);
-                var damageBlock = DamageBlock(hero, heroes);
+                var damageReduction = -DamageReduction(target, heroes);
+                var damageBlock = DamageBlock(target, heroes);
 
-                damage += DamageHelpers.GetSpellDamage(damageCalculation.GetDamage(hero) + damageBlock, 0, damageReduction);
-                readyDamage += DamageHelpers.GetSpellDamage(damageCalculation.GetDamage(hero, true, false) + damageBlock, 0, damageReduction);
-                totalDamage += DamageHelpers.GetSpellDamage(damageCalculation.GetDamage(hero, false, false) + damageBlock, 0, damageReduction);
+                var livingArmor = LivingArmor(target, heroes, damageCalculation.Abilities);
+                var damage = DamageHelpers.GetSpellDamage((damageCalculation.GetDamage(target) + hitArcaneBolt) + damageBlock, 0, damageReduction) - livingArmor;
+                var readyDamage = DamageHelpers.GetSpellDamage(damageCalculation.GetDamage(target, true, false) + damageBlock, 0, damageReduction) - livingArmor;
+                var totalDamage = DamageHelpers.GetSpellDamage(damageCalculation.GetDamage(target, false, false) + damageBlock, 0, damageReduction) - livingArmor;
 
-                damage -= LivingArmor(hero, heroes, damageCalculation.Abilities);
-                readyDamage -= LivingArmor(hero, heroes, damageCalculation.Abilities);
-                totalDamage -= LivingArmor(hero, heroes, damageCalculation.Abilities);
-
-                if (hero.HasModifier("modifier_abaddon_borrowed_time") 
-                    || hero.HasModifier("modifier_templar_assassin_refraction_absorb")
-                    || hero.HasAnyModifiers("modifier_winter_wyvern_winters_curse_aura", "modifier_winter_wyvern_winters_curse")
-                    || hero.IsInvulnerable())
+                if (target.HasAnyModifiers("modifier_abaddon_borrowed_time", "modifier_item_combo_breaker_buff")
+                    || target.HasModifier("modifier_templar_assassin_refraction_absorb")
+                    || target.HasAnyModifiers("modifier_winter_wyvern_winters_curse_aura", "modifier_winter_wyvern_winters_curse")
+                    || target.IsInvulnerable())
                 {
                     damage = 0.0f;
                     readyDamage = 0.0f;
                 }
 
-                DamageList.Add(new Damage(hero, damage, readyDamage, totalDamage, hero.Health));
+                DamageList.Add(new Damage(target, damage, readyDamage, totalDamage, target.Health));
             }
         }
 
-        private float LivingArmor(Hero hero, List<Hero> heroes, IReadOnlyCollection<BaseAbility> abilities)
+        private float LivingArmor(Hero target, List<Hero> heroes, IReadOnlyCollection<BaseAbility> abilities)
         {
-            if (!hero.HasModifier("modifier_treant_living_armor"))
+            if (!target.HasModifier("modifier_treant_living_armor"))
             {
                 return 0;
             }
@@ -135,17 +136,17 @@ namespace SkywrathMagePlus.Features
             var ability = treant.GetAbilityById(AbilityId.treant_living_armor);
             var block = ability.GetAbilitySpecialData("damage_block");
 
-            var count = abilities.Where(x => x.GetDamage(hero) > block).Count();
+            var count = abilities.Where(x => x.GetDamage(target) > block).Count();
 
             return count * block;
         }
 
-        private float DamageReduction(Hero hero, List<Hero> heroes)
+        private float DamageReduction(Hero target, List<Hero> heroes)
         {
             var value = 0.0f;
 
             // Bristleback
-            var bristleback = hero.GetAbilityById(AbilityId.bristleback_bristleback);
+            var bristleback = target.GetAbilityById(AbilityId.bristleback_bristleback);
             if (bristleback != null && bristleback.Level != 0)
             {
                 var brist = bristleback.Owner as Hero;
@@ -160,7 +161,7 @@ namespace SkywrathMagePlus.Features
             }
 
             // Modifier Centaur Stampede
-            if (hero.HasModifier("modifier_centaur_stampede"))
+            if (target.HasModifier("modifier_centaur_stampede"))
             {
                 var centaur = heroes.FirstOrDefault(x => x.IsEnemy(Owner) && x.HeroId == HeroId.npc_dota_hero_centaur);
                 if (centaur.HasAghanimsScepter())
@@ -172,7 +173,7 @@ namespace SkywrathMagePlus.Features
             }
 
             // Modifier Kunkka Ghostship
-            if (hero.HasModifier("modifier_kunkka_ghost_ship_damage_absorb"))
+            if (target.HasModifier("modifier_kunkka_ghost_ship_damage_absorb"))
             {
                 var kunkka = heroes.FirstOrDefault(x => x.IsEnemy(Owner) && x.HeroId == HeroId.npc_dota_hero_kunkka);
                 var ability = kunkka.GetAbilityById(AbilityId.kunkka_ghostship);
@@ -181,16 +182,16 @@ namespace SkywrathMagePlus.Features
             }
 
             // Modifier Wisp Overcharge
-            if (hero.HasModifier("modifier_wisp_overcharge"))
+            if (target.HasModifier("modifier_wisp_overcharge"))
             {
                 var wisp = heroes.FirstOrDefault(x => x.IsEnemy(Owner) && x.HeroId == HeroId.npc_dota_hero_wisp);
                 var ability = wisp.GetAbilityById(AbilityId.wisp_overcharge);
 
-                value -= ability.GetAbilitySpecialData("bonus_damage_pct") / 100f;
+                value += ability.GetAbilitySpecialData("bonus_damage_pct") / 100f;
             }
 
             // Modifier Bloodseeker Bloodrage
-            if (hero.HasModifier("modifier_bloodseeker_bloodrage") || Owner.HasModifier("modifier_bloodseeker_bloodrage"))
+            if (target.HasModifier("modifier_bloodseeker_bloodrage") || Owner.HasModifier("modifier_bloodseeker_bloodrage"))
             {
                 var bloodseeker = heroes.FirstOrDefault(x => x.HeroId == HeroId.npc_dota_hero_bloodseeker);
                 var ability = bloodseeker.GetAbilityById(AbilityId.bloodseeker_bloodrage);
@@ -199,25 +200,25 @@ namespace SkywrathMagePlus.Features
             }
 
             // Modifier Medusa Mana Shield
-            if (hero.HasModifier("modifier_medusa_mana_shield"))
+            if (target.HasModifier("modifier_medusa_mana_shield"))
             {
-                var ability = hero.GetAbilityById(AbilityId.medusa_mana_shield);
+                var ability = target.GetAbilityById(AbilityId.medusa_mana_shield);
 
-                if (hero.Mana >= 50)
+                if (target.Mana >= 50)
                 {
                     value -= ability.GetAbilitySpecialData("absorption_tooltip") / 100f;
                 }
             }
 
             // Modifier Ursa Enrage
-            if (hero.HasModifier("modifier_ursa_enrage"))
+            if (target.HasModifier("modifier_ursa_enrage"))
             {
-                var ability = hero.GetAbilityById(AbilityId.ursa_enrage);
+                var ability = target.GetAbilityById(AbilityId.ursa_enrage);
                 value -= ability.GetAbilitySpecialData("damage_reduction") / 100f;
             }
 
             // Modifier Chen Penitence
-            if (hero.HasModifier("modifier_chen_penitence"))
+            if (target.HasModifier("modifier_chen_penitence"))
             {
                 var chen = heroes.FirstOrDefault(x => x.IsAlly(Owner) && x.HeroId == HeroId.npc_dota_hero_chen);
                 var ability = chen.GetAbilityById(AbilityId.chen_penitence);
@@ -226,7 +227,7 @@ namespace SkywrathMagePlus.Features
             }
 
             // Modifier Shadow Demon Soul Catcher
-            if (hero.HasModifier("modifier_shadow_demon_soul_catcher"))
+            if (target.HasModifier("modifier_shadow_demon_soul_catcher"))
             {
                 var shadowDemon = heroes.FirstOrDefault(x => x.IsAlly(Owner) && x.HeroId == HeroId.npc_dota_hero_shadow_demon);
                 var ability = shadowDemon.GetAbilityById(AbilityId.shadow_demon_soul_catcher);
@@ -237,14 +238,14 @@ namespace SkywrathMagePlus.Features
             return value;
         }
 
-        private float DamageBlock(Hero hero, List<Hero> heroes)
+        private float DamageBlock(Hero target, List<Hero> heroes)
         {
             var value = 0.0f;
 
             // Modifier Hood Of Defiance Barrier
-            if (hero.HasModifier("modifier_item_hood_of_defiance_barrier"))
+            if (target.HasModifier("modifier_item_hood_of_defiance_barrier"))
             {
-                var item = hero.GetItemById(AbilityId.item_hood_of_defiance);
+                var item = target.GetItemById(AbilityId.item_hood_of_defiance);
                 if (item != null)
                 {
                     value -= item.GetAbilitySpecialData("barrier_block");
@@ -252,7 +253,7 @@ namespace SkywrathMagePlus.Features
             }
 
             // Modifier Pipe Barrier
-            if (hero.HasModifier("modifier_item_pipe_barrier"))
+            if (target.HasModifier("modifier_item_pipe_barrier"))
             {
                 var pipehero = heroes.FirstOrDefault(x => x.IsEnemy(Owner) && x.Inventory.Items.Any(v => v.Id == AbilityId.item_pipe));
                 if (pipehero != null)
@@ -264,9 +265,9 @@ namespace SkywrathMagePlus.Features
             }
 
             // Modifier Infused Raindrop
-            if (hero.HasModifier("modifier_item_infused_raindrop"))
+            if (target.HasModifier("modifier_item_infused_raindrop"))
             {
-                var item = hero.GetItemById(AbilityId.item_infused_raindrop);
+                var item = target.GetItemById(AbilityId.item_infused_raindrop);
                 if (item != null && item.Cooldown <= 0)
                 {
                     value -= item.GetAbilitySpecialData("magic_damage_block");
@@ -274,7 +275,7 @@ namespace SkywrathMagePlus.Features
             }
 
             // Modifier Abaddon Aphotic Shield
-            if (hero.HasModifier("modifier_abaddon_aphotic_shield"))
+            if (target.HasModifier("modifier_abaddon_aphotic_shield"))
             {
                 var abaddon = heroes.FirstOrDefault(x => x.IsEnemy(Owner) && x.HeroId == HeroId.npc_dota_hero_abaddon);
                 var ability = abaddon.GetAbilityById(AbilityId.abaddon_aphotic_shield);
@@ -289,9 +290,9 @@ namespace SkywrathMagePlus.Features
             }
 
             // Modifier Ember Spirit Flame Guard
-            if (hero.HasModifier("modifier_ember_spirit_flame_guard"))
+            if (target.HasModifier("modifier_ember_spirit_flame_guard"))
             {
-                var ability = hero.GetAbilityById(AbilityId.ember_spirit_flame_guard);
+                var ability = target.GetAbilityById(AbilityId.ember_spirit_flame_guard);
                 if (ability != null)
                 {
                     value -= ability.GetAbilitySpecialData("absorb_amount");
@@ -312,7 +313,7 @@ namespace SkywrathMagePlus.Features
 
         public class Damage
         {
-            public Hero GetHero { get; }
+            public Hero GetTarget { get; }
 
             public float GetDamage { get; }
 
@@ -322,9 +323,9 @@ namespace SkywrathMagePlus.Features
 
             public uint GetHealth { get; }
 
-            public Damage(Hero hero, float damage, float readyDamage, float totalDamage, uint health)
+            public Damage(Hero target, float damage, float readyDamage, float totalDamage, uint health)
             {
-                GetHero = hero;
+                GetTarget = target;
                 GetDamage = damage;
                 GetReadyDamage = readyDamage;
                 GetTotalDamage = totalDamage;

@@ -168,7 +168,7 @@ namespace SkywrathMagePlus
                 Target = Context.TargetSelector.Active.GetTargets().FirstOrDefault() as Hero;
             }
 
-            if (Target != null && !Menu.SpamKeyItem && (Menu.DrawOffTargetItem && !Menu.ComboKeyItem || Menu.DrawTargetItem && Menu.ComboKeyItem))
+            if (Target != null && !Menu.SpamArcaneBoltKeyItem && (Menu.DrawOffTargetItem && !Menu.ComboKeyItem || Menu.DrawTargetItem && Menu.ComboKeyItem))
             {
                 switch (Menu.TargetEffectTypeItem.Value.SelectedIndex)
                 {

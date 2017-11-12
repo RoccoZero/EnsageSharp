@@ -52,10 +52,10 @@ namespace SkywrathMagePlus
                 var posText = new Vector2(Config.Screen.X, Config.Screen.Y * 0.65f) - setPosText;
 
                 Text($"Combo { (Menu.ComboKeyItem ? "ON" : "OFF") }", posText, Menu.ComboKeyItem ? Color.Aqua : Color.Yellow);
-                Text($"Spam Q { (Menu.SpamKeyItem ? "ON" : "OFF") }", posText + new Vector2(0, 30), Menu.SpamKeyItem ? Color.Aqua : Color.Yellow);
-                Text($"Auto Q { (!Menu.ComboKeyItem && !Menu.SpamKeyItem && Menu.AutoQKeyItem ? "ON" : "OFF") }",
+                Text($"Spam Q { (Menu.SpamArcaneBoltKeyItem ? "ON" : "OFF") }", posText + new Vector2(0, 30), Menu.SpamArcaneBoltKeyItem ? Color.Aqua : Color.Yellow);
+                Text($"Auto Q { (!Menu.ComboKeyItem && !Menu.SpamArcaneBoltKeyItem && Menu.AutoArcaneBoltKeyItem ? "ON" : "OFF") }",
                     posText + new Vector2(0, 60),
-                    !Menu.ComboKeyItem && !Menu.SpamKeyItem && Menu.AutoQKeyItem ? Color.Aqua : Color.Yellow);
+                    !Menu.ComboKeyItem && !Menu.SpamArcaneBoltKeyItem && Menu.AutoArcaneBoltKeyItem ? Color.Aqua : Color.Yellow);
 
                 var i = 0;
                 if (Menu.AutoComboItem)
@@ -85,7 +85,7 @@ namespace SkywrathMagePlus
                 {
                     var posTexture = new Vector2(Config.Screen.X, Config.Screen.Y * 0.65f + x) - setPosTexture;
 
-                    var hero = Data.GetHero;
+                    var hero = Data.GetTarget;
                     var health = Data.GetHealth;
 
                     var ph = Math.Ceiling((float)health / hero.MaximumHealth * 100);

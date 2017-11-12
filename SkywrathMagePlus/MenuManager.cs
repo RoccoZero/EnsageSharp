@@ -96,11 +96,15 @@ namespace SkywrathMagePlus
 
         public MenuItem<KeyBind> StartComboKeyItem { get; }
 
-        public MenuItem<KeyBind> AutoQKeyItem { get; }
+        public MenuItem<KeyBind> AutoArcaneBoltKeyItem { get; }
 
-        public MenuItem<KeyBind> SpamKeyItem { get; }
+        public MenuItem<KeyBind> SpamArcaneBoltKeyItem { get; }
 
-        public MenuItem<bool> SpamUnitItem { get; }
+        public MenuItem<bool> SpamArcaneBoltUnitItem { get; }
+
+        public MenuItem<StringList> OrbwalkerArcaneBoltItem { get; }
+
+        public MenuItem<Slider> MinDisInOrbwalkArcaneBoltItem { get; }
 
         public MenuItem<bool> WWithoutFailItem { get; }
 
@@ -131,11 +135,14 @@ namespace SkywrathMagePlus
             ItemsToggler = ItemsMenu.Item("Use: ", new AbilityToggler(new Dictionary<string, bool>
             {
                 { "item_blink", false },
+                { "item_spirit_vessel", true },
+                { "item_urn_of_shadows", true },
                 { "item_shivas_guard", true },
                 { "item_dagon_5", true },
                 { "item_veil_of_discord", true },
                 { "item_ethereal_blade", true },
                 { "item_rod_of_atos", true },
+                { "item_nullifier", true },
                 { "item_bloodthorn", true },
                 { "item_orchid", true },
                 { "item_sheepstick", true }
@@ -146,7 +153,7 @@ namespace SkywrathMagePlus
 
             var AutoComboMenu = Factory.Menu("Auto Combo");
             AutoComboItem = AutoComboMenu.Item("Enable", true);
-            AutoAbilitiesToggler = AutoComboMenu.Item("Abilities: ", "AutoAbilitiesToggler", new AbilityToggler(new Dictionary<string, bool>
+            AutoAbilitiesToggler = AutoComboMenu.Item("Abilities: ", "autoabilitiestoggler", new AbilityToggler(new Dictionary<string, bool>
             {
                 { "skywrath_mage_mystic_flare", true },
                 { "skywrath_mage_ancient_seal", true },
@@ -154,13 +161,14 @@ namespace SkywrathMagePlus
                 { "skywrath_mage_arcane_bolt", true }
             }));
 
-            AutoItemsToggler = AutoComboMenu.Item("Items: ", "AutoItemsToggler", new AbilityToggler(new Dictionary<string, bool>
+            AutoItemsToggler = AutoComboMenu.Item("Items: ", "autoitemstoggler", new AbilityToggler(new Dictionary<string, bool>
             {
                 { "item_shivas_guard", true },
                 { "item_dagon_5", true },
                 { "item_veil_of_discord", true },
                 { "item_ethereal_blade", true },
                 { "item_rod_of_atos", true },
+                { "item_nullifier", true },
                 { "item_bloodthorn", true },
                 { "item_orchid", true },
                 { "item_sheepstick", true }
@@ -168,7 +176,7 @@ namespace SkywrathMagePlus
 
             var AutoKillStealMenu = Factory.Menu("Auto Kill Steal");
             AutoKillStealItem = AutoKillStealMenu.Item("Enable", true);
-            AutoKillStealToggler = AutoKillStealMenu.Item("Use: ", "AutoKillStealToggler", new AbilityToggler(new Dictionary<string, bool>
+            AutoKillStealToggler = AutoKillStealMenu.Item("Use: ", "autokillstealtoggler", new AbilityToggler(new Dictionary<string, bool>
             {
                 { "skywrath_mage_arcane_bolt", true },
                 { "skywrath_mage_concussive_shot", true },
@@ -197,6 +205,7 @@ namespace SkywrathMagePlus
                 { "skywrath_mage_arcane_bolt", true },
                 { "item_sheepstick", true},
                 { "item_rod_of_atos", true},
+                { "item_nullifier", true },
                 { "item_bloodthorn", true },
                 { "item_orchid", true },
                 { "item_cyclone", true },
@@ -209,6 +218,7 @@ namespace SkywrathMagePlus
                 { "skywrath_mage_arcane_bolt" },
                 { "item_sheepstick" },
                 { "item_rod_of_atos" },
+                { "item_nullifier" },
                 { "item_bloodthorn" },
                 { "item_orchid" },
                 { "item_cyclone" },
@@ -217,7 +227,7 @@ namespace SkywrathMagePlus
 
             LinkenBreakerMenu.Target.AddItem(new MenuItem("empty", ""));
 
-            LinkenBreakerMenu.Target.AddItem(new MenuItem("antiMagespellshield", "AntiMage Spell Shield:"));
+            LinkenBreakerMenu.Target.AddItem(new MenuItem("antimagespellshield", "Anti Mage Spell Shield:"));
             AntiMageBreakerToggler = LinkenBreakerMenu.Item("Use: ", "antimagetoggler", new AbilityToggler(new Dictionary<string, bool>
             {
                 { "skywrath_mage_ancient_seal", true },
@@ -244,6 +254,15 @@ namespace SkywrathMagePlus
             BladeMailItem.Item.SetTooltip("Cancel Combo if there is enemy Blade Mail");
             EulBladeMailItem = BladeMailMenu.Item("Use Eul", true);
             EulBladeMailItem.Item.SetTooltip("Use Eul if there is BladeMail with ULT");
+
+            var ArcaneBoltMenu = Factory.MenuWithTexture("Smart Arcane Bolt", "skywrath_mage_arcane_bolt");
+            AutoArcaneBoltKeyItem = ArcaneBoltMenu.Item("Auto Arcane Bolt Key", new KeyBind('F', KeyBindType.Toggle, false));
+            AutoArcaneBoltKeyItem.Item.SetValue(new KeyBind(AutoArcaneBoltKeyItem.Item.GetValue<KeyBind>().Key, KeyBindType.Toggle, false));
+            SpamArcaneBoltKeyItem = ArcaneBoltMenu.Item("Spam Arcane Bolt Key", new KeyBind('Q'));
+            SpamArcaneBoltUnitItem = ArcaneBoltMenu.Item("Spam Arcane Bolt Units", true);
+
+            OrbwalkerArcaneBoltItem = ArcaneBoltMenu.Item("Orbwalker", new StringList("Distance", "Default", "Free", "Only Attack", "No Move"));
+            MinDisInOrbwalkArcaneBoltItem = ArcaneBoltMenu.Item("Min Distance In Orbwalker", new Slider(600, 200, 600));
 
             var ConcussiveShotMenu = Factory.MenuWithTexture("Smart Concussive Shot", "skywrath_mage_concussive_shot");
             WWithoutFailItem = ConcussiveShotMenu.Item("Without Fail", true);
@@ -288,18 +307,14 @@ namespace SkywrathMagePlus
             TextYItem = DrawingMenu.Item("Y", new Slider(0, 0, (int)config.Screen.Y - 280));
 
             ComboKeyItem = Factory.Item("Combo Key", new KeyBind('D'));
-            OrbwalkerItem = Factory.Item("Orbwalker", new StringList("Default", "Distance", "Free"));
+            OrbwalkerItem = Factory.Item("Orbwalker", new StringList("Default", "Distance", "Free", "Only Attack", "No Move"));
             MinDisInOrbwalkItem = Factory.Item("Min Distance In Orbwalker", new Slider(600, 200, 600));
             TargetItem = Factory.Item("Target", new StringList("Lock", "Default"));
             StartComboKeyItem = Factory.Item("Start Combo With Mute", new KeyBind('0', KeyBindType.Toggle, false));
             StartComboKeyItem.Item.SetTooltip("Start Combo With Hex or Ancient Seal");
 
-            AutoQKeyItem = Factory.Item("Auto Q Key", new KeyBind('F', KeyBindType.Toggle, false));
-            AutoQKeyItem.Item.SetValue(new KeyBind(AutoQKeyItem.Item.GetValue<KeyBind>().Key, KeyBindType.Toggle, false));
-            SpamKeyItem = Factory.Item("Spam Q Key", new KeyBind('Q'));
-            SpamUnitItem = Factory.Item("Spam Q Units", true);
-
             ItemsToggler.PropertyChanged += Changed;
+            OrbwalkerArcaneBoltItem.PropertyChanged += Changed;
             DrawTargetItem.PropertyChanged += Changed;
             DrawOffTargetItem.PropertyChanged += Changed;
             OrbwalkerItem.PropertyChanged += Changed;
@@ -319,6 +334,16 @@ namespace SkywrathMagePlus
             {
                 BlinkActivationItem.Item.ShowItem = false;
                 BlinkDistanceEnemyItem.Item.ShowItem = false;
+            }
+
+            // Orbwalker Arcane Bolt Distance
+            if (OrbwalkerArcaneBoltItem.Value.SelectedValue.Contains("Distance"))
+            {
+                MinDisInOrbwalkArcaneBoltItem.Item.ShowItem = true;
+            }
+            else
+            {
+                MinDisInOrbwalkArcaneBoltItem.Item.ShowItem = false;
             }
 
             // Draw Target
@@ -401,6 +426,7 @@ namespace SkywrathMagePlus
             OrbwalkerItem.PropertyChanged -= Changed;
             DrawOffTargetItem.PropertyChanged -= Changed;
             DrawTargetItem.PropertyChanged -= Changed;
+            OrbwalkerArcaneBoltItem.PropertyChanged -= Changed;
             ItemsToggler.PropertyChanged -= Changed;
             Factory.Dispose();
         }

@@ -52,18 +52,18 @@ namespace SkywrathMagePlus.Features
                     BreakerChanger = Menu.LinkenBreakerChanger.Value.Dictionary.Where(
                         x => Menu.LinkenBreakerToggler.Value.IsEnabled(x.Key)).OrderByDescending(x => x.Value).ToList();
                 }
-                else if (Config.Extensions.AntimageShield(target))
+                else if (target.IsSpellShieldProtected())
                 {
                     BreakerChanger = Menu.AntiMageBreakerChanger.Value.Dictionary.Where(
                         x => Menu.AntiMageBreakerToggler.Value.IsEnabled(x.Key)).OrderByDescending(x => x.Value).ToList();
                 }
 
-                foreach (var Order in BreakerChanger)
+                foreach (var order in BreakerChanger)
                 {
                     // Eul
                     var Eul = Main.Eul;
                     if (Eul != null
-                        && Eul.ToString() == Order.Key
+                        && Eul.ToString() == order.Key
                         && Eul.CanBeCasted)
                     {
                         if (Eul.CanHit(target))
@@ -81,7 +81,7 @@ namespace SkywrathMagePlus.Features
                     // ForceStaff
                     var ForceStaff = Main.ForceStaff;
                     if (ForceStaff != null
-                        && ForceStaff.ToString() == Order.Key
+                        && ForceStaff.ToString() == order.Key
                         && ForceStaff.CanBeCasted)
                     {
                         if (ForceStaff.CanHit(target))
@@ -99,7 +99,7 @@ namespace SkywrathMagePlus.Features
                     // Orchid
                     var Orchid = Main.Orchid;
                     if (Orchid != null
-                        && Orchid.ToString() == Order.Key
+                        && Orchid.ToString() == order.Key
                         && Orchid.CanBeCasted)
                     {
                         if (Orchid.CanHit(target))
@@ -117,7 +117,7 @@ namespace SkywrathMagePlus.Features
                     // Bloodthorn
                     var Bloodthorn = Main.Bloodthorn;
                     if (Bloodthorn != null
-                        && Bloodthorn.ToString() == Order.Key
+                        && Bloodthorn.ToString() == order.Key
                         && Bloodthorn.CanBeCasted)
                     {
                         if (Bloodthorn.CanHit(target))
@@ -132,10 +132,28 @@ namespace SkywrathMagePlus.Features
                         }
                     }
 
+                    // Nullifier
+                    var Nullifier = Main.Nullifier;
+                    if (Nullifier != null
+                        && Nullifier.ToString() == order.Key
+                        && Nullifier.CanBeCasted)
+                    {
+                        if (Nullifier.CanHit(target))
+                        {
+                            Nullifier.UseAbility(target);
+                            await Await.Delay(Nullifier.GetCastDelay(target) + Nullifier.GetHitTime(target), token);
+                            return;
+                        }
+                        else if (Menu.UseOnlyFromRangeItem)
+                        {
+                            return;
+                        }
+                    }
+
                     // RodofAtos
                     var RodofAtos = Main.RodofAtos;
                     if (RodofAtos != null
-                        && RodofAtos.ToString() == Order.Key
+                        && RodofAtos.ToString() == order.Key
                         && RodofAtos.CanBeCasted)
                     {
                         if (RodofAtos.CanHit(target))
@@ -153,7 +171,7 @@ namespace SkywrathMagePlus.Features
                     // Hex
                     var Hex = Main.Hex;
                     if (Hex != null
-                        && Hex.ToString() == Order.Key
+                        && Hex.ToString() == order.Key
                         && Hex.CanBeCasted)
                     {
                         if (Hex.CanHit(target))
@@ -170,7 +188,7 @@ namespace SkywrathMagePlus.Features
 
                     // ArcaneBolt
                     var ArcaneBolt = Main.ArcaneBolt;
-                    if (ArcaneBolt.ToString() == Order.Key
+                    if (ArcaneBolt.ToString() == order.Key
                         && ArcaneBolt.CanBeCasted)
                     {
                         if (ArcaneBolt.CanHit(target))
@@ -187,7 +205,7 @@ namespace SkywrathMagePlus.Features
 
                     // AncientSeal
                     var AncientSeal = Main.AncientSeal;
-                    if (AncientSeal.ToString() == Order.Key
+                    if (AncientSeal.ToString() == order.Key
                         && AncientSeal.CanBeCasted)
                     {
                         if (AncientSeal.CanHit(target))

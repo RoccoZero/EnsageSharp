@@ -3,6 +3,7 @@ using System.Windows.Input;
 
 using Ensage;
 using Ensage.Common.Menu;
+using Ensage.Common.Objects.UtilityObjects;
 
 using SharpDX;
 
@@ -15,6 +16,8 @@ namespace SkywrathMagePlus
         public SkywrathMagePlus Main { get; }
 
         public Vector2 Screen { get; }
+
+        public MultiSleeper MultiSleeper { get; }
 
         public MenuManager Menu { get; }
 
@@ -48,6 +51,7 @@ namespace SkywrathMagePlus
         {
             Main = main;
             Screen = new Vector2(Drawing.Width - 160, Drawing.Height);
+            MultiSleeper = new MultiSleeper();
 
             Menu = new MenuManager(this);
             Extensions = new Extensions();
@@ -63,8 +67,8 @@ namespace SkywrathMagePlus
             AutoAbilities = new AutoAbilities(this);
 
             Menu.ComboKeyItem.Item.ValueChanged += ComboKeyChanged;
-            var Key = KeyInterop.KeyFromVirtualKey((int)Menu.ComboKeyItem.Value.Key);
-            Mode = new Mode(Main.Context, Key, this);
+            var key = KeyInterop.KeyFromVirtualKey((int)Menu.ComboKeyItem.Value.Key);
+            Mode = new Mode(Main.Context, key, this);
             Main.Context.Orbwalker.RegisterMode(Mode);
 
             Renderer = new Renderer(this);

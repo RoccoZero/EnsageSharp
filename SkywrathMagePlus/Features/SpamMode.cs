@@ -10,7 +10,7 @@ using Ensage.SDK.Extensions;
 using Ensage.SDK.Handlers;
 using Ensage.SDK.Helpers;
 using Ensage.SDK.Orbwalker;
-using Ensage.SDK.Service;
+using Ensage.SDK.Renderer.Particle;
 
 using SharpDX;
 
@@ -24,7 +24,7 @@ namespace SkywrathMagePlus
 
         private SkywrathMagePlus Main { get; }
 
-        private IServiceContext Context { get; }
+        private IParticleManager Particle { get; }
 
         private IOrbwalkerManager Orbwalker { get; }
 
@@ -39,23 +39,23 @@ namespace SkywrathMagePlus
             Config = config;
             Menu = config.Menu;
             Main = config.Main;
-            Context = config.Main.Context;
+            Particle = config.Main.Context.Particle;
             Orbwalker = config.Main.Context.Orbwalker;
             Owner = config.Main.Context.Owner;
 
-            config.Menu.SpamKeyItem.PropertyChanged += SpamKeyChanged;
+            config.Menu.SpamArcaneBoltKeyItem.PropertyChanged += SpamKeyChanged;
 
             Handler = UpdateManager.Run(ExecuteAsync, true, false);
         }
 
         public void Dispose()
         {
-            Menu.SpamKeyItem.PropertyChanged -= SpamKeyChanged;
+            Menu.SpamArcaneBoltKeyItem.PropertyChanged -= SpamKeyChanged;
         }
 
         private void SpamKeyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (Menu.SpamKeyItem)
+            if (Menu.SpamArcaneBoltKeyItem)
             {
                 Handler.RunAsync();
                 Target = null;
@@ -64,7 +64,7 @@ namespace SkywrathMagePlus
             {
                 Handler?.Cancel();
 
-                Context.Particle.Remove("SpamTarget");
+                Particle.Remove("SpamTarget");
             }
         }
 
@@ -74,7 +74,7 @@ namespace SkywrathMagePlus
             {
                 if (Target == null || !Target.IsValid || !Target.IsAlive)
                 {
-                    if (Menu.SpamUnitItem)
+                    if (Menu.SpamArcaneBoltUnitItem)
                     {
                         Target =
                             EntityManager<Unit>.Entities.Where(x =>
@@ -87,11 +87,11 @@ namespace SkywrathMagePlus
                                                                x.NetworkName == "CDOTA_Unit_Hero_Beastmaster_Boar" ||
                                                                x.NetworkName == "CDOTA_Unit_SpiritBear" ||
                                                                x.NetworkName == "CDOTA_Unit_Broodmother_Spiderling") &&
+                                                               x.IsValid &&
                                                                x.IsVisible &&
                                                                x.IsAlive &&
                                                                !x.IsIllusion &&
                                                                x.IsSpawned &&
-                                                               x.IsValid &&
                                                                x.IsEnemy(Owner) &&
                                                                x.Distance2D(Game.MousePosition) <= 100).OrderBy(x => x.Distance2D(Game.MousePosition)).FirstOrDefault();
                     }
@@ -104,7 +104,7 @@ namespace SkywrathMagePlus
 
                 if (Target != null)
                 {
-                    Context.Particle.DrawTargetLine(
+                    Particle.DrawTargetLine(
                         Owner,
                         "SpamTarget",
                         Target.Position,
@@ -117,6 +117,16 @@ namespace SkywrathMagePlus
                         if (ArcaneBolt.CanBeCasted && ArcaneBolt.CanHit(Target))
                         {
                             ArcaneBolt.UseAbility(Target);
+
+                            if (Target is Hero)
+                            {
+                                UpdateManager.BeginInvoke(() =>
+                                {
+                                    Config.MultiSleeper.Sleep(ArcaneBolt.GetHitTime(Target) - (ArcaneBolt.GetCastDelay(Target) + 350), $"arcanebolt_{ Target.Name }");
+                                },
+                                ArcaneBolt.GetCastDelay(Target) + 50);
+                            }
+
                             await Await.Delay(ArcaneBolt.GetCastDelay(Target), token);
                         }
                     }
@@ -127,21 +137,21 @@ namespace SkywrathMagePlus
                     }
                     else
                     {
-                        if (Menu.OrbwalkerItem.Value.SelectedValue.Contains("Default"))
+                        if (Menu.OrbwalkerArcaneBoltItem.Value.SelectedValue.Contains("Default"))
                         {
                             Orbwalker.OrbwalkingPoint = Vector3.Zero;
                             Orbwalker.OrbwalkTo(Target);
                         }
-                        else if (Menu.OrbwalkerItem.Value.SelectedValue.Contains("Distance"))
+                        else if (Menu.OrbwalkerArcaneBoltItem.Value.SelectedValue.Contains("Distance"))
                         {
                             var ownerDis = Math.Min(Owner.Distance2D(Game.MousePosition), 230);
                             var ownerPos = Owner.Position.Extend(Game.MousePosition, ownerDis);
-                            var pos = Target.Position.Extend(ownerPos, Menu.MinDisInOrbwalkItem);
+                            var pos = Target.Position.Extend(ownerPos, Menu.MinDisInOrbwalkArcaneBoltItem);
 
                             Orbwalker.OrbwalkTo(Target);
                             Orbwalker.OrbwalkingPoint = pos;
                         }
-                        else if (Menu.OrbwalkerItem.Value.SelectedValue.Contains("Free"))
+                        else if (Menu.OrbwalkerArcaneBoltItem.Value.SelectedValue.Contains("Free"))
                         {
                             if (Owner.Distance2D(Target) < Owner.AttackRange(Target) && Target.Distance2D(Game.MousePosition) < Owner.AttackRange(Target))
                             {
@@ -153,12 +163,23 @@ namespace SkywrathMagePlus
                                 Orbwalker.Move(Game.MousePosition);
                             }
                         }
+                        else if (Menu.OrbwalkerArcaneBoltItem.Value.SelectedValue.Contains("Only Attack"))
+                        {
+                            Orbwalker.Attack(Target);
+                        }
+                        else if (Menu.OrbwalkerArcaneBoltItem.Value.SelectedValue.Contains("No Move"))
+                        {
+                            if (Owner.Distance2D(Target) < Owner.AttackRange(Target))
+                            {
+                                Orbwalker.Attack(Target);
+                            }
+                        }
                     }
                 }
                 else
                 {
                     Orbwalker.Move(Game.MousePosition);
-                    Context.Particle.Remove("SpamTarget");
+                    Particle.Remove("SpamTarget");
                 }
             }
             catch (TaskCanceledException)

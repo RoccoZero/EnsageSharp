@@ -10,7 +10,6 @@ using Ensage.SDK.Extensions;
 using Ensage.SDK.Handlers;
 using Ensage.SDK.Helpers;
 using Ensage.SDK.Prediction;
-using Ensage.SDK.Prediction.Collision;
 
 namespace SkywrathMagePlus.Features
 {
@@ -78,10 +77,10 @@ namespace SkywrathMagePlus.Features
                 }
 
                 var target = EntityManager<Hero>.Entities.FirstOrDefault(x =>
+                                                                         x.IsValid &&
                                                                          x.IsVisible &&
                                                                          x.IsAlive &&
                                                                          !x.IsIllusion &&
-                                                                         x.IsValid &&
                                                                          x.IsEnemy(Owner) &&
                                                                          Config.Extensions.Active(x));
 
@@ -92,17 +91,17 @@ namespace SkywrathMagePlus.Features
 
                 if (!Menu.BladeMailItem || !target.HasModifier("modifier_item_blade_mail_reflect"))
                 {
-                    var StunDebuff = target.Modifiers.FirstOrDefault(x => x.IsStunDebuff);
-                    var HexDebuff = target.Modifiers.FirstOrDefault(x => x.IsValid && x.Name == "modifier_sheepstick_debuff");
-                    var AtosDebuff = target.Modifiers.FirstOrDefault(x => x.IsValid && x.Name == "modifier_rod_of_atos_debuff");
-                    var Sleeper = Config.Mode.Sleeper;
+                    var stunDebuff = target.Modifiers.FirstOrDefault(x => x.IsStunDebuff);
+                    var hexDebuff = target.Modifiers.FirstOrDefault(x => x.Name == "modifier_sheepstick_debuff");
+                    var atosDebuff = target.Modifiers.FirstOrDefault(x => x.Name == "modifier_rod_of_atos_debuff");
+                    var multiSleeper = Config.MultiSleeper;
 
-                    if (Config.Extensions.Cancel(target) || Owner.IsInvisible())
+                    if (!Config.Extensions.Cancel(target) || Owner.IsInvisible())
                     {
                         return;
                     }
 
-                    if (!target.IsLinkensProtected() && !Config.Extensions.AntimageShield(target))
+                    if (!target.IsBlockingAbilities())
                     {
                         // Hex
                         var Hex = Main.Hex;
@@ -110,8 +109,8 @@ namespace SkywrathMagePlus.Features
                             && Menu.AutoItemsToggler.Value.IsEnabled(Hex.ToString())
                             && Hex.CanBeCasted
                             && Hex.CanHit(target)
-                            && (StunDebuff == null || StunDebuff.RemainingTime <= 0.3f)
-                            && (HexDebuff == null || HexDebuff.RemainingTime <= 0.3f))
+                            && (stunDebuff == null || !stunDebuff.IsValid || stunDebuff.RemainingTime <= 0.3f)
+                            && (hexDebuff == null || !hexDebuff.IsValid || hexDebuff.RemainingTime <= 0.3f))
                         {
                             Hex.UseAbility(target);
                             await Await.Delay(Hex.GetCastDelay(target), token);
@@ -157,24 +156,30 @@ namespace SkywrathMagePlus.Features
                             var ultimateScepter = Owner.HasAghanimsScepter();
                             var dubleMysticFlare = ultimateScepter && enemies.Count() == 1;
 
-                            var Input =
-                                new PredictionInput(
-                                    Owner,
-                                    target,
-                                    0,
-                                    float.MaxValue,
-                                    MysticFlare.CastRange,
-                                    dubleMysticFlare ? -250 : -100,
-                                    PredictionSkillshotType.SkillshotCircle,
-                                    true)
-                                {
-                                    CollisionTypes = CollisionTypes.None
-                                };
+                            var input = new PredictionInput
+                            {
+                                Owner = Owner,
+                                Range = MysticFlare.CastRange,
+                                Radius = dubleMysticFlare ? -250 : -100
+                            };
 
-                            var Output = Prediction.GetPrediction(Input);
+                            var output = Prediction.GetPrediction(input.WithTarget(target));
 
-                            MysticFlare.UseAbility(Output.CastPosition);
-                            await Await.Delay(MysticFlare.GetCastDelay(Output.CastPosition), token);
+                            MysticFlare.UseAbility(output.CastPosition);
+                            await Await.Delay(MysticFlare.GetCastDelay(output.CastPosition), token);
+                        }
+
+                        // Nullifier
+                        var Nullifier = Main.Nullifier;
+                        if (Nullifier != null
+                            && Menu.ItemsToggler.Value.IsEnabled(Nullifier.ToString())
+                            && Nullifier.CanBeCasted
+                            && Nullifier.CanHit(target)
+                            && (stunDebuff == null || !stunDebuff.IsValid || stunDebuff.RemainingTime <= 0.5f)
+                            && (hexDebuff == null || !hexDebuff.IsValid || hexDebuff.RemainingTime <= 0.5f))
+                        {
+                            Nullifier.UseAbility(target);
+                            await Await.Delay(Nullifier.GetCastDelay(target), token);
                         }
 
                         // RodofAtos
@@ -183,8 +188,8 @@ namespace SkywrathMagePlus.Features
                             && Menu.AutoItemsToggler.Value.IsEnabled(RodofAtos.ToString())
                             && RodofAtos.CanBeCasted
                             && RodofAtos.CanHit(target)
-                            && (StunDebuff == null || StunDebuff.RemainingTime <= 0.5f)
-                            && (AtosDebuff == null || AtosDebuff.RemainingTime <= 0.5f))
+                            && (stunDebuff == null || !stunDebuff.IsValid || stunDebuff.RemainingTime <= 0.5f)
+                            && (atosDebuff == null || !atosDebuff.IsValid || atosDebuff.RemainingTime <= 0.5f))
                         {
                             RodofAtos.UseAbility(target);
                             await Await.Delay(RodofAtos.GetCastDelay(target), token);
@@ -220,7 +225,7 @@ namespace SkywrathMagePlus.Features
                             && Ethereal.CanHit(target))
                         {
                             Ethereal.UseAbility(target);
-                            Sleeper.Sleep(Ethereal.GetHitTime(target));
+                            multiSleeper.Sleep(Ethereal.GetHitTime(target), "ethereal");
                             await Await.Delay(Ethereal.GetCastDelay(target), token);
                         }
 
@@ -235,7 +240,7 @@ namespace SkywrathMagePlus.Features
                             await Await.Delay(Shivas.GetCastDelay(), token);
                         }
 
-                        if (!Sleeper.Sleeping || target.IsEthereal())
+                        if (!multiSleeper.Sleeping("ethereal") || target.IsEthereal())
                         {
                             // ConcussiveShot
                             var ConcussiveShot = Main.ConcussiveShot;
@@ -257,6 +262,13 @@ namespace SkywrathMagePlus.Features
                                 && ArcaneBolt.CanHit(target))
                             {
                                 ArcaneBolt.UseAbility(target);
+
+                                UpdateManager.BeginInvoke(() =>
+                                {
+                                    multiSleeper.Sleep(ArcaneBolt.GetHitTime(target) - (ArcaneBolt.GetCastDelay(target) + 350), $"arcanebolt_{ target.Name }");
+                                },
+                                ArcaneBolt.GetCastDelay(target) + 50);
+
                                 await Await.Delay(ArcaneBolt.GetCastDelay(target), token);
                                 return;
                             }
