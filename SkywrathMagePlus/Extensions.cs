@@ -2,6 +2,7 @@
 
 using Ensage;
 using Ensage.SDK.Extensions;
+using Ensage.SDK.Helpers;
 
 namespace SkywrathMagePlus
 {
@@ -26,7 +27,7 @@ namespace SkywrathMagePlus
                 || target.HasModifier("modifier_naga_siren_ensnare")
                 || target.HasModifier("modifier_meepo_earthbind")
                 || target.HasModifier("modifier_lone_druid_spirit_bear_entangle_effect")
-                || (target.HasModifier("modifier_legion_commander_duel") && target.HasAghanimsScepter())
+                || target.HasModifier("modifier_legion_commander_duel")
                 || target.HasModifier("modifier_kunkka_torrent")
                 || target.HasModifier("modifier_enigma_black_hole_pull")
                 || (BlackHole != null && BlackHole.IsInAbilityPhase)
@@ -88,7 +89,24 @@ namespace SkywrathMagePlus
         {
             return !target.IsMagicImmune() && !target.IsInvulnerable()
                 && !target.HasAnyModifiers("modifier_abaddon_borrowed_time", "modifier_item_combo_breaker_buff")
-                && !target.HasAnyModifiers("modifier_winter_wyvern_winters_curse_aura", "modifier_winter_wyvern_winters_curse");
+                && !target.HasAnyModifiers("modifier_winter_wyvern_winters_curse_aura", "modifier_winter_wyvern_winters_curse")
+                && !DuelAghanimsScepter(target);
+        }
+
+        public bool DuelAghanimsScepter(Hero target)
+        {
+            var duelAghanimsScepter = false;
+            if (target.HasModifier("modifier_legion_commander_duel"))
+            {
+                duelAghanimsScepter = EntityManager<Hero>.Entities.Any(x =>
+                                                                       x.HeroId == HeroId.npc_dota_hero_legion_commander &&
+                                                                       x.IsValid &&
+                                                                       x.IsVisible &&
+                                                                       x.IsAlive &&
+                                                                       x.HasAghanimsScepter());
+            }
+
+            return duelAghanimsScepter;
         }
     }
 }

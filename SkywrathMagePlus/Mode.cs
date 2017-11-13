@@ -107,9 +107,10 @@ namespace SkywrathMagePlus
                         // MysticFlare
                         var MysticFlare = Main.MysticFlare;
                         if (Menu.AbilitiesToggler.Value.IsEnabled(MysticFlare.ToString())
+                            && Menu.MinHealthToUltItem <= ((float)target.Health / target.MaximumHealth) * 100
                             && Main.MysticFlare.CanBeCasted
                             && Main.MysticFlare.CanHit(target)
-                            && Config.Extensions.Active(target))
+                            && (BadUlt(target) || Config.Extensions.Active(target)))
                         {
                             var enemies = EntityManager<Hero>.Entities.Where(x =>
                                                                              x.IsValid &&
@@ -358,6 +359,26 @@ namespace SkywrathMagePlus
             }
 
             return true;
+        }
+
+        private bool BadUlt(Hero target)
+        {
+            if (!Menu.BadUltItem)
+            {
+                return false;
+            }
+
+            if (Main.RodofAtos != null || Main.Hex != null || Main.Ethereal != null)
+            {
+                return false;
+            }
+
+            if (target.MovementSpeed < Menu.BadUltMovementSpeedItem)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

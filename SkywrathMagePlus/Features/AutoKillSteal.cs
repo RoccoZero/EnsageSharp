@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Ensage;
-using Ensage.Common.Objects.UtilityObjects;
 using Ensage.Common.Threading;
 using Ensage.SDK.Extensions;
 using Ensage.SDK.Handlers;
@@ -98,7 +97,7 @@ namespace SkywrathMagePlus.Features
                 var target = Damage.GetTarget;
                 var multiSleeper = Config.MultiSleeper;
 
-                if (Cancel(target))
+                if (!Cancel(target))
                 {
                     return;
                 }
@@ -211,13 +210,19 @@ namespace SkywrathMagePlus.Features
 
         private bool Cancel(Hero target)
         {
+            return !Owner.IsInvisible()
+                && !target.IsMagicImmune()
+                && !target.IsInvulnerable()
+                && !target.HasAnyModifiers("modifier_dazzle_shallow_grave", "modifier_necrolyte_reapers_scythe")
+                && !Config.Extensions.DuelAghanimsScepter(target)
+                && !Reincarnation(target);
+        }
+
+        private bool Reincarnation(Hero target)
+        {
             var reincarnation = target.GetAbilityById(AbilityId.skeleton_king_reincarnation);
 
-            return Owner.IsInvisible()
-                || target.IsMagicImmune()
-                || target.IsInvulnerable()
-                || target.HasAnyModifiers("modifier_dazzle_shallow_grave", "modifier_necrolyte_reapers_scythe")
-                || (reincarnation != null && reincarnation.Cooldown == 0 && reincarnation.Level > 0);
+            return reincarnation != null && reincarnation.Cooldown == 0 && reincarnation.Level > 0;
         }
 
         private void Stop()

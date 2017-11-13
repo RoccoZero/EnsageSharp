@@ -138,12 +138,12 @@ namespace SkywrathMagePlus.Features
                             await Await.Delay(Bloodthorn.GetCastDelay(target), token);
                         }
 
-                        // MysticFlare
+                        // Mystic Flare
                         var MysticFlare = Main.MysticFlare;
                         if (Menu.AutoAbilitiesToggler.Value.IsEnabled(MysticFlare.ToString())
+                            && Menu.AutoMinHealthToUltItem <= ((float)target.Health / target.MaximumHealth) * 100
                             && Main.MysticFlare.CanBeCasted
-                            && Main.MysticFlare.CanHit(target)
-                            && Config.Extensions.Active(target))
+                            && Main.MysticFlare.CanHit(target))
                         {
                             var enemies = EntityManager<Hero>.Entities.Where(x =>
                                                                              x.IsVisible &&

@@ -14,6 +14,12 @@ namespace SkywrathMagePlus
 
         public MenuItem<AbilityToggler> AbilitiesToggler { get; }
 
+        public MenuItem<Slider> MinHealthToUltItem { get; }
+
+        public MenuItem<bool> BadUltItem { get; }
+
+        public MenuItem<Slider> BadUltMovementSpeedItem { get; }
+
         public MenuItem<AbilityToggler> ItemsToggler { get; }
 
         public MenuItem<Slider> BlinkActivationItem { get; }
@@ -25,6 +31,8 @@ namespace SkywrathMagePlus
         public MenuItem<AbilityToggler> AutoAbilitiesToggler { get; }
 
         public MenuItem<AbilityToggler> AutoItemsToggler { get; }
+
+        public MenuItem<Slider> AutoMinHealthToUltItem { get; }
 
         public MenuItem<bool> AutoKillStealItem { get; }
 
@@ -131,6 +139,12 @@ namespace SkywrathMagePlus
                 { "skywrath_mage_arcane_bolt", true }
             }));
 
+            MinHealthToUltItem = AbilitiesMenu.Item("Min Health % To Ult", new Slider(100, 10, 100));
+            BadUltItem = AbilitiesMenu.Item("Bad Ult", false);
+            BadUltItem.Item.SetTooltip("It is not recommended to enable this. If you do not have these items (RodofAtos, Hex, Ethereal) then this function is activated");
+            BadUltMovementSpeedItem = AbilitiesMenu.Item("Bad Ult Movement Speed", new Slider(500, 240, 500));
+            BadUltMovementSpeedItem.Item.SetTooltip("If the enemy has less Movement Speed from this value, then immediately ULT");
+
             var ItemsMenu = Factory.Menu("Items");
             ItemsToggler = ItemsMenu.Item("Use: ", new AbilityToggler(new Dictionary<string, bool>
             {
@@ -173,6 +187,8 @@ namespace SkywrathMagePlus
                 { "item_orchid", true },
                 { "item_sheepstick", true }
             }));
+
+            AutoMinHealthToUltItem = AutoComboMenu.Item("Min Health % To Ult", new Slider(100, 10, 100));
 
             var AutoKillStealMenu = Factory.Menu("Auto Kill Steal");
             AutoKillStealItem = AutoKillStealMenu.Item("Enable", true);
@@ -313,7 +329,11 @@ namespace SkywrathMagePlus
             StartComboKeyItem = Factory.Item("Start Combo With Mute", new KeyBind('0', KeyBindType.Toggle, false));
             StartComboKeyItem.Item.SetTooltip("Start Combo With Hex or Ancient Seal");
 
+            AbilitiesToggler.PropertyChanged += Changed;
+            BadUltItem.PropertyChanged += Changed;
             ItemsToggler.PropertyChanged += Changed;
+            AutoComboItem.PropertyChanged += Changed;
+            AutoAbilitiesToggler.PropertyChanged += Changed;
             OrbwalkerArcaneBoltItem.PropertyChanged += Changed;
             DrawTargetItem.PropertyChanged += Changed;
             DrawOffTargetItem.PropertyChanged += Changed;
@@ -324,6 +344,29 @@ namespace SkywrathMagePlus
 
         private void Changed(object sender, PropertyChangedEventArgs e)
         {
+            // Bad Ult
+            if (BadUltItem)
+            {
+                BadUltMovementSpeedItem.Item.ShowItem = true;
+            }
+            else
+            {
+                BadUltMovementSpeedItem.Item.ShowItem = false;
+            }
+
+            // Mystic Flare
+            if (AbilitiesToggler.Value.IsEnabled("skywrath_mage_mystic_flare"))
+            {
+                MinHealthToUltItem.Item.ShowItem = true;
+                BadUltItem.Item.ShowItem = true;
+            }
+            else
+            {
+                MinHealthToUltItem.Item.ShowItem = false;
+                BadUltItem.Item.ShowItem = false;
+                BadUltMovementSpeedItem.Item.ShowItem = false;
+            }
+
             // Blink
             if (ItemsToggler.Value.IsEnabled("item_blink"))
             {
@@ -336,6 +379,29 @@ namespace SkywrathMagePlus
                 BlinkDistanceEnemyItem.Item.ShowItem = false;
             }
 
+            // Auto Mystic Flare
+            if (AutoAbilitiesToggler.Value.IsEnabled("skywrath_mage_mystic_flare"))
+            {
+                AutoMinHealthToUltItem.Item.ShowItem = true;
+            }
+            else
+            {
+                AutoMinHealthToUltItem.Item.ShowItem = false;
+            }
+
+            // Auto Combo
+            if (AutoComboItem)
+            {
+                AutoAbilitiesToggler.Item.ShowItem = true;
+                AutoItemsToggler.Item.ShowItem = true;
+            }
+            else
+            {
+                AutoAbilitiesToggler.Item.ShowItem = false;
+                AutoItemsToggler.Item.ShowItem = false;
+                AutoMinHealthToUltItem.Item.ShowItem = false;
+            }
+            
             // Orbwalker Arcane Bolt Distance
             if (OrbwalkerArcaneBoltItem.Value.SelectedValue.Contains("Distance"))
             {
@@ -427,7 +493,11 @@ namespace SkywrathMagePlus
             DrawOffTargetItem.PropertyChanged -= Changed;
             DrawTargetItem.PropertyChanged -= Changed;
             OrbwalkerArcaneBoltItem.PropertyChanged -= Changed;
+            AutoAbilitiesToggler.PropertyChanged -= Changed;
+            AutoComboItem.PropertyChanged -= Changed;
             ItemsToggler.PropertyChanged -= Changed;
+            BadUltItem.PropertyChanged -= Changed;
+            AbilitiesToggler.PropertyChanged -= Changed;
             Factory.Dispose();
         }
     }
