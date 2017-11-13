@@ -4,6 +4,7 @@ using Ensage;
 using Ensage.SDK.Extensions;
 
 using SharpDX;
+using Ensage.Common;
 
 namespace SkywrathMagePlus
 {
@@ -45,9 +46,7 @@ namespace SkywrathMagePlus
         {
             if (Menu.TextItem)
             {
-                var setPosText = new Vector2(
-                    (Config.Screen.X) - Menu.TextXItem - 10,
-                    Menu.TextYItem - 20);
+                var setPosText = new Vector2(Config.Screen.X - Menu.TextXItem - 10, Menu.TextYItem - 20);
 
                 var posText = new Vector2(Config.Screen.X, Config.Screen.Y * 0.65f) - setPosText;
 
@@ -76,24 +75,22 @@ namespace SkywrathMagePlus
             
             if (Menu.CalculationItem)
             {
-                var setPosTexture = new Vector2(
-                    Config.Screen.X - Menu.CalculationXItem - 20,
-                    Menu.CalculationYItem - 110);
+                var setPosTexture = new Vector2(Config.Screen.X - Menu.CalculationXItem - 20, Menu.CalculationYItem - 110);
 
                 var x = 0;
                 foreach (var Data in Config.DamageCalculation.DamageList)
                 {
                     var posTexture = new Vector2(Config.Screen.X, Config.Screen.Y * 0.65f + x) - setPosTexture;
 
-                    var hero = Data.GetTarget;
+                    var target = Data.GetTarget;
                     var health = Data.GetHealth;
 
-                    var ph = Math.Ceiling((float)health / hero.MaximumHealth * 100);
-                    var doNotKill = DoNotKill(hero);
+                    var ph = Math.Ceiling((float)health / target.MaximumHealth * 100);
+                    var doNotKill = DoNotKill(target);
 
-                    if (!hero.IsVisible)
+                    if (!target.IsVisible)
                     {
-                        Texture(posTexture + 5, new Vector2(55), $"heroes_round/{ hero.Name.Substring("npc_dota_hero_".Length) }");
+                        Texture(posTexture + 5, new Vector2(55), $"heroes_round/{ target.Name.Substring("npc_dota_hero_".Length) }");
                         Texture(posTexture, new Vector2(65), "other/round_percentage/frame/white");
                         Texture(posTexture, new Vector2(65), $"other/round_percentage/hp/{ Math.Min(ph, 100) }");
 
@@ -110,8 +107,8 @@ namespace SkywrathMagePlus
                     var readyDamage = Data.GetReadyDamage;
                     var totalDamage = Data.GetTotalDamage;
 
-                    var maxHealth = hero.MaximumHealth + (health - hero.MaximumHealth);
-                    var damagePercent = Math.Ceiling(100 - (health - Math.Max(damage, 0)) / maxHealth * 100);
+                    var maxHealth = target.MaximumHealth + (health - target.MaximumHealth);
+                    var damagePercent = Math.Ceiling(100 - (health - Math.Max(Data.GetDamage, 0)) / maxHealth * 100);
                     var readyDamagePercent = Math.Ceiling(100 - (health - Math.Max(readyDamage, 0)) / maxHealth * 100);
                     var totalDamagePercent = Math.Ceiling(100 - (health - Math.Max(totalDamage, 0)) / maxHealth * 100);
 
@@ -120,7 +117,7 @@ namespace SkywrathMagePlus
                         Texture(posTexture - 10, new Vector2(85), $"other/round_percentage/alert/{ Alert() }");
                     }
 
-                    Texture(posTexture + 5, new Vector2(55), $"heroes_round/{ hero.Name.Substring("npc_dota_hero_".Length) }");
+                    Texture(posTexture + 5, new Vector2(55), $"heroes_round/{ target.Name.Substring("npc_dota_hero_".Length) }");
 
                     Texture(posTexture, new Vector2(65), "other/round_percentage/frame/white");
                     Texture(posTexture, new Vector2(65), $"other/round_percentage/no_percent_gray/{ Math.Min(totalDamagePercent, 100) }");

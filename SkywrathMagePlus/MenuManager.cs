@@ -139,7 +139,7 @@ namespace SkywrathMagePlus
                 { "skywrath_mage_arcane_bolt", true }
             }));
 
-            MinHealthToUltItem = AbilitiesMenu.Item("Min Health % To Ult", new Slider(100, 10, 100));
+            MinHealthToUltItem = AbilitiesMenu.Item("Min Health % To Ult", new Slider(0, 0, 70));
             BadUltItem = AbilitiesMenu.Item("Bad Ult", false);
             BadUltItem.Item.SetTooltip("It is not recommended to enable this. If you do not have these items (RodofAtos, Hex, Ethereal) then this function is activated");
             BadUltMovementSpeedItem = AbilitiesMenu.Item("Bad Ult Movement Speed", new Slider(500, 240, 500));
@@ -188,7 +188,7 @@ namespace SkywrathMagePlus
                 { "item_sheepstick", true }
             }));
 
-            AutoMinHealthToUltItem = AutoComboMenu.Item("Min Health % To Ult", new Slider(100, 10, 100));
+            AutoMinHealthToUltItem = AutoComboMenu.Item("Min Health % To Ult", new Slider(0, 0, 70));
 
             var AutoKillStealMenu = Factory.Menu("Auto Kill Steal");
             AutoKillStealItem = AutoKillStealMenu.Item("Enable", true);
