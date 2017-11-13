@@ -141,7 +141,7 @@ namespace SkywrathMagePlus.Features
                         // Mystic Flare
                         var MysticFlare = Main.MysticFlare;
                         if (Menu.AutoAbilitiesToggler.Value.IsEnabled(MysticFlare.ToString())
-                            && Menu.AutoMinHealthToUltItem <= ((float)target.Health / target.MaximumHealth) * 100
+                            && Menu.AutoMinHealthToUltItem >= ((float)target.Health / target.MaximumHealth) * 100
                             && Main.MysticFlare.CanBeCasted
                             && Main.MysticFlare.CanHit(target))
                         {
