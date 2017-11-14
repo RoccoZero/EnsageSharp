@@ -51,10 +51,10 @@ namespace SkywrathMagePlus.Features
                 if (Menu.EulBladeMailItem)
                 {
                     var target = EntityManager<Hero>.Entities.FirstOrDefault(x =>
+                                                                             x.IsValid &&
                                                                              x.IsVisible &&
                                                                              x.IsAlive &&
                                                                              !x.IsIllusion &&
-                                                                             x.IsValid &&
                                                                              x.IsEnemy(Owner) &&
                                                                              x.HasModifier("modifier_item_blade_mail_reflect") &&
                                                                              x.HasModifier("modifier_skywrath_mystic_flare_aura_effect"));
@@ -73,12 +73,12 @@ namespace SkywrathMagePlus.Features
 
                     var target =
                         EntityManager<Hero>.Entities.Where(x =>
-                                                          x.IsVisible &&
-                                                          x.IsAlive &&
-                                                          !x.IsIllusion &&
-                                                          x.IsValid &&
-                                                          x.IsEnemy(Owner) &&
-                                                          ArcaneBolt.CanHit(x)).OrderBy(x => x.Health).FirstOrDefault();
+                                                           x.IsVisible &&
+                                                           x.IsAlive &&
+                                                           !x.IsIllusion &&
+                                                           x.IsValid &&
+                                                           x.IsEnemy(Owner) &&
+                                                           ArcaneBolt.CanHit(x)).OrderBy(x => x.Health).FirstOrDefault();
 
                     if (target != null && Config.Extensions.Cancel(target) && !Owner.IsInvisible())
                     {

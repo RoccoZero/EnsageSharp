@@ -54,7 +54,7 @@ namespace SkywrathMagePlus
             MultiSleeper = new MultiSleeper();
 
             Menu = new MenuManager(this);
-            Extensions = new Extensions();
+            Extensions = new Extensions(this);
 
             UpdateMode = new UpdateMode(this);
             DamageCalculation = new DamageCalculation(this);

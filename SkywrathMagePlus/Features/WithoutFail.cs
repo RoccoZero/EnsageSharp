@@ -8,34 +8,34 @@ namespace SkywrathMagePlus.Features
     {
         private MenuManager Menu { get; }
 
-        private UpdateMode UpdateMode { get; }
+        private SkywrathMagePlus Main { get; }
 
         public WithoutFail(Config config)
         {
             Menu = config.Menu;
-            UpdateMode = config.UpdateMode;
+            Main = config.Main;
 
-            if (config.Menu.WWithoutFailItem)
+            if (config.Menu.ConcussiveShotWithoutFailItem)
             {
                 Player.OnExecuteOrder += OnExecuteOrder;
             }
 
-            config.Menu.WWithoutFailItem.PropertyChanged += WWithoutFailChanged;
+            config.Menu.ConcussiveShotWithoutFailItem.PropertyChanged += ConcussiveShotWithoutFailChanged;
         }
 
         public void Dispose()
         {
-            Menu.WWithoutFailItem.PropertyChanged -= WWithoutFailChanged;
+            Menu.ConcussiveShotWithoutFailItem.PropertyChanged -= ConcussiveShotWithoutFailChanged;
 
-            if (Menu.WWithoutFailItem)
+            if (Menu.ConcussiveShotWithoutFailItem)
             {
                 Player.OnExecuteOrder -= OnExecuteOrder;
             }
         }
 
-        private void WWithoutFailChanged(object sender, PropertyChangedEventArgs e)
+        private void ConcussiveShotWithoutFailChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (Menu.WWithoutFailItem)
+            if (Menu.ConcussiveShotWithoutFailItem)
             {
                 Player.OnExecuteOrder += OnExecuteOrder;
             }
@@ -47,9 +47,7 @@ namespace SkywrathMagePlus.Features
 
         private void OnExecuteOrder(Player sender, ExecuteOrderEventArgs args)
         {
-            if (args.OrderId == OrderId.Ability 
-                && args.Ability.Name == "skywrath_mage_concussive_shot" 
-                && UpdateMode.WShowTarget == null)
+            if (args.OrderId == OrderId.Ability && args.Ability.Name == "skywrath_mage_concussive_shot" && Main.ConcussiveShot.TargetHit == null)
             {
                 args.Process = false;
                 Game.PrintMessage($"<font color='#FF6666'>There is no one in the radius.</font>");

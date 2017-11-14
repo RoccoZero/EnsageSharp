@@ -67,7 +67,7 @@ namespace SkywrathMagePlus.Features
         {
             try
             {
-                if (Game.IsPaused || !Owner.IsValid || !Owner.IsAlive || Owner.IsStunned())
+                if (Game.IsPaused || !Owner.IsValid || !Owner.IsAlive || Owner.IsStunned() || Owner.IsInvisible())
                 {
                     return;
                 }

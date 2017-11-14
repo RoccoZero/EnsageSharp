@@ -8,6 +8,13 @@ namespace SkywrathMagePlus
 {
     internal class Extensions
     {
+        private MenuManager Menu { get; }
+
+        public Extensions(Config config)
+        {
+            Menu = config.Menu;
+        }
+
         public bool Active(Hero target)
         {
             var stunDebuff = target.Modifiers.FirstOrDefault(x => x.IsStunDebuff);
@@ -91,6 +98,31 @@ namespace SkywrathMagePlus
                 && !target.HasAnyModifiers("modifier_abaddon_borrowed_time", "modifier_item_combo_breaker_buff")
                 && !target.HasAnyModifiers("modifier_winter_wyvern_winters_curse_aura", "modifier_winter_wyvern_winters_curse")
                 && !DuelAghanimsScepter(target);
+        }
+
+        public bool ConcussiveShotTarget(Hero target, Hero targetHit)
+        {
+            if (!Menu.ConcussiveShotTargetItem)
+            {
+                return true;
+            }
+
+            if (targetHit == null)
+            {
+                return false;
+            }
+
+            if (target == targetHit)
+            {
+                return true;
+            }
+
+            if (target.Distance2D(targetHit) < 200)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public bool DuelAghanimsScepter(Hero target)

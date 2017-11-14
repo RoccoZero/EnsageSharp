@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 using Ensage;
@@ -78,7 +77,7 @@ namespace SkywrathMagePlus.Features
 
                     // ConcussiveShot
                     var ConcussiveShot = Main.ConcussiveShot;
-                    if (ConcussiveShot.Ability.Level > 0 && Menu.AutoKillStealToggler.Value.IsEnabled(ConcussiveShot.ToString()) && target == Config.UpdateMode.WShowTarget)
+                    if (ConcussiveShot.Ability.Level > 0 && Menu.AutoKillStealToggler.Value.IsEnabled(ConcussiveShot.ToString()) && target == ConcussiveShot.TargetHit)
                     {
                         abilities.Add(ConcussiveShot);
                     }

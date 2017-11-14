@@ -27,6 +27,8 @@ namespace SkywrathMagePlus
 
         private SkywrathMagePlus Main { get; }
 
+        private Extensions Extensions { get; }
+
         private IPredictionManager Prediction { get; }
 
         public Mode(IServiceContext context, Key key, Config config) 
@@ -35,6 +37,7 @@ namespace SkywrathMagePlus
             Config = config;
             Menu = config.Menu;
             Main = config.Main;
+            Extensions = config.Extensions;
             Prediction = context.Prediction;
         }
 
@@ -65,7 +68,7 @@ namespace SkywrathMagePlus
                     }
                 }
 
-                if (Config.Extensions.Cancel(target) && StartCombo(target))
+                if (Extensions.Cancel(target) && StartCombo(target))
                 {
                     if (!target.IsBlockingAbilities())
                     {
@@ -110,7 +113,7 @@ namespace SkywrathMagePlus
                             && Menu.MinHealthToUltItem <= ((float)target.Health / target.MaximumHealth) * 100
                             && Main.MysticFlare.CanBeCasted
                             && Main.MysticFlare.CanHit(target)
-                            && (BadUlt(target) || Config.Extensions.Active(target)))
+                            && (BadUlt(target) || Extensions.Active(target)))
                         {
                             var enemies = EntityManager<Hero>.Entities.Where(x =>
                                                                              x.IsValid &&
@@ -212,11 +215,9 @@ namespace SkywrathMagePlus
                             // ConcussiveShot
                             var ConcussiveShot = Main.ConcussiveShot;
                             if (Menu.AbilitiesToggler.Value.IsEnabled(ConcussiveShot.ToString())
-                                && (!Menu.WTargetItem
-                                || (target == Config.UpdateMode.WShowTarget
-                                || (Config.UpdateMode.WShowTarget != null && target.Distance2D(Config.UpdateMode.WShowTarget) < 250)))
+                                && Extensions.ConcussiveShotTarget(target, ConcussiveShot.TargetHit)
                                 && ConcussiveShot.CanBeCasted
-                                && Owner.Distance2D(target) < Menu.WRadiusItem - Owner.HullRadius)
+                                && ConcussiveShot.CanHit(target))
                             {
                                 ConcussiveShot.UseAbility();
                                 await Await.Delay(ConcussiveShot.GetCastDelay(), token);
@@ -313,11 +314,11 @@ namespace SkywrathMagePlus
                             Orbwalker.Move(Game.MousePosition);
                         }
                     }
-                    else if (Menu.OrbwalkerArcaneBoltItem.Value.SelectedValue.Contains("Only Attack"))
+                    else if (Menu.OrbwalkerItem.Value.SelectedValue.Contains("Only Attack"))
                     {
                         Orbwalker.Attack(target);
                     }
-                    else if (Menu.OrbwalkerArcaneBoltItem.Value.SelectedValue.Contains("No Move"))
+                    else if (Menu.OrbwalkerItem.Value.SelectedValue.Contains("No Move"))
                     {
                         if (Owner.Distance2D(target) < Owner.AttackRange(target))
                         {

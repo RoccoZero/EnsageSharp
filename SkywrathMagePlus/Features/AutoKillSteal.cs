@@ -154,9 +154,9 @@ namespace SkywrathMagePlus.Features
                         // ConcussiveShot
                         var ConcussiveShot = Main.ConcussiveShot;
                         if (Menu.AutoKillStealToggler.Value.IsEnabled(ConcussiveShot.ToString())
-                            && target == Config.UpdateMode.WShowTarget
+                            && target == ConcussiveShot.TargetHit
                             && ConcussiveShot.CanBeCasted
-                            && Owner.Distance2D(target) < Menu.WRadiusItem - Owner.HullRadius)
+                            && ConcussiveShot.CanHit(target))
                         {
                             ConcussiveShot.UseAbility();
                             await Await.Delay(ConcussiveShot.GetCastDelay(), token);

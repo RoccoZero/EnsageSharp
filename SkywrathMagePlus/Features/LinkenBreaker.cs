@@ -39,7 +39,6 @@ namespace SkywrathMagePlus.Features
             try
             {
                 var target = Config.UpdateMode.Target;
-
                 if (target == null)
                 {
                     return;

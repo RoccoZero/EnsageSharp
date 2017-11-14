@@ -78,7 +78,7 @@ namespace SkywrathMagePlus
 
         public MenuItem<bool> MysticFlareRadiusItem { get; }
 
-        public MenuItem<bool> WDrawItem { get; }
+        public MenuItem<bool> TargetHitConcussiveShotItem { get; }
 
         public MenuItem<bool> BlinkRadiusItem { get; }
 
@@ -87,6 +87,10 @@ namespace SkywrathMagePlus
         public MenuItem<Slider> CalculationXItem { get; }
 
         public MenuItem<Slider> CalculationYItem { get; }
+
+        public MenuItem<bool> HPBarCalculationItem { get; }
+
+        public MenuItem<Slider> HPBarCalculationPosItem { get; }
 
         public MenuItem<bool> TextItem { get; }
 
@@ -114,11 +118,11 @@ namespace SkywrathMagePlus
 
         public MenuItem<Slider> MinDisInOrbwalkArcaneBoltItem { get; }
 
-        public MenuItem<bool> WWithoutFailItem { get; }
+        public MenuItem<bool> ConcussiveShotWithoutFailItem { get; }
 
-        public MenuItem<bool> WTargetItem { get; }
+        public MenuItem<bool> ConcussiveShotTargetItem { get; }
 
-        public MenuItem<Slider> WRadiusItem { get; }
+        public MenuItem<Slider> ConcussiveShotUseRadiusItem { get; }
 
         public MenuItem<bool> BladeMailItem { get; }
 
@@ -281,11 +285,11 @@ namespace SkywrathMagePlus
             MinDisInOrbwalkArcaneBoltItem = ArcaneBoltMenu.Item("Min Distance In Orbwalker", new Slider(600, 200, 600));
 
             var ConcussiveShotMenu = Factory.MenuWithTexture("Smart Concussive Shot", "skywrath_mage_concussive_shot");
-            WWithoutFailItem = ConcussiveShotMenu.Item("Without Fail", true);
-            WTargetItem = ConcussiveShotMenu.Item("Use Only Target", true);
-            WTargetItem.Item.SetTooltip("This only works with Combo");
-            WRadiusItem = ConcussiveShotMenu.Item("Use in Radius", new Slider(1400, 800, 1600));
-            WRadiusItem.Item.SetTooltip("This only works with Combo");
+            ConcussiveShotWithoutFailItem = ConcussiveShotMenu.Item("Without Fail", true);
+            ConcussiveShotTargetItem = ConcussiveShotMenu.Item("Use Only Target", true);
+            ConcussiveShotTargetItem.Item.SetTooltip("This only works with Combo");
+            ConcussiveShotUseRadiusItem = ConcussiveShotMenu.Item("Use in Radius", new Slider(1400, 800, 1600));
+            ConcussiveShotUseRadiusItem.Item.SetTooltip("This only works with Combo");
 
             var DrawingMenu = Factory.Menu("Drawing");
             var TargetMenu = DrawingMenu.Menu("Target");
@@ -306,21 +310,27 @@ namespace SkywrathMagePlus
             OffTargetBlueItem = TargetMenu.Item("Blue", "offblue", new Slider(255, 0, 255));
             OffTargetBlueItem.Item.SetFontColor(Color.Blue);
 
+            var CalculationMenu = DrawingMenu.Menu("Damage Calculation");
+            CalculationItem = CalculationMenu.Item("Enable", true);
+            CalculationXItem = CalculationMenu.Item("X", new Slider(0, 0, (int)config.Screen.X + 65));
+            CalculationYItem = CalculationMenu.Item("Y", new Slider((int)config.Screen.Y - 260, 0, (int)config.Screen.Y - 200));
+
+            var HPBarCalculationMenu = DrawingMenu.Menu("HP Bar Damage Calculation");
+            HPBarCalculationItem = HPBarCalculationMenu.Item("Enable", true);
+            HPBarCalculationPosItem = HPBarCalculationMenu.Item("Damage Bar Position", new Slider(84, 0, 100));
+
+            var TextMenu = DrawingMenu.Menu("Text");
+            TextItem = TextMenu.Item("Enable", true);
+            TextXItem = TextMenu.Item("X", new Slider((int)config.Screen.X - 50, 0, (int)config.Screen.X - 50));
+            TextYItem = TextMenu.Item("Y", new Slider(0, 0, (int)config.Screen.Y - 280));
+
             var RadiusMenu = DrawingMenu.Menu("Radius");
-            ArcaneBoltRadiusItem = RadiusMenu.Item("Arcane Bolt Radius", true);
-            ConcussiveShotRadiusItem = RadiusMenu.Item("Concussive Shot Radius", true);
-            AncientSealRadiusItem = RadiusMenu.Item("Ancient Seal Radius", true);
-            MysticFlareRadiusItem = RadiusMenu.Item("Mystic Flare Radius", true);
-            WDrawItem = RadiusMenu.Item("Show W Target", true);
-            BlinkRadiusItem = RadiusMenu.Item("Blink Radius", false);
-
-            CalculationItem = DrawingMenu.Item("Damage Calculation", true);
-            CalculationXItem = DrawingMenu.Item("X", "calculation_x", new Slider(0, 0, (int)config.Screen.X + 65));
-            CalculationYItem = DrawingMenu.Item("Y", "calculation_y", new Slider((int)config.Screen.Y - 260, 0, (int)config.Screen.Y - 200));
-
-            TextItem = DrawingMenu.Item("Text", true);
-            TextXItem = DrawingMenu.Item("X", new Slider((int)config.Screen.X - 50, 0, (int)config.Screen.X - 50));
-            TextYItem = DrawingMenu.Item("Y", new Slider(0, 0, (int)config.Screen.Y - 280));
+            ArcaneBoltRadiusItem = RadiusMenu.Item("Arcane Bolt", true);
+            ConcussiveShotRadiusItem = RadiusMenu.Item("Concussive Shot", true);
+            AncientSealRadiusItem = RadiusMenu.Item("Ancient Seal", true);
+            MysticFlareRadiusItem = RadiusMenu.Item("Mystic Flare", true);
+            TargetHitConcussiveShotItem = RadiusMenu.Item("Target Hit Concussive Shot", true);
+            BlinkRadiusItem = RadiusMenu.Item("Blink", false);
 
             ComboKeyItem = Factory.Item("Combo Key", new KeyBind('D'));
             OrbwalkerItem = Factory.Item("Orbwalker", new StringList("Default", "Distance", "Free", "Only Attack", "No Move"));
@@ -498,6 +508,7 @@ namespace SkywrathMagePlus
             ItemsToggler.PropertyChanged -= Changed;
             BadUltItem.PropertyChanged -= Changed;
             AbilitiesToggler.PropertyChanged -= Changed;
+
             Factory.Dispose();
         }
     }

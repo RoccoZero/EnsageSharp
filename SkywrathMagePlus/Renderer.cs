@@ -72,18 +72,49 @@ namespace SkywrathMagePlus
                 i += 30;
                 Text($"Start Combo Mute { (Menu.StartComboKeyItem ? "ON" : "OFF") }", posText + new Vector2(0, 60 + i), Menu.StartComboKeyItem ? Color.Aqua : Color.Yellow);
             }
-            
-            if (Menu.CalculationItem)
-            {
-                var setPosTexture = new Vector2(Config.Screen.X - Menu.CalculationXItem - 20, Menu.CalculationYItem - 110);
 
-                var x = 0;
-                foreach (var Data in Config.DamageCalculation.DamageList)
+            var setPosTexture = new Vector2(Config.Screen.X - Menu.CalculationXItem - 20, Menu.CalculationYItem - 110);
+
+            var x = 0;
+            foreach (var Data in Config.DamageCalculation.DamageList)
+            {
+                var target = Data.GetTarget;
+                var health = Data.GetHealth;
+                var damage = Data.GetDamage;
+                var readyDamage = Data.GetReadyDamage;
+
+                if (Menu.HPBarCalculationItem && target.Position.IsOnScreen())
+                {
+                    var hpBarSizeX = HUDInfo.GetHPBarSizeX(target);
+                    var hpBarSizeY = HUDInfo.GetHpBarSizeY(target) / 1.7f;
+                    var hpBarPos = HUDInfo.GetHPbarPosition(target) + new Vector2(0, hpBarSizeY * (Menu.HPBarCalculationPosItem / 70f));
+
+                    var readyDamageBar = Math.Max(readyDamage, 0) / target.MaximumHealth;
+                    if (readyDamageBar > 0)
+                    {
+                        var readyDamagePos = Math.Max(health - readyDamage, 0) / target.MaximumHealth;
+                        var readyDamagePosition = new Vector2(hpBarPos.X + ((hpBarSizeX + readyDamageBar) * readyDamagePos), hpBarPos.Y);
+                        var readyDamageSize = new Vector2(hpBarSizeX * (readyDamageBar + Math.Min(health - readyDamage, 0) / target.MaximumHealth), hpBarSizeY);
+
+                        Drawing.DrawRect(readyDamagePosition, readyDamageSize, ((float)health / target.MaximumHealth) - readyDamageBar > 0 ? new Color(100, 0, 0, 200) : new Color(191, 255, 0, 200));
+                        Drawing.DrawRect(readyDamagePosition, readyDamageSize, Color.Black, true);
+                    }
+
+                    var damageBar = Math.Max(damage, 0) / target.MaximumHealth;
+                    if (damageBar > 0)
+                    {
+                        var damagePos = Math.Max(health - damage, 0) / target.MaximumHealth;
+                        var damagePosition = new Vector2(hpBarPos.X + ((hpBarSizeX + damageBar) * damagePos), hpBarPos.Y);
+                        var damageSize = new Vector2(hpBarSizeX * (damageBar + Math.Min(health - damage, 0) / target.MaximumHealth), hpBarSizeY);
+
+                        Drawing.DrawRect(damagePosition, damageSize, ((float)health / target.MaximumHealth) - damageBar > 0 ? new Color(0, 255, 0) : Color.Aqua);
+                        Drawing.DrawRect(damagePosition, damageSize, Color.Black, true);
+                    }
+                }
+
+                if (Menu.CalculationItem)
                 {
                     var posTexture = new Vector2(Config.Screen.X, Config.Screen.Y * 0.65f + x) - setPosTexture;
-
-                    var target = Data.GetTarget;
-                    var health = Data.GetHealth;
 
                     var ph = Math.Ceiling((float)health / target.MaximumHealth * 100);
                     var doNotKill = DoNotKill(target);
@@ -103,12 +134,10 @@ namespace SkywrathMagePlus
                         continue;
                     }
 
-                    var damage = Data.GetDamage;
-                    var readyDamage = Data.GetReadyDamage;
                     var totalDamage = Data.GetTotalDamage;
 
                     var maxHealth = target.MaximumHealth + (health - target.MaximumHealth);
-                    var damagePercent = Math.Ceiling(100 - (health - Math.Max(Data.GetDamage, 0)) / maxHealth * 100);
+                    var damagePercent = Math.Ceiling(100 - (health - Math.Max(damage, 0)) / maxHealth * 100);
                     var readyDamagePercent = Math.Ceiling(100 - (health - Math.Max(readyDamage, 0)) / maxHealth * 100);
                     var totalDamagePercent = Math.Ceiling(100 - (health - Math.Max(totalDamage, 0)) / maxHealth * 100);
 

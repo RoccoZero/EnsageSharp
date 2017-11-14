@@ -21,6 +21,8 @@ namespace SkywrathMagePlus.Features
 
         private SkywrathMagePlus Main { get; }
 
+        private Extensions Extensions { get; }
+
         private Unit Owner { get; }
 
         private IPredictionManager Prediction { get; }
@@ -32,6 +34,7 @@ namespace SkywrathMagePlus.Features
             Config = config;
             Menu = config.Menu;
             Main = config.Main;
+            Extensions = config.Extensions;
             Owner = config.Main.Context.Owner;
             Prediction = config.Main.Context.Prediction;
 
@@ -71,7 +74,7 @@ namespace SkywrathMagePlus.Features
         {
             try
             {
-                if (Game.IsPaused || !Owner.IsValid || !Owner.IsAlive || Owner.IsStunned() || Menu.ComboKeyItem)
+                if (Game.IsPaused || !Owner.IsValid || !Owner.IsAlive || Owner.IsStunned() || Menu.ComboKeyItem || Owner.IsInvisible())
                 {
                     return;
                 }
@@ -82,7 +85,7 @@ namespace SkywrathMagePlus.Features
                                                                          x.IsAlive &&
                                                                          !x.IsIllusion &&
                                                                          x.IsEnemy(Owner) &&
-                                                                         Config.Extensions.Active(x));
+                                                                         Extensions.Active(x));
 
                 if (target == null)
                 {
@@ -96,7 +99,7 @@ namespace SkywrathMagePlus.Features
                     var atosDebuff = target.Modifiers.FirstOrDefault(x => x.Name == "modifier_rod_of_atos_debuff");
                     var multiSleeper = Config.MultiSleeper;
 
-                    if (!Config.Extensions.Cancel(target) || Owner.IsInvisible())
+                    if (!Extensions.Cancel(target))
                     {
                         return;
                     }
@@ -245,11 +248,9 @@ namespace SkywrathMagePlus.Features
                             // ConcussiveShot
                             var ConcussiveShot = Main.ConcussiveShot;
                             if (Menu.AutoAbilitiesToggler.Value.IsEnabled(ConcussiveShot.ToString())
-                                && (!Menu.WTargetItem
-                                || (target == Config.UpdateMode.WShowTarget
-                                || (Config.UpdateMode.WShowTarget != null && target.Distance2D(Config.UpdateMode.WShowTarget) < 250)))
+                                && Extensions.ConcussiveShotTarget(target, ConcussiveShot.TargetHit)
                                 && ConcussiveShot.CanBeCasted
-                                && Owner.Distance2D(target) < Menu.WRadiusItem - Owner.HullRadius)
+                                && Owner.Distance2D(target) < Menu.ConcussiveShotUseRadiusItem - Owner.HullRadius)
                             {
                                 ConcussiveShot.UseAbility();
                                 await Await.Delay(ConcussiveShot.GetCastDelay(), token);
