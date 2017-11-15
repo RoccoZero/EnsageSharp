@@ -52,6 +52,26 @@ namespace SkywrathMagePlus
 
         public MenuItem<bool> UseOnlyFromRangeItem { get; }
 
+        public MenuItem<bool> BladeMailItem { get; }
+
+        public MenuItem<bool> EulBladeMailItem { get; }
+
+        public MenuItem<KeyBind> AutoArcaneBoltKeyItem { get; }
+
+        public MenuItem<KeyBind> SpamArcaneBoltKeyItem { get; }
+
+        public MenuItem<bool> SpamArcaneBoltUnitItem { get; }
+
+        public MenuItem<StringList> OrbwalkerArcaneBoltItem { get; }
+
+        public MenuItem<Slider> MinDisInOrbwalkArcaneBoltItem { get; }
+
+        public MenuItem<bool> ConcussiveShotWithoutFailItem { get; }
+
+        public MenuItem<bool> ConcussiveShotTargetItem { get; }
+
+        public MenuItem<Slider> ConcussiveShotUseRadiusItem { get; }
+
         public MenuItem<StringList> TargetEffectTypeItem { get; }
 
         public MenuItem<bool> DrawTargetItem { get; }
@@ -107,27 +127,6 @@ namespace SkywrathMagePlus
         public MenuItem<StringList> TargetItem { get; }
 
         public MenuItem<KeyBind> StartComboKeyItem { get; }
-
-        public MenuItem<KeyBind> AutoArcaneBoltKeyItem { get; }
-
-        public MenuItem<KeyBind> SpamArcaneBoltKeyItem { get; }
-
-        public MenuItem<bool> SpamArcaneBoltUnitItem { get; }
-
-        public MenuItem<StringList> OrbwalkerArcaneBoltItem { get; }
-
-        public MenuItem<Slider> MinDisInOrbwalkArcaneBoltItem { get; }
-
-        public MenuItem<bool> ConcussiveShotWithoutFailItem { get; }
-
-        public MenuItem<bool> ConcussiveShotTargetItem { get; }
-
-        public MenuItem<Slider> ConcussiveShotUseRadiusItem { get; }
-
-        public MenuItem<bool> BladeMailItem { get; }
-
-        public MenuItem<bool> EulBladeMailItem { get; }
-
 
         public MenuManager(Config config)
         {

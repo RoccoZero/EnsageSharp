@@ -29,7 +29,7 @@ namespace SkywrathMagePlus
 
         public LinkenBreaker LinkenBreaker { get; }
 
-        public AutoKillSteal AutoKillSteal { get; }
+        private AutoKillSteal AutoKillSteal { get; }
 
         private AutoCombo AutoCombo { get; }
 
@@ -41,7 +41,7 @@ namespace SkywrathMagePlus
 
         private AutoAbilities AutoAbilities { get; }
 
-        public Mode Mode { get; }
+        private Mode Mode { get; }
 
         private Renderer Renderer { get; }
 
@@ -50,6 +50,8 @@ namespace SkywrathMagePlus
         public Config(SkywrathMagePlus main)
         {
             Main = main;
+
+            ActivatePlugins();
             Screen = new Vector2(Drawing.Width - 160, Drawing.Height);
             MultiSleeper = new MultiSleeper();
 
@@ -74,10 +76,30 @@ namespace SkywrathMagePlus
             Renderer = new Renderer(this);
         }
 
+        private void ActivatePlugins()
+        {
+            var orbwalker = Main.Context.Orbwalker;
+            if (!orbwalker.IsActive)
+            {
+                orbwalker.Activate();
+            }
+
+            var targetSelector = Main.Context.TargetSelector;
+            if (!targetSelector.IsActive)
+            {
+                targetSelector.Activate();
+            }
+
+            var prediction = Main.Context.Prediction;
+            if (!prediction.IsActive)
+            {
+                prediction.Activate();
+            }
+        }
+
         private void ComboKeyChanged(object sender, OnValueChangeEventArgs e)
         {
             var keyCode = e.GetNewValue<KeyBind>().Key;
-
             if (keyCode == e.GetOldValue<KeyBind>().Key)
             {
                 return;
@@ -103,8 +125,10 @@ namespace SkywrathMagePlus
             if (disposing)
             {
                 Renderer.Dispose();
+
                 Main.Context.Orbwalker.UnregisterMode(Mode);
                 Menu.ComboKeyItem.Item.ValueChanged -= ComboKeyChanged;
+
                 AutoAbilities.Dispose();
                 WithoutFail.Dispose();
                 AutoDisable.Dispose();
@@ -113,7 +137,9 @@ namespace SkywrathMagePlus
                 AutoKillSteal.Dispose();
                 DamageCalculation.Dispose();
                 UpdateMode.Dispose();
+
                 Main.Context.Particle.Dispose();
+
                 Menu.Dispose();
             }
 

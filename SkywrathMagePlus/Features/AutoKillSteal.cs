@@ -40,7 +40,7 @@ namespace SkywrathMagePlus.Features
 
             Handler = UpdateManager.Run(ExecuteAsync, true, false);
 
-            if (Menu.AutoKillStealItem)
+            if (config.Menu.AutoKillStealItem)
             {
                 Handler.RunAsync();
             }

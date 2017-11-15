@@ -35,7 +35,7 @@ namespace SkywrathMagePlus.Features
 
         private void OnUpdate()
         {
-            var heroes = EntityManager<Hero>.Entities.Where(x => !x.IsIllusion && x.IsValid).ToList();
+            var heroes = EntityManager<Hero>.Entities.Where(x => x.IsValid && !x.IsIllusion).ToList();
 
             DamageList.Clear();
 
@@ -111,10 +111,10 @@ namespace SkywrathMagePlus.Features
                 var readyDamage = DamageHelpers.GetSpellDamage(damageCalculation.GetDamage(target, true, false) + damageBlock, 0, damageReduction) - livingArmor;
                 var totalDamage = DamageHelpers.GetSpellDamage(damageCalculation.GetDamage(target, false, false) + damageBlock, 0, damageReduction) - livingArmor;
 
-                if (target.HasAnyModifiers("modifier_abaddon_borrowed_time", "modifier_item_combo_breaker_buff")
+                if (target.IsInvulnerable()
+                    || target.HasAnyModifiers("modifier_abaddon_borrowed_time", "modifier_item_combo_breaker_buff")
                     || target.HasModifier("modifier_templar_assassin_refraction_absorb")
-                    || target.HasAnyModifiers("modifier_winter_wyvern_winters_curse_aura", "modifier_winter_wyvern_winters_curse")
-                    || target.IsInvulnerable())
+                    || target.HasAnyModifiers("modifier_winter_wyvern_winters_curse_aura", "modifier_winter_wyvern_winters_curse"))
                 {
                     damage = 0.0f;
                     readyDamage = 0.0f;

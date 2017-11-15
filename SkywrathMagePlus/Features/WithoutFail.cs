@@ -47,7 +47,8 @@ namespace SkywrathMagePlus.Features
 
         private void OnExecuteOrder(Player sender, ExecuteOrderEventArgs args)
         {
-            if (args.OrderId == OrderId.Ability && args.Ability.Name == "skywrath_mage_concussive_shot" && Main.ConcussiveShot.TargetHit == null)
+            var concussiveShot = Main.ConcussiveShot;
+            if (args.OrderId == OrderId.Ability && args.Ability.Name == concussiveShot.ToString() && concussiveShot.TargetHit == null)
             {
                 args.Process = false;
                 Game.PrintMessage($"<font color='#FF6666'>There is no one in the radius.</font>");

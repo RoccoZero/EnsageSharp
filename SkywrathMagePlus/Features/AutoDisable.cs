@@ -73,12 +73,12 @@ namespace SkywrathMagePlus.Features
                 }
 
                 var target = EntityManager<Hero>.Entities.FirstOrDefault(x =>
+                                                                         x.IsValid &&
                                                                          x.IsVisible &&
                                                                          x.IsAlive &&
                                                                          !x.IsIllusion &&
-                                                                         x.IsValid &&
                                                                          x.IsEnemy(Owner) &&
-                                                                         Config.Extensions.Disable(x));
+                                                                         Disable(x));
 
                 if (target == null)
                 {
@@ -140,6 +140,45 @@ namespace SkywrathMagePlus.Features
             {
                 Main.Log.Error(e);
             }
+        }
+
+        private bool Disable(Hero target)
+        {
+            var queenofPainBlink = target.GetAbilityById(AbilityId.queenofpain_blink);
+            var antiMageBlink = target.GetAbilityById(AbilityId.antimage_blink);
+            var manaVoid = target.GetAbilityById(AbilityId.antimage_mana_void);
+            var duel = target.GetAbilityById(AbilityId.legion_commander_duel);
+            var doom = target.GetAbilityById(AbilityId.doom_bringer_doom);
+            var timeWalk = target.GetAbilityById(AbilityId.faceless_void_time_walk);
+            var chronoSphere = target.GetAbilityById(AbilityId.faceless_void_chronosphere);
+            var deathWard = target.GetAbilityById(AbilityId.witch_doctor_death_ward);
+            var powerCogs = target.GetAbilityById(AbilityId.rattletrap_power_cogs);
+            var ravage = target.GetAbilityById(AbilityId.tidehunter_ravage);
+            var berserkersCall = target.GetAbilityById(AbilityId.axe_berserkers_call);
+            var primalSplit = target.GetAbilityById(AbilityId.brewmaster_primal_split);
+            var guardianAngel = target.GetAbilityById(AbilityId.omniknight_guardian_angel);
+            var sonicWave = target.GetAbilityById(AbilityId.queenofpain_sonic_wave);
+            var slithereenCrush = target.GetAbilityById(AbilityId.slardar_slithereen_crush);
+            var fingerofDeath = target.GetAbilityById(AbilityId.lion_finger_of_death);
+            var lagunaBlade = target.GetAbilityById(AbilityId.lina_laguna_blade);
+
+            return (queenofPainBlink != null && queenofPainBlink.IsInAbilityPhase)
+                || (antiMageBlink != null && antiMageBlink.IsInAbilityPhase)
+                || (manaVoid != null && manaVoid.IsInAbilityPhase)
+                || (duel != null && duel.IsInAbilityPhase)
+                || (doom != null && doom.IsInAbilityPhase)
+                || (timeWalk != null && timeWalk.IsInAbilityPhase)
+                || (chronoSphere != null && chronoSphere.IsInAbilityPhase)
+                || (deathWard != null && deathWard.IsInAbilityPhase)
+                || (powerCogs != null && powerCogs.IsInAbilityPhase)
+                || (ravage != null && ravage.IsInAbilityPhase)
+                || (berserkersCall != null && berserkersCall.IsInAbilityPhase)
+                || (primalSplit != null && primalSplit.IsInAbilityPhase)
+                || (guardianAngel != null && guardianAngel.IsInAbilityPhase)
+                || (sonicWave != null && sonicWave.IsInAbilityPhase)
+                || (slithereenCrush != null && slithereenCrush.IsInAbilityPhase)
+                || (fingerofDeath != null && fingerofDeath.IsInAbilityPhase)
+                || (lagunaBlade != null && lagunaBlade.IsInAbilityPhase);
         }
     }
 }

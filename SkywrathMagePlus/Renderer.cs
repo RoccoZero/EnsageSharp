@@ -1,10 +1,10 @@
 ﻿using System;
 
 using Ensage;
+using Ensage.Common;
 using Ensage.SDK.Extensions;
 
 using SharpDX;
-using Ensage.Common;
 
 namespace SkywrathMagePlus
 {
@@ -47,7 +47,6 @@ namespace SkywrathMagePlus
             if (Menu.TextItem)
             {
                 var setPosText = new Vector2(Config.Screen.X - Menu.TextXItem - 10, Menu.TextYItem - 20);
-
                 var posText = new Vector2(Config.Screen.X, Config.Screen.Y * 0.65f) - setPosText;
 
                 Text($"Combo { (Menu.ComboKeyItem ? "ON" : "OFF") }", posText, Menu.ComboKeyItem ? Color.Aqua : Color.Yellow);
@@ -95,8 +94,9 @@ namespace SkywrathMagePlus
                         var readyDamagePos = Math.Max(health - readyDamage, 0) / target.MaximumHealth;
                         var readyDamagePosition = new Vector2(hpBarPos.X + ((hpBarSizeX + readyDamageBar) * readyDamagePos), hpBarPos.Y);
                         var readyDamageSize = new Vector2(hpBarSizeX * (readyDamageBar + Math.Min(health - readyDamage, 0) / target.MaximumHealth), hpBarSizeY);
+                        var readyDamageColor = ((float)health / target.MaximumHealth) - readyDamageBar > 0 ? new Color(100, 0, 0, 200) : new Color(191, 255, 0, 200);
 
-                        Drawing.DrawRect(readyDamagePosition, readyDamageSize, ((float)health / target.MaximumHealth) - readyDamageBar > 0 ? new Color(100, 0, 0, 200) : new Color(191, 255, 0, 200));
+                        Drawing.DrawRect(readyDamagePosition, readyDamageSize, readyDamageColor);
                         Drawing.DrawRect(readyDamagePosition, readyDamageSize, Color.Black, true);
                     }
 
@@ -106,8 +106,9 @@ namespace SkywrathMagePlus
                         var damagePos = Math.Max(health - damage, 0) / target.MaximumHealth;
                         var damagePosition = new Vector2(hpBarPos.X + ((hpBarSizeX + damageBar) * damagePos), hpBarPos.Y);
                         var damageSize = new Vector2(hpBarSizeX * (damageBar + Math.Min(health - damage, 0) / target.MaximumHealth), hpBarSizeY);
+                        var damageColor = ((float)health / target.MaximumHealth) - damageBar > 0 ? new Color(0, 255, 0) : Color.Aqua;
 
-                        Drawing.DrawRect(damagePosition, damageSize, ((float)health / target.MaximumHealth) - damageBar > 0 ? new Color(0, 255, 0) : Color.Aqua);
+                        Drawing.DrawRect(damagePosition, damageSize, damageColor);
                         Drawing.DrawRect(damagePosition, damageSize, Color.Black, true);
                     }
                 }
@@ -117,7 +118,7 @@ namespace SkywrathMagePlus
                     var posTexture = new Vector2(Config.Screen.X, Config.Screen.Y * 0.65f + x) - setPosTexture;
 
                     var ph = Math.Ceiling((float)health / target.MaximumHealth * 100);
-                    var doNotKill = DoNotKill(target);
+                    var doNotKill = Reincarnation(target);
 
                     if (!target.IsVisible)
                     {
@@ -170,7 +171,7 @@ namespace SkywrathMagePlus
             }
         }
 
-        private string DoNotKill(Hero hero)
+        private string Reincarnation(Hero hero)
         {
             var reincarnation = hero.GetAbilityById(AbilityId.skeleton_king_reincarnation);
             if (reincarnation != null && reincarnation.Cooldown == 0 && reincarnation.Level > 0)

@@ -19,11 +19,11 @@ namespace SkywrathMagePlus
         {
             var stunDebuff = target.Modifiers.FirstOrDefault(x => x.IsStunDebuff);
 
-            var BorrowedTime = target.GetAbilityById(AbilityId.abaddon_borrowed_time);
-            var PowerCogs = target.GetAbilityById(AbilityId.rattletrap_power_cogs);
-            var BlackHole = target.GetAbilityById(AbilityId.enigma_black_hole);
-            var FiendsGrip = target.GetAbilityById(AbilityId.bane_fiends_grip);
-            var DeathWard = target.GetAbilityById(AbilityId.witch_doctor_death_ward);
+            var borrowedTime = target.GetAbilityById(AbilityId.abaddon_borrowed_time);
+            var powerCogs = target.GetAbilityById(AbilityId.rattletrap_power_cogs);
+            var blackHole = target.GetAbilityById(AbilityId.enigma_black_hole);
+            var fiendsGrip = target.GetAbilityById(AbilityId.bane_fiends_grip);
+            var deathWard = target.GetAbilityById(AbilityId.witch_doctor_death_ward);
 
             return (target.MovementSpeed < 240
                 || (stunDebuff != null && stunDebuff.Duration >= 1)
@@ -37,59 +37,20 @@ namespace SkywrathMagePlus
                 || target.HasModifier("modifier_legion_commander_duel")
                 || target.HasModifier("modifier_kunkka_torrent")
                 || target.HasModifier("modifier_enigma_black_hole_pull")
-                || (BlackHole != null && BlackHole.IsInAbilityPhase)
+                || (blackHole != null && blackHole.IsInAbilityPhase)
                 || target.HasModifier("modifier_ember_spirit_searing_chains")
                 || target.HasModifier("modifier_dark_troll_warlord_ensnare")
                 || target.HasModifier("modifier_rattletrap_cog_marker")
-                || (PowerCogs != null && PowerCogs.IsInAbilityPhase)
+                || (powerCogs != null && powerCogs.IsInAbilityPhase)
                 || target.HasModifier("modifier_axe_berserkers_call")
                 || target.HasModifier("modifier_faceless_void_chronosphere_freeze")
-                || (FiendsGrip != null && FiendsGrip.IsInAbilityPhase)
-                || (DeathWard != null && DeathWard.IsInAbilityPhase)
+                || (fiendsGrip != null && fiendsGrip.IsInAbilityPhase)
+                || (deathWard != null && deathWard.IsInAbilityPhase)
                 || target.HasModifier("modifier_winter_wyvern_cold_embrace"))
-                && (BorrowedTime == null || BorrowedTime.Owner.Health > 2000 || BorrowedTime.Cooldown > 0)
+                && (borrowedTime == null || borrowedTime.Owner.Health > 2000 || borrowedTime.Cooldown > 0)
                 && !target.HasModifier("modifier_dazzle_shallow_grave")
                 && !target.HasModifier("modifier_spirit_breaker_charge_of_darkness")
                 && !target.HasModifier("modifier_pugna_nether_ward_aura");
-        }
-
-        public bool Disable(Hero target)
-        {
-            var QueenofPainBlink = target.GetAbilityById(AbilityId.queenofpain_blink);
-            var AntiMageBlink = target.GetAbilityById(AbilityId.antimage_blink);
-            var ManaVoid = target.GetAbilityById(AbilityId.antimage_mana_void);
-            var Duel = target.GetAbilityById(AbilityId.legion_commander_duel);
-            var Doom = target.GetAbilityById(AbilityId.doom_bringer_doom);
-            var TimeWalk = target.GetAbilityById(AbilityId.faceless_void_time_walk);
-            var ChronoSphere = target.GetAbilityById(AbilityId.faceless_void_chronosphere);
-            var DeathWard = target.GetAbilityById(AbilityId.witch_doctor_death_ward);
-            var PowerCogs = target.GetAbilityById(AbilityId.rattletrap_power_cogs);
-            var Ravage = target.GetAbilityById(AbilityId.tidehunter_ravage);
-            var BerserkersCall = target.GetAbilityById(AbilityId.axe_berserkers_call);
-            var PrimalSplit = target.GetAbilityById(AbilityId.brewmaster_primal_split);
-            var GuardianAngel = target.GetAbilityById(AbilityId.omniknight_guardian_angel);
-            var SonicWave = target.GetAbilityById(AbilityId.queenofpain_sonic_wave);
-            var SlithereenCrush = target.GetAbilityById(AbilityId.slardar_slithereen_crush);
-            var FingerofDeath = target.GetAbilityById(AbilityId.lion_finger_of_death);
-            var LagunaBlade = target.GetAbilityById(AbilityId.lina_laguna_blade);
-
-            return (QueenofPainBlink != null && QueenofPainBlink.IsInAbilityPhase)
-                || (AntiMageBlink != null && AntiMageBlink.IsInAbilityPhase)
-                || (ManaVoid != null && ManaVoid.IsInAbilityPhase)
-                || (Duel != null && Duel.IsInAbilityPhase)
-                || (Doom != null && Doom.IsInAbilityPhase)
-                || (TimeWalk != null && TimeWalk.IsInAbilityPhase)
-                || (ChronoSphere != null && ChronoSphere.IsInAbilityPhase)
-                || (DeathWard != null && DeathWard.IsInAbilityPhase)
-                || (PowerCogs != null && PowerCogs.IsInAbilityPhase)
-                || (Ravage != null && Ravage.IsInAbilityPhase)
-                || (BerserkersCall != null && BerserkersCall.IsInAbilityPhase)
-                || (PrimalSplit != null && PrimalSplit.IsInAbilityPhase)
-                || (GuardianAngel != null && GuardianAngel.IsInAbilityPhase)
-                || (SonicWave != null && SonicWave.IsInAbilityPhase)
-                || (SlithereenCrush != null && SlithereenCrush.IsInAbilityPhase)
-                || (FingerofDeath != null && FingerofDeath.IsInAbilityPhase)
-                || (LagunaBlade != null && LagunaBlade.IsInAbilityPhase);
         }
 
         public bool Cancel(Hero target)

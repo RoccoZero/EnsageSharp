@@ -122,28 +122,21 @@ namespace SkywrathMagePlus
                 Particle.Remove("Blink");
             }
 
-            if (Menu.TargetHitConcussiveShotItem)
+            var targetHit = ConcussiveShot.TargetHit;
+            if (Menu.TargetHitConcussiveShotItem && targetHit != null && ConcussiveShot.Ability.Cooldown <= 1 && ConcussiveShot.Ability.Level > 0)
             {
-                var targetHit = ConcussiveShot.TargetHit;
-                if (targetHit != null && ConcussiveShot.Ability.Cooldown <= 1)
-                {
-                    Particle.AddOrUpdate(
-                        targetHit,
-                        "TargetHitConcussiveShot",
-                        "particles/units/heroes/hero_skywrath_mage/skywrath_mage_concussive_shot.vpcf",
-                        ParticleAttachment.AbsOrigin,
-                        RestartType.None,
-                        0,
-                        targetHit.Position + new Vector3(0, 200, targetHit.HealthBarOffset),
-                        1,
-                        targetHit.Position + new Vector3(0, 200, targetHit.HealthBarOffset),
-                        2,
-                        new Vector3(1000));
-                }
-                else
-                {
-                    Particle.Remove("TargetHitConcussiveShot");
-                }
+                Particle.AddOrUpdate(
+                    targetHit,
+                    "TargetHitConcussiveShot",
+                    "particles/units/heroes/hero_skywrath_mage/skywrath_mage_concussive_shot.vpcf",
+                    ParticleAttachment.AbsOrigin,
+                    RestartType.None,
+                    0,
+                    targetHit.Position + new Vector3(0, 200, targetHit.HealthBarOffset),
+                    1,
+                    targetHit.Position + new Vector3(0, 200, targetHit.HealthBarOffset),
+                    2,
+                    new Vector3(1000));
             }
             else
             {

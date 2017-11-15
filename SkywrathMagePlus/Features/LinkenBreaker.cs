@@ -44,20 +44,20 @@ namespace SkywrathMagePlus.Features
                     return;
                 }
 
-                List<KeyValuePair<string, uint>> BreakerChanger = new List<KeyValuePair<string, uint>>();
+                List<KeyValuePair<string, uint>> breakerChanger = new List<KeyValuePair<string, uint>>();
 
                 if (target.IsLinkensProtected())
                 {
-                    BreakerChanger = Menu.LinkenBreakerChanger.Value.Dictionary.Where(
+                    breakerChanger = Menu.LinkenBreakerChanger.Value.Dictionary.Where(
                         x => Menu.LinkenBreakerToggler.Value.IsEnabled(x.Key)).OrderByDescending(x => x.Value).ToList();
                 }
                 else if (target.IsSpellShieldProtected())
                 {
-                    BreakerChanger = Menu.AntiMageBreakerChanger.Value.Dictionary.Where(
+                    breakerChanger = Menu.AntiMageBreakerChanger.Value.Dictionary.Where(
                         x => Menu.AntiMageBreakerToggler.Value.IsEnabled(x.Key)).OrderByDescending(x => x.Value).ToList();
                 }
 
-                foreach (var order in BreakerChanger)
+                foreach (var order in breakerChanger)
                 {
                     // Eul
                     var Eul = Main.Eul;

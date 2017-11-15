@@ -44,7 +44,6 @@ namespace SkywrathMagePlus
         public override async Task ExecuteAsync(CancellationToken token)
         {
             var target = Config.UpdateMode.Target;
-
             if (target != null && (!Menu.BladeMailItem || !target.HasModifier("modifier_item_blade_mail_reflect")))
             {
                 var stunDebuff = target.Modifiers.FirstOrDefault(x => x.IsStunDebuff);

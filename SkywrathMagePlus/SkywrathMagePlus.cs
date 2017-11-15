@@ -20,17 +20,17 @@ namespace SkywrathMagePlus
         name: "SkywrathMagePlus",
         mode: StartupMode.Auto,
         author: "YEEEEEEE", 
-        version: "2.1.0.0",
+        version: "2.1.0.1",
         units: HeroId.npc_dota_hero_skywrath_mage)]
     internal class SkywrathMagePlus : Plugin
     {
-        private Config Config { get; set; }
-
         public IServiceContext Context { get; }
 
         private AbilityFactory AbilityFactory { get; }
 
         public ILog Log = AssemblyLogs.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        private Config Config { get; set; }
 
         [ImportingConstructor]
         public SkywrathMagePlus([Import] IServiceContext context)
