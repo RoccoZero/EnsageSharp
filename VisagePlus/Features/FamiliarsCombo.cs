@@ -14,32 +14,37 @@ using Ensage.SDK.Helpers;
 
 namespace VisagePlus.Features
 {
-    internal class FamiliarsCombo : Extensions
+    internal class FamiliarsCombo
     {
         private Config Config { get; }
 
+        private MenuManager Menu { get; }
+
+        private VisagePlus Main { get; }
+
+        private Extensions Extensions { get; }
+
+        private MultiSleeper MultiSleeper { get; }
+
         private Unit Owner { get; }
 
-        private Sleeper FamiliarsSleeper { get; }
-
         private TaskHandler Handler { get; }
-
-        private Hero Target { get; set; }
 
         public FamiliarsCombo(Config config)
         {
             Config = config;
+            Menu = config.Menu;
+            Main = config.Main;
+            Extensions = config.Extensions;
+            MultiSleeper = config.MultiSleeper;
             Owner = config.Main.Context.Owner;
 
-            FamiliarsSleeper = new Sleeper();
+            config.Menu.ComboKeyItem.PropertyChanged += ComboChanged;
+            config.Menu.FamiliarsLockItem.PropertyChanged += FamiliarsLockChanged;
 
-            config.ComboKeyItem.PropertyChanged += ComboChanged;
-            config.FamiliarsLockItem.PropertyChanged += FamiliarsLockChanged;
-
-            if (config.FamiliarsLockItem)
+            if (config.Menu.FamiliarsLockItem)
             {
-                config.FamiliarsLockItem.Item.SetValue(new KeyBind(
-                    config.FamiliarsLockItem.Item.GetValue<KeyBind>().Key, KeyBindType.Toggle, false));
+                config.Menu.FamiliarsLockItem.Item.SetValue(new KeyBind(config.Menu.FamiliarsLockItem.Value, KeyBindType.Toggle));
             }
 
             Handler = UpdateManager.Run(ExecuteAsync, true, false);
@@ -47,24 +52,21 @@ namespace VisagePlus.Features
 
         public void Dispose()
         {
-            if (Config.ComboKeyItem)
+            if (Menu.ComboKeyItem)
             {
                 Handler?.Cancel();
             }
 
-            Config.FamiliarsLockItem.PropertyChanged -= FamiliarsLockChanged;
-            Config.ComboKeyItem.PropertyChanged -= ComboChanged;
+            Menu.FamiliarsLockItem.PropertyChanged -= FamiliarsLockChanged;
+            Menu.ComboKeyItem.PropertyChanged -= ComboChanged;
         }
 
         private void FamiliarsLockChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (Config.FamiliarsLockItem)
+            if (Menu.FamiliarsLockItem)
             {
-                Config.FollowKeyItem.Item.SetValue(new KeyBind(
-                    Config.FollowKeyItem.Item.GetValue<KeyBind>().Key, KeyBindType.Toggle, false));
-
-                Config.LastHitItem.Item.SetValue(new KeyBind(
-                    Config.LastHitItem.Item.GetValue<KeyBind>().Key, KeyBindType.Toggle, false));
+                Menu.FollowKeyItem.Item.SetValue(new KeyBind(Menu.FollowKeyItem.Value, KeyBindType.Toggle));
+                Menu.LastHitItem.Item.SetValue(new KeyBind(Menu.LastHitItem.Value, KeyBindType.Toggle));
             }
 
             if (Handler.IsRunning)
@@ -72,7 +74,7 @@ namespace VisagePlus.Features
                 Handler?.Cancel();
             }
 
-            if (Config.FamiliarsLockItem)
+            if (Menu.FamiliarsLockItem)
             {
                 Handler.RunAsync();
             }
@@ -84,16 +86,18 @@ namespace VisagePlus.Features
 
         private void ComboChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (!Config.FamiliarsLockItem)
+            if (Menu.FamiliarsLockItem)
             {
-                if (Config.ComboKeyItem)
-                {
-                    Handler.RunAsync();
-                }
-                else
-                {
-                    Handler?.Cancel();
-                }
+                return;
+            }
+
+            if (Menu.ComboKeyItem)
+            {
+                Handler.RunAsync();
+            }
+            else
+            {
+                Handler?.Cancel();
             }
         }
 
@@ -106,7 +110,7 @@ namespace VisagePlus.Features
                     return;
                 }
 
-                var Familiars =
+                var familiars =
                     EntityManager<Unit>.Entities.Where(x =>
                                                        x.IsValid &&
                                                        x.IsAlive &&
@@ -115,70 +119,68 @@ namespace VisagePlus.Features
                                                        x.IsAlly(Owner) &&
                                                        x.NetworkName == "CDOTA_Unit_VisageFamiliar").ToList();
 
-                if (Config.FamiliarsLockItem)
+                Hero target = null;
+                if (Menu.FamiliarsLockItem)
                 {
-                    Target = Config.UpdateMode.FamiliarTarget;
+                    target = Config.UpdateMode.FamiliarTarget;
                 }
                 else
                 {
-                    Target = Config.UpdateMode.Target;
+                    target = Config.UpdateMode.Target;
                 }
 
-                foreach (var Familiar in Familiars)
+                foreach (var familiar in familiars)
                 {
-                    if (Target != null)
+                    if (target != null)
                     {
-                        var FamiliarDamage = Familiar.Modifiers.Any(x => 
-                                                                    x.IsValid && 
-                                                                    x.StackCount > Config.FamiliarsChargeItem && 
-                                                                    x.Name == "modifier_visage_summon_familiars_damage_charge");
+                        var graveChillDebuff = target.HasModifier(Main.GraveChill.TargetModifierName);
+                        var stunDebuff = target.Modifiers.Any(x => x.IsValid && x.IsStunDebuff && x.RemainingTime > 0.5f);
+                        var hexDebuff = target.Modifiers.Any(x => x.IsValid  && x.Name == "modifier_sheepstick_debuff" && x.RemainingTime > 0.5f);
+                        var atosDebuff = target.Modifiers.Any(x => x.IsValid && x.Name == "modifier_rod_of_atos_debuff" && x.RemainingTime > 0.5f);
+                        var familiarsStoneForm = familiar.GetAbilityById(AbilityId.visage_summon_familiars_stone_form);
 
-                        var StunDebuff = Target.Modifiers.Any(x => x.IsValid && x.IsStunDebuff && x.RemainingTime > 0.5f);
-                        var HexDebuff = Target.Modifiers.Any(x => x.IsValid && x.RemainingTime > 0.5f && x.Name == "modifier_sheepstick_debuff");
-                        var FamiliarsStoneForm = Familiar.GetAbilityById(AbilityId.visage_summon_familiars_stone_form);
-
-                        if (!Target.IsMagicImmune() && !Target.IsInvulnerable() && !Target.HasModifier("modifier_winter_wyvern_winters_curse"))
+                        if (Extensions.Cancel(target))
                         {
                             // FamiliarsStoneForm
-                            if (Config.AbilityToggler.Value.IsEnabled(FamiliarsStoneForm.Name)
-                                && CanBeCasted(FamiliarsStoneForm, Familiar)
-                                && Familiar.Distance2D(Target) <= 100
-                                && !StunDebuff && !HexDebuff
-                                && (!Config.FamiliarsStoneControlItem || SmartStone(Target) || !FamiliarDamage)
-                                && !FamiliarsSleeper.Sleeping)
+                            if (Menu.AbilityToggler.Value.IsEnabled(familiarsStoneForm.Name)
+                                && Extensions.CanBeCasted(familiarsStoneForm, familiar)
+                                && familiar.Distance2D(target) <= 100
+                                && !graveChillDebuff && !stunDebuff && !hexDebuff && !atosDebuff
+                                && !MultiSleeper.Sleeping("FamiliarsStoneForm"))
                             {
-                                UseAbility(FamiliarsStoneForm, Familiar);
-                                FamiliarsSleeper.Sleep(FamiliarsStoneForm.GetAbilitySpecialData("stun_duration") * 1000 - 200);
-                                await Await.Delay(GetDelay);
+                                Extensions.UseAbility(familiarsStoneForm, familiar);
+                                MultiSleeper.Sleep(familiarsStoneForm.GetAbilitySpecialData("stun_duration") * 1000 - 200, "FamiliarsStoneForm");
+                                await Await.Delay(Extensions.GetDelay);
                             }
                         }
 
-                        if (Target.IsInvulnerable() || Target.IsAttackImmune())
+                        if (target.IsInvulnerable() || target.IsAttackImmune())
                         {
-                            Move(Familiar, Target.Position);
+                            Extensions.Move(familiar, target.Position);
                         }
-                        else if (Config.FamiliarsStoneControlItem  && FamiliarDamage && !SmartStone(Target))
+                        else 
+                        
+                        if (!Menu.AbilityToggler.Value.IsEnabled(familiarsStoneForm.Name) 
+                            || target.IsMagicImmune() 
+                            || !Extensions.CanBeCasted(familiarsStoneForm, familiar)
+                            || graveChillDebuff || stunDebuff || hexDebuff || atosDebuff)
                         {
-                            Attack(Familiar, Target);
-                        }
-                        else if ((Target.IsMagicImmune() || !CanBeCasted(FamiliarsStoneForm, Familiar)) || (StunDebuff || HexDebuff))
-                        {
-                            Attack(Familiar, Target);
+                            Extensions.Attack(familiar, target);
                         }
                         else
                         {
-                            Move(Familiar, Target.Position);
+                            Extensions.Move(familiar, target.Position);
                         }
                     }
                     else
                     {
-                        if (Config.FamiliarsFollowItem)
+                        if (Menu.FamiliarsFollowItem)
                         {
-                            Move(Familiar, Game.MousePosition);
+                            Extensions.Move(familiar, Game.MousePosition);
                         }
                         else
                         {
-                            Follow(Familiar, Owner);
+                            Extensions.Follow(familiar, Owner);
                         }
                     }
                 }
@@ -189,7 +191,7 @@ namespace VisagePlus.Features
             }
             catch (Exception e)
             {
-                Config.Main.Log.Error(e);
+                Main.Log.Error(e);
             }
         }
     }

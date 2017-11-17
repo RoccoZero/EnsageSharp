@@ -1,8 +1,11 @@
 ﻿using System.Linq;
 
 using Ensage;
+using Ensage.SDK.Extensions;
 using Ensage.SDK.Helpers;
-using Ensage.SDK.Service;
+using Ensage.SDK.Orbwalker;
+using Ensage.SDK.Renderer.Particle;
+using Ensage.SDK.TargetSelector;
 
 using SharpDX;
 
@@ -10,11 +13,17 @@ namespace VisagePlus
 {
     internal class UpdateMode
     {
-        private Config Config { get; }
+        private MenuManager Menu { get; }
 
         private VisagePlus Main { get; }
 
-        private IServiceContext Context { get; }
+        private ITargetSelectorManager TargetSelector { get; }
+
+        private IOrbwalkerManager Orbwalker { get; }
+
+        private IParticleManager Particle { get; }
+
+        private Unit Owner { get; }
 
         public Hero Target { get; set; }
 
@@ -22,9 +31,12 @@ namespace VisagePlus
 
         public UpdateMode(Config config)
         {
-            Config = config;
+            Menu = config.Menu;
             Main = config.Main;
-            Context = config.Main.Context;
+            TargetSelector = config.Main.Context.TargetSelector;
+            Orbwalker = config.Main.Context.Orbwalker;
+            Particle = config.Main.Context.Particle;
+            Owner = config.Main.Context.Owner;
 
             UpdateManager.Subscribe(OnUpdate, 25);
         }
@@ -36,53 +48,122 @@ namespace VisagePlus
 
         private void OnUpdate()
         {
-            if (Config.EscapeKeyItem && !Config.ComboKeyItem)
+            if (Menu.EscapeKeyItem && !Menu.ComboKeyItem)
             {
-                Context.Orbwalker.Move(Game.MousePosition);
+                Orbwalker.Move(Game.MousePosition);
             }
 
-            if (Config.ComboRadiusItem)
+            var graveChill = Main.GraveChill;
+            if (Menu.GraveChillRadiusItem && graveChill.Ability.Level > 0)
             {
-                Context.Particle.DrawRange(
-                    Context.Owner,
-                    "ComboRadius",
-                    Main.GraveChill.CastRange,
-                    Color.Aqua);
+                Particle.DrawRange(
+                    Owner,
+                    "GraveChill",
+                    graveChill.CastRange,
+                    graveChill.IsReady ? Color.Aqua : Color.Gray);
             }
             else
             {
-                Context.Particle.Remove("ComboRadius");
+                Particle.Remove("GraveChill");
             }
 
-            if (Config.TargetItem.Value.SelectedValue.Contains("Lock") && Context.TargetSelector.IsActive
-                && (!Config.ComboKeyItem || Target == null || !Target.IsValid || !Target.IsAlive))
+            var soulAssumption = Main.SoulAssumption;
+            if (Menu.SoulAssumptionRadiusItem && soulAssumption.Ability.Level > 0)
             {
-                Target = Context.TargetSelector.Active.GetTargets().FirstOrDefault() as Hero;
-            }
-            else if (Config.TargetItem.Value.SelectedValue.Contains("Default") && Context.TargetSelector.IsActive)
-            {
-                Target = Context.TargetSelector.Active.GetTargets().FirstOrDefault() as Hero;
-            }
-
-            if (Context.TargetSelector.IsActive
-                && (!Config.FamiliarsLockItem || FamiliarTarget == null || !FamiliarTarget.IsValid || !FamiliarTarget.IsAlive))
-            {
-                FamiliarTarget = Context.TargetSelector.Active.GetTargets().FirstOrDefault() as Hero;
-            }
-
-            if (Target != null && ((Config.DrawOffTargetItem && !Config.ComboKeyItem) || (Config.DrawTargetItem && Config.ComboKeyItem)))
-            {
-                Context.Particle.DrawTargetLine(
-                    Context.Owner,
-                    "PlusTarget",
-                    Target.Position,
-                    Config.ComboKeyItem 
-                    ? new Color(Config.TargetRedItem, Config.TargetGreenItem, Config.TargetBlueItem)
-                    : new Color(Config.OffTargetRedItem, Config.OffTargetGreenItem, Config.OffTargetBlueItem));
+                Particle.DrawRange(
+                    Owner,
+                    "SoulAssumption",
+                    soulAssumption.CastRange,
+                    soulAssumption.IsReady ? Color.Aqua : Color.Gray);
             }
             else
             {
-                Context.Particle.Remove("PlusTarget");
+                Particle.Remove("SoulAssumption");
+            }
+
+            var blink = Main.Blink;
+            if (Menu.BlinkRadiusItem && blink != null)
+            {
+                var color = Color.Red;
+                if (!blink.IsReady)
+                {
+                    color = Color.Gray;
+                }
+                else if (Owner.Distance2D(Game.MousePosition) > Menu.BlinkActivationItem)
+                {
+                    color = Color.Aqua;
+                }
+
+                Particle.DrawRange(
+                    Owner,
+                    "Blink",
+                    blink.CastRange,
+                    color);
+            }
+            else
+            {
+                Particle.Remove("Blink");
+            }
+
+            if (Menu.TargetItem.Value.SelectedValue.Contains("Lock") && TargetSelector.IsActive
+                && (!Menu.ComboKeyItem || Target == null || !Target.IsValid || !Target.IsAlive))
+            {
+                Target = TargetSelector.Active.GetTargets().FirstOrDefault() as Hero;
+            }
+            else if (Menu.TargetItem.Value.SelectedValue.Contains("Default") && TargetSelector.IsActive)
+            {
+                Target = TargetSelector.Active.GetTargets().FirstOrDefault() as Hero;
+            }
+
+            if (TargetSelector.IsActive 
+                && (!Menu.FamiliarsLockItem || FamiliarTarget == null || !FamiliarTarget.IsValid || !FamiliarTarget.IsAlive))
+            {
+                FamiliarTarget = TargetSelector.Active.GetTargets().FirstOrDefault() as Hero;
+            }
+
+            if (Target != null && (Menu.DrawOffTargetItem && !Menu.ComboKeyItem || Menu.DrawTargetItem && Menu.ComboKeyItem))
+            {
+                switch (Menu.TargetEffectTypeItem.Value.SelectedIndex)
+                {
+                    case 0:
+                        Particle.DrawTargetLine(
+                            Owner,
+                            "VisagePlusTarget",
+                            Target.Position,
+                            Menu.ComboKeyItem
+                            ? new Color(Menu.TargetRedItem, Menu.TargetGreenItem, Menu.TargetBlueItem)
+                            : new Color(Menu.OffTargetRedItem, Menu.OffTargetGreenItem, Menu.OffTargetBlueItem));
+                        break;
+
+                    case 1:
+                        Particle.DrawDangerLine(
+                            Owner,
+                            "VisagePlusTarget",
+                            Target.Position,
+                            Menu.ComboKeyItem
+                            ? new Color(Menu.TargetRedItem, Menu.TargetGreenItem, Menu.TargetBlueItem)
+                            : new Color(Menu.OffTargetRedItem, Menu.OffTargetGreenItem, Menu.OffTargetBlueItem));
+                        break;
+
+                    default:
+                        Particle.AddOrUpdate(
+                            Target,
+                            "VisagePlusTarget",
+                            Menu.Effects[Menu.TargetEffectTypeItem.Value.SelectedIndex],
+                            ParticleAttachment.AbsOriginFollow,
+                            RestartType.NormalRestart,
+                            1,
+                            Menu.ComboKeyItem
+                            ? new Color(Menu.TargetRedItem, Menu.TargetGreenItem, Menu.TargetBlueItem)
+                            : new Color(Menu.OffTargetRedItem, Menu.OffTargetGreenItem, Menu.OffTargetBlueItem),
+                            2,
+                            new Vector3(255));
+                        break;
+                }
+            }
+            else
+            {
+                Particle.Remove("VisagePlusTarget");
             }
         }
     }

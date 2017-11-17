@@ -1,71 +1,67 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 using Ensage;
 using Ensage.Common.Menu;
-using Ensage.Common.Threading;
 using Ensage.SDK.Extensions;
 using Ensage.SDK.Handlers;
 using Ensage.SDK.Helpers;
 
 namespace VisagePlus.Features
 {
-    internal class FamiliarsLastHit : Extensions
+    internal class FamiliarsLastHit
     {
-        private Config Config { get; }
+        private MenuManager Menu { get; }
+
+        private VisagePlus Main { get; }
+
+        private Extensions Extensions { get; }
 
         private Unit Owner { get; }
 
-        private TaskHandler Handler { get; }
+        private IUpdateHandler Update { get; }
 
         public FamiliarsLastHit(Config config)
         {
-            Config = config;
+            Menu = config.Menu;
+            Main = config.Main;
+            Extensions = config.Extensions;
             Owner = config.Main.Context.Owner;
 
-            config.LastHitItem.PropertyChanged += FamiliarsLastHitChanged;
+            Update = UpdateManager.Subscribe(Execute);
 
-            Handler = UpdateManager.Run(ExecuteAsync, true, false);
-
-            if (config.LastHitItem)
+            if (config.Menu.LastHitItem)
             {
-                config.LastHitItem.Item.SetValue(new KeyBind(
-                    config.LastHitItem.Item.GetValue<KeyBind>().Key, KeyBindType.Toggle, false));
+                config.Menu.LastHitItem.Item.SetValue(new KeyBind(config.Menu.LastHitItem.Value, KeyBindType.Toggle));
             }
+
+            config.Menu.LastHitItem.PropertyChanged += FamiliarsLastHitChanged;
         }
 
         public void Dispose()
         {
-            Config.LastHitItem.PropertyChanged -= FamiliarsLastHitChanged;
+            Menu.LastHitItem.PropertyChanged -= FamiliarsLastHitChanged;
 
-            if (Config.LastHitItem)
-            {
-                Handler?.Cancel();
-            }
+            UpdateManager.Unsubscribe(Execute);
         }
 
         private void FamiliarsLastHitChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (Config.LastHitItem)
+            if (Menu.LastHitItem)
             {
-                Handler.RunAsync();
+                Update.IsEnabled = true;
 
-                Config.FollowKeyItem.Item.SetValue(new KeyBind(
-                    Config.FollowKeyItem.Item.GetValue<KeyBind>().Key, KeyBindType.Toggle, false));
-
-                Config.FamiliarsLockItem.Item.SetValue(new KeyBind(
-                    Config.FamiliarsLockItem.Item.GetValue<KeyBind>().Key, KeyBindType.Toggle, false));
+                Menu.FollowKeyItem.Item.SetValue(new KeyBind(Menu.FollowKeyItem.Value, KeyBindType.Toggle));
+                Menu.FamiliarsLockItem.Item.SetValue(new KeyBind(Menu.FamiliarsLockItem.Value, KeyBindType.Toggle));
             }
             else
             {
-                Handler?.Cancel();
+                Update.IsEnabled = false;
             }
         }
 
-        private async Task ExecuteAsync(CancellationToken token)
+        private void Execute()
         {
             try
             {
@@ -74,7 +70,7 @@ namespace VisagePlus.Features
                     return;
                 }
 
-                var Familiars =
+                var familiars =
                     EntityManager<Unit>.Entities.Where(x =>
                                                        x.IsValid &&
                                                        x.IsAlive &&
@@ -82,119 +78,112 @@ namespace VisagePlus.Features
                                                        x.IsAlly(Owner) &&
                                                        x.NetworkName == "CDOTA_Unit_VisageFamiliar").ToList();
 
-                var AttackingMe = ObjectManager.TrackingProjectiles.FirstOrDefault(x => x.Target.NetworkName == "CDOTA_Unit_VisageFamiliar");
+                var attackingMe = ObjectManager.TrackingProjectiles.FirstOrDefault(x => x.Target.NetworkName == "CDOTA_Unit_VisageFamiliar");
 
-                foreach (var Familiar in Familiars)
+                foreach (var Familiar in familiars)
                 {
-                    var EnemyHero =
+                    var enemyHero =
                         EntityManager<Hero>.Entities.FirstOrDefault(x =>
                                                                     x.IsAlive &&
                                                                     x.IsVisible &&
                                                                     x.IsEnemy(Owner) &&
                                                                     x.Distance2D(Familiar) <= x.AttackRange + 400);
 
-                    var ClosestAllyTower =
-                        EntityManager<Unit>.Entities.OrderBy(
-                            x => x.Distance2D(Familiar)).FirstOrDefault(x =>
-                                                                        x.NetworkName == "CDOTA_BaseNPC_Tower" &&
-                                                                        x.IsAlive &&
-                                                                        x.IsAlly(Owner) &&
-                                                                        x.Distance2D(Familiar) >= 100);
+                    var closestAllyTower =
+                        EntityManager<Unit>.Entities.Where(x =>
+                                                           x.IsAlive &&
+                                                           x.IsAlly(Owner) &&
+                                                           x.Distance2D(Familiar) >= 100 &&
+                                                           x.NetworkName == "CDOTA_BaseNPC_Tower").OrderBy(
+                                                                                x => x.Distance2D(Familiar)).FirstOrDefault();
 
-                    if (EnemyHero != null || (AttackingMe != null && AttackingMe.Target.Handle == Familiar.Handle))
+                    if (enemyHero != null || (attackingMe != null && attackingMe.Target.Handle == Familiar.Handle))
                     {
-                        if (ClosestAllyTower == null)
+                        if (closestAllyTower == null)
                         {
-                            var ClosestAllyFountain =
+                            var closestAllyFountain =
                                 EntityManager<Unit>.Entities.FirstOrDefault(x =>
-                                                                            x.NetworkName == "CDOTA_BaseNPC_Fort" &&
                                                                             x.IsAlive &&
-                                                                            x.IsAlly(Owner));
+                                                                            x.IsAlly(Owner) &&
+                                                                            x.NetworkName == "CDOTA_BaseNPC_Fort");
 
-                            if (ClosestAllyFountain != null)
+                            if (closestAllyFountain != null)
                             {
-                                Follow(Familiar, ClosestAllyFountain);
+                                Extensions.Follow(Familiar, closestAllyFountain);
                             }
                         }
                         else
                         {
-                            Follow(Familiar, ClosestAllyTower);
+                            Extensions.Follow(Familiar, closestAllyTower);
                         }
                     }
                     else
                     {
-                        var ClosestAllyCreep =
-                            EntityManager<Unit>.Entities.OrderBy(
-                                x => x.Distance2D(Familiar)).FirstOrDefault(x =>
-                                                                            (x.NetworkName == "CDOTA_BaseNPC_Creep_Lane" ||
-                                                                            x.NetworkName == "CDOTA_BaseNPC_Creep_Siege") &&
-                                                                            x.IsAlive &&
-                                                                            x.IsAlly(Owner) &&
-                                                                            Familiar.Distance2D(x) <= 3000);
+                        var closestAllyCreep =
+                            EntityManager<Unit>.Entities.Where(x =>
+                                                               x.IsAlive &&
+                                                               x.IsAlly(Owner) &&
+                                                               Familiar.Distance2D(x) <= 3000 &&
+                                                               (x.NetworkName == "CDOTA_BaseNPC_Creep_Lane" ||
+                                                               x.NetworkName == "CDOTA_BaseNPC_Creep_Siege")).OrderBy(
+                                                                                      x => x.Distance2D(Familiar)).FirstOrDefault();
 
-                        var ClosestUnit =
-                            EntityManager<Unit>.Entities.OrderBy(
-                                x => (float)x.Health / x.MaximumHealth).FirstOrDefault(x =>
-                                                                                       ((x.NetworkName == "CDOTA_BaseNPC_Tower" && x.Health <= 200) ||
-                                                                                       x.NetworkName == "CDOTA_BaseNPC_Creep_Lane" ||
-                                                                                       x.NetworkName == "CDOTA_BaseNPC_Creep" ||
-                                                                                       x.NetworkName == "CDOTA_BaseNPC_Creep_Neutral" ||
-                                                                                       x.NetworkName == "CDOTA_BaseNPC_Creep_Siege" ||
-                                                                                       x.NetworkName == "CDOTA_BaseNPC_Additive" ||
-                                                                                       x.NetworkName == "CDOTA_BaseNPC_Barracks" ||
-                                                                                       x.NetworkName == "CDOTA_BaseNPC_Building" ||
-                                                                                       x.NetworkName == "CDOTA_BaseNPC_Creature") &&
-                                                                                       x.IsAlive &&
-                                                                                       x.IsVisible &&
-                                                                                       (Config.DenyItem && x.IsAlly(Owner) || x.IsEnemy(Owner)) &&
-                                                                                       Familiar.Distance2D(x) <= 1000);
+                        var closestUnit =
+                            EntityManager<Unit>.Entities.Where(x =>
+                                                               x.IsAlive &&
+                                                               x.IsVisible &&
+                                                               (Menu.DenyItem && x.IsAlly(Owner) || x.IsEnemy(Owner)) &&
+                                                               Familiar.Distance2D(x) <= 1000 &&
+                                                               ((x.NetworkName == "CDOTA_BaseNPC_Tower" && x.Health <= 200) ||
+                                                               x.NetworkName == "CDOTA_BaseNPC_Creep_Lane" ||
+                                                               x.NetworkName == "CDOTA_BaseNPC_Creep" ||
+                                                               x.NetworkName == "CDOTA_BaseNPC_Creep_Neutral" ||
+                                                               x.NetworkName == "CDOTA_BaseNPC_Creep_Siege" ||
+                                                               x.NetworkName == "CDOTA_BaseNPC_Additive" ||
+                                                               x.NetworkName == "CDOTA_BaseNPC_Barracks" ||
+                                                               x.NetworkName == "CDOTA_BaseNPC_Building" ||
+                                                               x.NetworkName == "CDOTA_BaseNPC_Creature")).OrderBy(
+                                                                                x => (float)x.Health / x.MaximumHealth).FirstOrDefault();
 
-                        if (ClosestAllyCreep == null || ClosestAllyCreep.Distance2D(Familiar) >= 1000)
+                        if (closestAllyCreep == null || closestAllyCreep.Distance2D(Familiar) >= 1000)
                         {
-                            if (ClosestAllyTower == null)
+                            if (closestAllyTower == null)
                             {
-                                var ClosestAllyFort =
-                                    EntityManager<Unit>.Entities.FirstOrDefault(
-                                        x =>
-                                        x.NetworkName == "CDOTA_BaseNPC_Fort" &&
-                                        x.IsAlive &&
-                                        x.IsAlly(Owner));
+                                var closestAllyFort =
+                                    EntityManager<Unit>.Entities.FirstOrDefault(x =>
+                                                                                x.IsAlive &&
+                                                                                x.IsAlly(Owner) &&
+                                                                                x.NetworkName == "CDOTA_BaseNPC_Fort");
 
-                                Follow(Familiar, ClosestAllyFort);
+                                Extensions.Follow(Familiar, closestAllyFort);
                             }
                             else
                             {
-                                Follow(Familiar, ClosestAllyTower);
+                                Extensions.Follow(Familiar, closestAllyTower);
                             }
                         }
-                        else if (ClosestAllyCreep != null && ClosestUnit == null)
+                        else if (closestAllyCreep != null && closestUnit == null)
                         {
-                            Follow(Familiar, ClosestAllyCreep);
+                            Extensions.Follow(Familiar, closestAllyCreep);
                         }
-                        else if (ClosestAllyCreep != null && ClosestUnit != null)
+                        else if (closestAllyCreep != null && closestUnit != null)
                         {
-                            var CommonAttack = Config.CommonAttackItem ? Familiars.Count() : 1;
-                            if (ClosestUnit.Health <= CommonAttack * Familiar.GetAttackDamage(ClosestUnit))
+                            var commonAttack = Menu.CommonAttackItem ? familiars.Count() : 1;
+                            if (closestUnit.Health <= commonAttack * Familiar.GetAttackDamage(closestUnit))
                             {
-                                Attack(Familiar, ClosestUnit);
+                                Extensions.Attack(Familiar, closestUnit);
                             }
                             else
                             {
-                                Follow(Familiar, ClosestUnit);
+                                Extensions.Follow(Familiar, closestUnit);
                             }
                         }
                     }
                 }
-
-                await Await.Delay(25, token);
-            }
-            catch (TaskCanceledException)
-            {
-                // canceled
             }
             catch (Exception e)
             {
-                Config.Main.Log.Error(e);
+                Main.Log.Error(e);
             }
         }
     }

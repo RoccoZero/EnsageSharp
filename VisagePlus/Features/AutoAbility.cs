@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,9 +14,11 @@ namespace VisagePlus.Features
 {
     internal class AutoAbility
     {
-        private Config Config { get; }
+        private MenuManager Menu { get; }
 
         private VisagePlus Main { get; }
+
+        private Extensions Extensions { get; }
 
         private Unit Owner { get; }
 
@@ -23,91 +26,67 @@ namespace VisagePlus.Features
 
         public AutoAbility(Config config)
         {
-            Config = config;
+            Menu = config.Menu;
             Main = config.Main;
+            Extensions = config.Extensions;
             Owner = config.Main.Context.Owner;
 
-            Handler = UpdateManager.Run(ExecuteAsync, true, true);
+            Handler = UpdateManager.Run(ExecuteAsync, true, false);
+
+            if (config.Menu.AutoSoulAssumptionItem)
+            {
+                Handler.RunAsync();
+            }
+
+            config.Menu.AutoSoulAssumptionItem.PropertyChanged += AutoSoulAssumptionChanged;
         }
 
         public void Dispose()
         {
+            Menu.AutoSoulAssumptionItem.PropertyChanged -= AutoSoulAssumptionChanged;
+
             Handler?.Cancel();
+        }
+
+        private void AutoSoulAssumptionChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (Menu.AutoSoulAssumptionItem)
+            {
+                Handler.RunAsync();
+            }
+            else
+            {
+                Handler?.Cancel();
+            }
         }
 
         private async Task ExecuteAsync(CancellationToken token)
         {
             try
             {
-                if (Game.IsPaused || !Owner.IsValid || !Owner.IsAlive || Owner.IsStunned())
+                if (Game.IsPaused || !Owner.IsValid || !Owner.IsAlive || Owner.IsStunned() || Menu.ComboKeyItem || Owner.IsInvisible())
                 {
                     return;
                 }
 
-                if (Config.AutoSoulAssumptionItem && !Config.ComboKeyItem)
+                // SoulAssumption
+                var soulAssumption = Main.SoulAssumption;
+                if (soulAssumption.CanBeCasted && soulAssumption.MaxCharges)
                 {
-                    // SoulAssumption
-                    var SoulAssumption = Main.SoulAssumption;
-                    if (SoulAssumption.CanBeCasted && SoulAssumption.MaxCharges)
-                    {
-                        var Target =
-                            EntityManager<Hero>.Entities.OrderBy(x => x.Health).FirstOrDefault(x =>
-                                                                                               !x.IsIllusion &&
-                                                                                               x.IsAlive &&
-                                                                                               x.IsVisible &&
-                                                                                               x.IsValid &&
-                                                                                               x.IsEnemy(Owner) &&
-                                                                                               SoulAssumption.CanHit(x));
+                    var target =
+                        EntityManager<Hero>.Entities.Where(x =>
+                                                           x.IsValid &&
+                                                           !x.IsIllusion &&
+                                                           x.IsAlive &&
+                                                           x.IsVisible &&
+                                                           x.IsEnemy(Owner) &&
+                                                           soulAssumption.CanHit(x)).OrderBy(x => x.Health).FirstOrDefault();
 
-                        if (Target != null && !Target.IsMagicImmune() && !Target.IsInvulnerable() && !Target.HasModifier("modifier_winter_wyvern_winters_curse"))
-                        {
-                            Main.SoulAssumption.UseAbility(Target);
-                            await Await.Delay(Main.SoulAssumption.GetCastDelay(Target), token);
-                        }
+                    if (target != null && Extensions.Cancel(target))
+                    {
+                        Main.SoulAssumption.UseAbility(target);
+                        await Await.Delay(Main.SoulAssumption.GetCastDelay(target), token);
                     }
-                }
-
-                if (Config.KillStealItem)
-                {
-                    var Target =
-                        EntityManager<Hero>.Entities.OrderBy(x => x.Health).FirstOrDefault(x => 
-                                                                                           !x.IsIllusion &&
-                                                                                           x.IsAlive &&
-                                                                                           x.IsVisible &&
-                                                                                           x.IsValid &&
-                                                                                           x.IsEnemy(Owner));
-
-                    if (Target != null && !Target.IsMagicImmune() && !Target.IsInvulnerable() && !Target.HasModifier("modifier_winter_wyvern_winters_curse"))
-                    {
-                        if (Target.Health <= Damage(Target))
-                        {
-                            // SoulAssumption
-                            var Dagon = Main.Dagon;
-                            var SoulAssumption = Main.SoulAssumption;
-                            if (Config.KillStealToggler.Value.IsEnabled(SoulAssumption.ToString())
-                                && SoulAssumption.CanBeCasted
-                                && SoulAssumption.CanHit(Target)
-                                && SoulAssumption.MaxCharges
-                                && (Dagon == null || Dagon.CanHit(Target)))
-                            {
-                                SoulAssumption.UseAbility(Target);
-                                await Await.Delay(SoulAssumption.GetCastDelay(Target), token);
-                            }
-
-                            // Dagon
-                            var Ethereal = Main.Ethereal;
-                            if (Dagon != null
-                                 && Config.KillStealToggler.Value.IsEnabled("item_dagon_5")
-                                 && Dagon.CanBeCasted
-                                 && Dagon.CanHit(Target)
-                                 && (Ethereal == null || (Target.IsEthereal() && !Ethereal.CanBeCasted)
-                                 || !Config.ItemsToggler.Value.IsEnabled(Ethereal.ToString())))
-                            {
-                                Dagon.UseAbility(Target);
-                                await Await.Delay(Dagon.GetCastDelay(Target), token);
-                            }
-                        }
-                    }  
                 }
             }
             catch (TaskCanceledException)
@@ -118,29 +97,6 @@ namespace VisagePlus.Features
             {
                 Main.Log.Error(e);
             }
-        }
-
-        private float Damage(Hero EnemyHero)
-        {
-            var damage = 0.0f;
-
-            var SoulAssumption = Main.SoulAssumption;
-            if (Config.KillStealToggler.Value.IsEnabled(SoulAssumption.ToString())
-                && SoulAssumption.IsReady
-                && SoulAssumption.MaxCharges)
-            {
-                damage += SoulAssumption.GetDamage(EnemyHero);
-            }
-
-            var Dagon = Main.Dagon;
-            if (Dagon != null
-                && Config.KillStealToggler.Value.IsEnabled("item_dagon_5")
-                && Dagon.IsReady)
-            {
-                damage += Dagon.GetDamage(EnemyHero);
-            }
-
-            return damage;
         }
     }
 }

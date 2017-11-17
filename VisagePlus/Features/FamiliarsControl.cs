@@ -14,68 +14,68 @@ using Ensage.SDK.Helpers;
 
 namespace VisagePlus.Features
 {
-    internal class FamiliarsControl : Extensions
+    internal class FamiliarsControl
     {
-        private Config Config { get; }
+        private MenuManager Menu { get; }
+
+        private MultiSleeper MultiSleeper { get; }
+
+        private VisagePlus Main { get; }
+
+        private Extensions Extensions { get; }
 
         private Unit Owner { get; }
-
-        private Sleeper FamiliarsSleeper { get; }
 
         private TaskHandler Handler { get; }
 
         public FamiliarsControl(Config config)
         {
-            Config = config;
+            Main = config.Main;
+            Menu = config.Menu;
+            MultiSleeper = config.MultiSleeper;
+            Extensions = config.Extensions;
             Owner = config.Main.Context.Owner;
 
-            FamiliarsSleeper = new Sleeper();
-
-            config.FollowKeyItem.PropertyChanged += FollowKeyChanged;
-            config.EscapeKeyItem.PropertyChanged += EscapeKeyChanged;
-
-            if (config.FollowKeyItem)
-            {
-                config.FollowKeyItem.Item.SetValue(new KeyBind(
-                    config.FollowKeyItem.Item.GetValue<KeyBind>().Key, KeyBindType.Toggle, false));
-            }
-                
             Handler = UpdateManager.Run(ExecuteAsync, true, true);
+
+            if (config.Menu.FollowKeyItem)
+            {
+                config.Menu.FollowKeyItem.Item.SetValue(new KeyBind(Menu.FollowKeyItem.Value, KeyBindType.Toggle));
+            }
+
+            config.Menu.FollowKeyItem.PropertyChanged += FollowKeyChanged;
+            config.Menu.EscapeKeyItem.PropertyChanged += EscapeKeyChanged;
         }
 
         public void Dispose()
         {
-            Handler?.Cancel();
+            Menu.EscapeKeyItem.PropertyChanged -= EscapeKeyChanged;
+            Menu.FollowKeyItem.PropertyChanged -= FollowKeyChanged;
 
-            Config.EscapeKeyItem.PropertyChanged -= EscapeKeyChanged;
-            Config.FollowKeyItem.PropertyChanged -= FollowKeyChanged;
+            Handler?.Cancel();
         }
 
         private void FollowKeyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (Config.FollowKeyItem)
+            if (!Menu.FollowKeyItem)
             {
-                Config.LastHitItem.Item.SetValue(new KeyBind(
-                    Config.LastHitItem.Item.GetValue<KeyBind>().Key, KeyBindType.Toggle, false));
-
-                Config.FamiliarsLockItem.Item.SetValue(new KeyBind(
-                    Config.FamiliarsLockItem.Item.GetValue<KeyBind>().Key, KeyBindType.Toggle, false));
+                return;
             }
+
+            Menu.LastHitItem.Item.SetValue(new KeyBind(Menu.LastHitItem.Value, KeyBindType.Toggle));
+            Menu.FamiliarsLockItem.Item.SetValue(new KeyBind(Menu.FamiliarsLockItem.Value, KeyBindType.Toggle));
         }
 
         private void EscapeKeyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (Config.EscapeKeyItem)
+            if (!Menu.EscapeKeyItem)
             {
-                Config.LastHitItem.Item.SetValue(new KeyBind(
-                    Config.LastHitItem.Item.GetValue<KeyBind>().Key, KeyBindType.Toggle, false));
-
-                Config.FollowKeyItem.Item.SetValue(new KeyBind(
-                    Config.FollowKeyItem.Item.GetValue<KeyBind>().Key, KeyBindType.Toggle, false));
-
-                Config.FamiliarsLockItem.Item.SetValue(new KeyBind(
-                    Config.FamiliarsLockItem.Item.GetValue<KeyBind>().Key, KeyBindType.Toggle, false));
+                return;
             }
+
+            Menu.LastHitItem.Item.SetValue(new KeyBind(Menu.LastHitItem.Value, KeyBindType.Toggle));
+            Menu.FollowKeyItem.Item.SetValue(new KeyBind(Menu.FollowKeyItem.Value, KeyBindType.Toggle));
+            Menu.FamiliarsLockItem.Item.SetValue(new KeyBind(Menu.FamiliarsLockItem.Value, KeyBindType.Toggle));
         }
 
         private async Task ExecuteAsync(CancellationToken token)
@@ -87,7 +87,7 @@ namespace VisagePlus.Features
                     return;
                 }
 
-                var Familiars =
+                var familiars =
                     EntityManager<Unit>.Entities.Where(x =>
                                                        x.IsValid &&
                                                        x.IsAlive &&
@@ -96,74 +96,64 @@ namespace VisagePlus.Features
                                                        x.NetworkName == "CDOTA_Unit_VisageFamiliar").ToList();
 
                 var Others =
-                    EntityManager<Unit>.Entities.Where(x => 
-                                                       !x.IsIllusion &&
+                    EntityManager<Unit>.Entities.Where(x =>
                                                        x.IsValid &&
+                                                       !x.IsIllusion &&
                                                        x.IsVisible &&
                                                        x.IsAlive &&
                                                        x.IsEnemy(Owner)).ToList();
 
-                foreach (var Familiar in Familiars)
+                foreach (var familiar in familiars)
                 {
-                    var FamiliarsStoneForm = Familiar.GetAbilityById(AbilityId.visage_summon_familiars_stone_form);
-
                     // Auto Stone Form
-                    if (Familiar.Health * 100 / Familiar.MaximumHealth <= Config.FamiliarsLowHPItem && CanBeCasted(FamiliarsStoneForm, Familiar))
+                    var familiarsStoneForm = familiar.GetAbilityById(AbilityId.visage_summon_familiars_stone_form);
+                    if (familiar.Health * 100 / familiar.MaximumHealth <= Menu.FamiliarsLowHPItem && Extensions.CanBeCasted(familiarsStoneForm, familiar))
                     {
-                        FamiliarsStoneForm.UseAbility();
-                        await Await.Delay(GetDelay, token);
+                        familiarsStoneForm.UseAbility();
+                        await Await.Delay(Extensions.GetDelay, token);
                     }
 
                     // Follow
-                    if (Config.FollowKeyItem)
+                    if (Menu.FollowKeyItem)
                     {
-                        Follow(Familiar, Owner);
+                        Extensions.Follow(familiar, Owner);
                     }
 
                     // Courier
-                    if (Config.FamiliarsCourierItem)
+                    if (Menu.FamiliarsCourierItem)
                     {
-                        var courier = Others.OrderBy(x => x.Distance2D(Familiar)).FirstOrDefault(x => x.NetworkName == "CDOTA_Unit_Courier");
-
-                        if (courier != null && Familiar.Distance2D(courier) <= 600 && !Config.FollowKeyItem)
+                        var courier = Others.Where(x => x.NetworkName == "CDOTA_Unit_Courier").OrderBy(x => x.Distance2D(familiar)).FirstOrDefault();
+                        if (courier != null && familiar.Distance2D(courier) <= 600 && !Menu.FollowKeyItem)
                         {
-                            Attack(Familiar, courier);
+                            Extensions.Attack(familiar, courier);
                         }
                     }
 
                     // Escape
-                    if (Config.EscapeKeyItem 
-                        && !Config.ComboKeyItem 
-                        && !Config.FamiliarsLockItem
-                        && !Config.LastHitItem
-                        && !Config.FollowKeyItem)
+                    if (Menu.EscapeKeyItem && !Menu.ComboKeyItem && !Menu.FamiliarsLockItem && !Menu.LastHitItem && !Menu.FollowKeyItem)
                     {
-                        var hero = Others.OrderBy(x => x.Distance2D(Owner)).FirstOrDefault(x => x is Hero);
-
-                        if (hero == null 
-                            || hero.IsMagicImmune() || hero.IsInvulnerable() || hero.HasModifier("modifier_winter_wyvern_winters_curse")
-                            || Owner.Distance2D(hero) > 800)
+                        var hero = Others.Where(x => x is Hero).OrderBy(x => x.Distance2D(Owner)).FirstOrDefault() as Hero;
+                        if (hero == null || !Extensions.Cancel(hero) || Owner.Distance2D(hero) > 800)
                         {
-                            Follow(Familiar, Owner);
-
+                            Extensions.Follow(familiar, Owner);
                             continue;
                         }
 
-                        if (CanBeCasted(FamiliarsStoneForm, Familiar)
-                            && Familiar.Distance2D(hero) <= 100
-                            && !FamiliarsSleeper.Sleeping)
+                        if (Extensions.CanBeCasted(familiarsStoneForm, familiar)
+                            && familiar.Distance2D(hero) <= 100
+                            && !MultiSleeper.Sleeping("FamiliarsStoneForm"))
                         {
-                            UseAbility(FamiliarsStoneForm, Familiar);
-                            FamiliarsSleeper.Sleep(FamiliarsStoneForm.GetAbilitySpecialData("stun_duration") * 1000 - 200);
-                            await Await.Delay(GetDelay, token);
+                            Extensions.UseAbility(familiarsStoneForm, familiar);
+                            MultiSleeper.Sleep(familiarsStoneForm.GetAbilitySpecialData("stun_duration") * 1000 - 200, "FamiliarsStoneForm");
+                            await Await.Delay(Extensions.GetDelay, token);
                         }
-                        else if (CanBeCasted(FamiliarsStoneForm, Familiar))
+                        else if (Extensions.CanBeCasted(familiarsStoneForm, familiar))
                         {
-                            Move(Familiar, hero.Position);
+                            Extensions.Move(familiar, hero.Position);
                         }
                         else
                         {
-                            Follow(Familiar, Owner);
+                            Extensions.Follow(familiar, Owner);
                         }
                     }
                 }
@@ -174,7 +164,7 @@ namespace VisagePlus.Features
             }
             catch (Exception e)
             {
-                Config.Main.Log.Error(e);
+                Main.Log.Error(e);
             }
         }
     }

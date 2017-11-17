@@ -20,17 +20,17 @@ namespace VisagePlus
         name: "VisagePlus",
         mode: StartupMode.Auto,
         author: "YEEEEEEE", 
-        version: "1.2.0.0",
+        version: "2.0.0.0",
         units: HeroId.npc_dota_hero_visage)]
     internal class VisagePlus : Plugin
     {
-        private Config Config { get; set; }
-
         public IServiceContext Context { get; }
 
         private AbilityFactory AbilityFactory { get; }
 
-        public ILog Log = AssemblyLogs.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        public ILog Log { get; } = AssemblyLogs.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        private Config Config { get; set; }
 
         [ImportingConstructor]
         public VisagePlus([Import] IServiceContext context)
@@ -124,6 +124,18 @@ namespace VisagePlus
 
         [ItemBinding]
         public item_heavens_halberd HeavensHalberd { get; set; }
+
+        [ItemBinding]
+        public item_blink Blink { get; set; }
+
+        [ItemBinding]
+        public item_nullifier Nullifier { get; set; }
+
+        [ItemBinding]
+        public item_urn_of_shadows UrnOfShadows { get; set; }
+
+        [ItemBinding]
+        public item_spirit_vessel SpiritVessel { get; set; }
 
         protected override void OnActivate()
         {

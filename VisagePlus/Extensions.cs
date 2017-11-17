@@ -1,6 +1,9 @@
-﻿using Ensage;
-using Ensage.Common;
+﻿using System.Linq;
+
+using Ensage;
+using Ensage.Common.Objects.UtilityObjects;
 using Ensage.SDK.Extensions;
+using Ensage.SDK.Helpers;
 
 using SharpDX;
 
@@ -8,6 +11,13 @@ namespace VisagePlus
 {
     internal class Extensions
     {
+        private MultiSleeper MultiSleeper { get; }
+
+        public Extensions(Config config)
+        {
+            MultiSleeper = config.MultiSleeper;
+        }
+
         public int GetDelay { get; } = 100 + (int)Game.Ping;
 
         private float LastCastAttempt { get; set; }
@@ -24,7 +34,7 @@ namespace VisagePlus
                 return false;
             }
 
-            if ((Game.RawGameTime - LastCastAttempt) < 0.8f)
+            if (Game.RawGameTime - LastCastAttempt < 0.8f)
             {
                 return false;
             }
@@ -50,10 +60,9 @@ namespace VisagePlus
 
         public bool Attack(Unit unit, Unit target)
         {
-            if (Utils.SleepCheck($"Attack{unit.Handle}"))
+            if (!MultiSleeper.Sleeping($"Attack{ unit.Handle }"))
             {
-                Utils.Sleep(200, $"Attack{unit.Handle}");
-
+                MultiSleeper.Sleep(200, $"Attack{ unit.Handle }");
                 return unit.Attack(target);
             }
 
@@ -67,10 +76,9 @@ namespace VisagePlus
                 return false;
             }
 
-            if (Utils.SleepCheck($"Move{unit.Handle}"))
+            if (!MultiSleeper.Sleeping($"Move{ unit.Handle }"))
             {
-                Utils.Sleep(200, $"Move{unit.Handle}");
-
+                MultiSleeper.Sleep(200, $"Move{ unit.Handle }");
                 return unit.Move(position);
             }
 
@@ -84,19 +92,37 @@ namespace VisagePlus
                 return false;
             }
 
-            if (Utils.SleepCheck($"Follow{unit.Handle}"))
+            if (!MultiSleeper.Sleeping($"Follow{ unit.Handle }"))
             {
-                Utils.Sleep(200, $"Follow{unit.Handle}");
-
+                MultiSleeper.Sleep(200, $"Follow{ unit.Handle }");
                 return unit.Follow(target);
             }
 
             return false;
         }
 
-        public bool SmartStone(Unit target)
+        public bool Cancel(Hero target)
         {
-            return target.HasModifier("modifier_teleporting");
+            return !target.IsMagicImmune() && !target.IsInvulnerable()
+                && !target.HasAnyModifiers("modifier_abaddon_borrowed_time", "modifier_item_combo_breaker_buff")
+                && !target.HasAnyModifiers("modifier_winter_wyvern_winters_curse_aura", "modifier_winter_wyvern_winters_curse")
+                && !DuelAghanimsScepter(target);
+        }
+
+        public bool DuelAghanimsScepter(Hero target)
+        {
+            var duelAghanimsScepter = false;
+            if (target.HasModifier("modifier_legion_commander_duel"))
+            {
+                duelAghanimsScepter = EntityManager<Hero>.Entities.Any(x =>
+                                                                       x.HeroId == HeroId.npc_dota_hero_legion_commander &&
+                                                                       x.IsValid &&
+                                                                       x.IsVisible &&
+                                                                       x.IsAlive &&
+                                                                       x.HasAghanimsScepter());
+            }
+
+            return duelAghanimsScepter;
         }
     }
 }
