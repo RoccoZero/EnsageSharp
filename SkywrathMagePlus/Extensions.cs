@@ -61,6 +61,22 @@ namespace SkywrathMagePlus
                 && !DuelAghanimsScepter(target);
         }
 
+        public bool DuelAghanimsScepter(Hero target)
+        {
+            var duelAghanimsScepter = false;
+            if (target.HasModifier("modifier_legion_commander_duel"))
+            {
+                duelAghanimsScepter = EntityManager<Hero>.Entities.Any(x =>
+                                                                       x.HeroId == HeroId.npc_dota_hero_legion_commander &&
+                                                                       x.IsValid &&
+                                                                       x.IsVisible &&
+                                                                       x.IsAlive &&
+                                                                       x.HasAghanimsScepter());
+            }
+
+            return duelAghanimsScepter;
+        }
+
         public bool ConcussiveShotTarget(Hero target, Hero targetHit)
         {
             if (!Menu.ConcussiveShotTargetItem)
@@ -84,22 +100,6 @@ namespace SkywrathMagePlus
             }
 
             return false;
-        }
-
-        public bool DuelAghanimsScepter(Hero target)
-        {
-            var duelAghanimsScepter = false;
-            if (target.HasModifier("modifier_legion_commander_duel"))
-            {
-                duelAghanimsScepter = EntityManager<Hero>.Entities.Any(x =>
-                                                                       x.HeroId == HeroId.npc_dota_hero_legion_commander &&
-                                                                       x.IsValid &&
-                                                                       x.IsVisible &&
-                                                                       x.IsAlive &&
-                                                                       x.HasAghanimsScepter());
-            }
-
-            return duelAghanimsScepter;
         }
     }
 }

@@ -12,7 +12,7 @@ namespace SkywrathMagePlus
     {
         private MenuFactory Factory { get; }
 
-        public MenuItem<AbilityToggler> AbilitiesToggler { get; }
+        public MenuItem<AbilityToggler> AbilityToggler { get; }
 
         public MenuItem<Slider> MinHealthToUltItem { get; }
 
@@ -20,7 +20,7 @@ namespace SkywrathMagePlus
 
         public MenuItem<Slider> BadUltMovementSpeedItem { get; }
 
-        public MenuItem<AbilityToggler> ItemsToggler { get; }
+        public MenuItem<AbilityToggler> ItemToggler { get; }
 
         public MenuItem<Slider> BlinkActivationItem { get; }
 
@@ -28,9 +28,9 @@ namespace SkywrathMagePlus
 
         public MenuItem<bool> AutoComboItem { get; }
 
-        public MenuItem<AbilityToggler> AutoAbilitiesToggler { get; }
+        public MenuItem<AbilityToggler> AutoAbilityToggler { get; }
 
-        public MenuItem<AbilityToggler> AutoItemsToggler { get; }
+        public MenuItem<AbilityToggler> AutoItemToggler { get; }
 
         public MenuItem<Slider> AutoMinHealthToUltItem { get; }
 
@@ -134,7 +134,7 @@ namespace SkywrathMagePlus
             Factory.Target.SetFontColor(Color.Aqua);
 
             var AbilitiesMenu = Factory.Menu("Abilities");
-            AbilitiesToggler = AbilitiesMenu.Item("Use: ", new AbilityToggler(new Dictionary<string, bool>
+            AbilityToggler = AbilitiesMenu.Item("Use: ", new AbilityToggler(new Dictionary<string, bool>
             {
                 { "skywrath_mage_mystic_flare", true },
                 { "skywrath_mage_ancient_seal", true },
@@ -149,7 +149,7 @@ namespace SkywrathMagePlus
             BadUltMovementSpeedItem.Item.SetTooltip("If the enemy has less Movement Speed from this value, then immediately ULT");
 
             var ItemsMenu = Factory.Menu("Items");
-            ItemsToggler = ItemsMenu.Item("Use: ", new AbilityToggler(new Dictionary<string, bool>
+            ItemToggler = ItemsMenu.Item("Use: ", new AbilityToggler(new Dictionary<string, bool>
             {
                 { "item_blink", false },
                 { "item_spirit_vessel", true },
@@ -170,7 +170,7 @@ namespace SkywrathMagePlus
 
             var AutoComboMenu = Factory.Menu("Auto Combo");
             AutoComboItem = AutoComboMenu.Item("Enable", true);
-            AutoAbilitiesToggler = AutoComboMenu.Item("Abilities: ", "autoabilitiestoggler", new AbilityToggler(new Dictionary<string, bool>
+            AutoAbilityToggler = AutoComboMenu.Item("Abilities: ", "autoabilitiestoggler", new AbilityToggler(new Dictionary<string, bool>
             {
                 { "skywrath_mage_mystic_flare", true },
                 { "skywrath_mage_ancient_seal", true },
@@ -178,7 +178,7 @@ namespace SkywrathMagePlus
                 { "skywrath_mage_arcane_bolt", true }
             }));
 
-            AutoItemsToggler = AutoComboMenu.Item("Items: ", "autoitemstoggler", new AbilityToggler(new Dictionary<string, bool>
+            AutoItemToggler = AutoComboMenu.Item("Items: ", "autoitemstoggler", new AbilityToggler(new Dictionary<string, bool>
             {
                 { "item_shivas_guard", true },
                 { "item_dagon_5", true },
@@ -338,11 +338,11 @@ namespace SkywrathMagePlus
             StartComboKeyItem = Factory.Item("Start Combo With Mute", new KeyBind('0', KeyBindType.Toggle, false));
             StartComboKeyItem.Item.SetTooltip("Start Combo With Hex or Ancient Seal");
 
-            AbilitiesToggler.PropertyChanged += Changed;
+            AbilityToggler.PropertyChanged += Changed;
             BadUltItem.PropertyChanged += Changed;
-            ItemsToggler.PropertyChanged += Changed;
+            ItemToggler.PropertyChanged += Changed;
             AutoComboItem.PropertyChanged += Changed;
-            AutoAbilitiesToggler.PropertyChanged += Changed;
+            AutoAbilityToggler.PropertyChanged += Changed;
             OrbwalkerArcaneBoltItem.PropertyChanged += Changed;
             DrawTargetItem.PropertyChanged += Changed;
             DrawOffTargetItem.PropertyChanged += Changed;
@@ -364,7 +364,7 @@ namespace SkywrathMagePlus
             }
 
             // Mystic Flare
-            if (AbilitiesToggler.Value.IsEnabled("skywrath_mage_mystic_flare"))
+            if (AbilityToggler.Value.IsEnabled("skywrath_mage_mystic_flare"))
             {
                 MinHealthToUltItem.Item.ShowItem = true;
                 BadUltItem.Item.ShowItem = true;
@@ -377,7 +377,7 @@ namespace SkywrathMagePlus
             }
 
             // Blink
-            if (ItemsToggler.Value.IsEnabled("item_blink"))
+            if (ItemToggler.Value.IsEnabled("item_blink"))
             {
                 BlinkActivationItem.Item.ShowItem = true;
                 BlinkDistanceEnemyItem.Item.ShowItem = true;
@@ -389,7 +389,7 @@ namespace SkywrathMagePlus
             }
 
             // Auto Mystic Flare
-            if (AutoAbilitiesToggler.Value.IsEnabled("skywrath_mage_mystic_flare"))
+            if (AutoAbilityToggler.Value.IsEnabled("skywrath_mage_mystic_flare"))
             {
                 AutoMinHealthToUltItem.Item.ShowItem = true;
             }
@@ -401,13 +401,13 @@ namespace SkywrathMagePlus
             // Auto Combo
             if (AutoComboItem)
             {
-                AutoAbilitiesToggler.Item.ShowItem = true;
-                AutoItemsToggler.Item.ShowItem = true;
+                AutoAbilityToggler.Item.ShowItem = true;
+                AutoItemToggler.Item.ShowItem = true;
             }
             else
             {
-                AutoAbilitiesToggler.Item.ShowItem = false;
-                AutoItemsToggler.Item.ShowItem = false;
+                AutoAbilityToggler.Item.ShowItem = false;
+                AutoItemToggler.Item.ShowItem = false;
                 AutoMinHealthToUltItem.Item.ShowItem = false;
             }
             
@@ -502,11 +502,11 @@ namespace SkywrathMagePlus
             DrawOffTargetItem.PropertyChanged -= Changed;
             DrawTargetItem.PropertyChanged -= Changed;
             OrbwalkerArcaneBoltItem.PropertyChanged -= Changed;
-            AutoAbilitiesToggler.PropertyChanged -= Changed;
+            AutoAbilityToggler.PropertyChanged -= Changed;
             AutoComboItem.PropertyChanged -= Changed;
-            ItemsToggler.PropertyChanged -= Changed;
+            ItemToggler.PropertyChanged -= Changed;
             BadUltItem.PropertyChanged -= Changed;
-            AbilitiesToggler.PropertyChanged -= Changed;
+            AbilityToggler.PropertyChanged -= Changed;
 
             Factory.Dispose();
         }

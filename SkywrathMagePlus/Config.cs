@@ -39,7 +39,7 @@ namespace SkywrathMagePlus
 
         private WithoutFail WithoutFail { get; }
 
-        private AutoAbilities AutoAbilities { get; }
+        private AutoAbility AutoAbility { get; }
 
         private Mode Mode { get; }
 
@@ -66,11 +66,11 @@ namespace SkywrathMagePlus
             SpamMode = new SpamMode(this);
             AutoDisable = new AutoDisable(this);
             WithoutFail = new WithoutFail(this);
-            AutoAbilities = new AutoAbilities(this);
+            AutoAbility = new AutoAbility(this);
 
             Menu.ComboKeyItem.Item.ValueChanged += ComboKeyChanged;
             var key = KeyInterop.KeyFromVirtualKey((int)Menu.ComboKeyItem.Value.Key);
-            Mode = new Mode(Main.Context, key, this);
+            Mode = new Mode(key, this);
             Main.Context.Orbwalker.RegisterMode(Mode);
 
             Renderer = new Renderer(this);
@@ -129,7 +129,7 @@ namespace SkywrathMagePlus
                 Main.Context.Orbwalker.UnregisterMode(Mode);
                 Menu.ComboKeyItem.Item.ValueChanged -= ComboKeyChanged;
 
-                AutoAbilities.Dispose();
+                AutoAbility.Dispose();
                 WithoutFail.Dispose();
                 AutoDisable.Dispose();
                 SpamMode.Dispose();

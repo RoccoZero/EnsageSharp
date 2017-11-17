@@ -31,14 +31,14 @@ namespace SkywrathMagePlus
 
         private IPredictionManager Prediction { get; }
 
-        public Mode(IServiceContext context, Key key, Config config) 
-            : base(context, key)
+        public Mode(Key key, Config config) 
+            : base(config.Main.Context, key)
         {
             Config = config;
             Menu = config.Menu;
             Main = config.Main;
             Extensions = config.Extensions;
-            Prediction = context.Prediction;
+            Prediction = config.Main.Context.Prediction;
         }
 
         public override async Task ExecuteAsync(CancellationToken token)
@@ -54,7 +54,7 @@ namespace SkywrathMagePlus
                 // Blink
                 var Blink = Main.Blink;
                 if (Blink != null
-                    && Menu.ItemsToggler.Value.IsEnabled(Blink.ToString())
+                    && Menu.ItemToggler.Value.IsEnabled(Blink.ToString())
                     && Owner.Distance2D(Game.MousePosition) > Menu.BlinkActivationItem
                     && Owner.Distance2D(target) > 600
                     && Blink.CanBeCasted)
@@ -74,7 +74,7 @@ namespace SkywrathMagePlus
                         // Hex
                         var Hex = Main.Hex;
                         if (Hex != null
-                            && Menu.ItemsToggler.Value.IsEnabled(Hex.ToString())
+                            && Menu.ItemToggler.Value.IsEnabled(Hex.ToString())
                             && Hex.CanBeCasted
                             && Hex.CanHit(target)
                             && (stunDebuff == null || !stunDebuff.IsValid || stunDebuff.RemainingTime <= 0.3f)
@@ -87,7 +87,7 @@ namespace SkywrathMagePlus
                         // Orchid
                         var Orchid = Main.Orchid;
                         if (Orchid != null
-                            && Menu.ItemsToggler.Value.IsEnabled(Orchid.ToString())
+                            && Menu.ItemToggler.Value.IsEnabled(Orchid.ToString())
                             && Orchid.CanBeCasted
                             && Orchid.CanHit(target))
                         {
@@ -98,7 +98,7 @@ namespace SkywrathMagePlus
                         // Bloodthorn
                         var Bloodthorn = Main.Bloodthorn;
                         if (Bloodthorn != null
-                            && Menu.ItemsToggler.Value.IsEnabled(Bloodthorn.ToString())
+                            && Menu.ItemToggler.Value.IsEnabled(Bloodthorn.ToString())
                             && Bloodthorn.CanBeCasted
                             && Bloodthorn.CanHit(target))
                         {
@@ -108,7 +108,7 @@ namespace SkywrathMagePlus
 
                         // MysticFlare
                         var MysticFlare = Main.MysticFlare;
-                        if (Menu.AbilitiesToggler.Value.IsEnabled(MysticFlare.ToString())
+                        if (Menu.AbilityToggler.Value.IsEnabled(MysticFlare.ToString())
                             && Menu.MinHealthToUltItem <= ((float)target.Health / target.MaximumHealth) * 100
                             && Main.MysticFlare.CanBeCasted
                             && Main.MysticFlare.CanHit(target)
@@ -141,7 +141,7 @@ namespace SkywrathMagePlus
                         // Nullifier
                         var Nullifier = Main.Nullifier;
                         if (Nullifier != null
-                            && Menu.ItemsToggler.Value.IsEnabled(Nullifier.ToString())
+                            && Menu.ItemToggler.Value.IsEnabled(Nullifier.ToString())
                             && Nullifier.CanBeCasted
                             && Nullifier.CanHit(target)
                             && (stunDebuff == null || !stunDebuff.IsValid || stunDebuff.RemainingTime <= 0.5f)
@@ -154,7 +154,7 @@ namespace SkywrathMagePlus
                         // RodofAtos
                         var RodofAtos = Main.RodofAtos;
                         if (RodofAtos != null
-                            && Menu.ItemsToggler.Value.IsEnabled(RodofAtos.ToString())
+                            && Menu.ItemToggler.Value.IsEnabled(RodofAtos.ToString())
                             && RodofAtos.CanBeCasted
                             && RodofAtos.CanHit(target)
                             && (stunDebuff == null || !stunDebuff.IsValid || stunDebuff.RemainingTime <= 0.5f)
@@ -166,7 +166,7 @@ namespace SkywrathMagePlus
 
                         // AncientSeal
                         var AncientSeal = Main.AncientSeal;
-                        if (Menu.AbilitiesToggler.Value.IsEnabled(AncientSeal.ToString())
+                        if (Menu.AbilityToggler.Value.IsEnabled(AncientSeal.ToString())
                             && AncientSeal.CanBeCasted
                             && AncientSeal.CanHit(target))
                         {
@@ -178,7 +178,7 @@ namespace SkywrathMagePlus
                         // Veil
                         var Veil = Main.Veil;
                         if (Veil != null
-                            && Menu.ItemsToggler.Value.IsEnabled(Veil.ToString())
+                            && Menu.ItemToggler.Value.IsEnabled(Veil.ToString())
                             && Veil.CanBeCasted
                             && Veil.CanHit(target))
                         {
@@ -189,7 +189,7 @@ namespace SkywrathMagePlus
                         // Ethereal
                         var Ethereal = Main.Ethereal;
                         if (Ethereal != null
-                            && Menu.ItemsToggler.Value.IsEnabled(Ethereal.ToString())
+                            && Menu.ItemToggler.Value.IsEnabled(Ethereal.ToString())
                             && Ethereal.CanBeCasted
                             && Ethereal.CanHit(target))
                         {
@@ -201,7 +201,7 @@ namespace SkywrathMagePlus
                         // Shivas
                         var Shivas = Main.Shivas;
                         if (Shivas != null
-                            && Menu.ItemsToggler.Value.IsEnabled(Shivas.ToString())
+                            && Menu.ItemToggler.Value.IsEnabled(Shivas.ToString())
                             && Shivas.CanBeCasted
                             && Shivas.CanHit(target))
                         {
@@ -213,7 +213,7 @@ namespace SkywrathMagePlus
                         {
                             // ConcussiveShot
                             var ConcussiveShot = Main.ConcussiveShot;
-                            if (Menu.AbilitiesToggler.Value.IsEnabled(ConcussiveShot.ToString())
+                            if (Menu.AbilityToggler.Value.IsEnabled(ConcussiveShot.ToString())
                                 && Extensions.ConcussiveShotTarget(target, ConcussiveShot.TargetHit)
                                 && ConcussiveShot.CanBeCasted
                                 && ConcussiveShot.CanHit(target))
@@ -224,7 +224,7 @@ namespace SkywrathMagePlus
 
                             // ArcaneBolt
                             var ArcaneBolt = Main.ArcaneBolt;
-                            if (Menu.AbilitiesToggler.Value.IsEnabled(ArcaneBolt.ToString())
+                            if (Menu.AbilityToggler.Value.IsEnabled(ArcaneBolt.ToString())
                                 && ArcaneBolt.CanBeCasted
                                 && ArcaneBolt.CanHit(target))
                             {
@@ -243,7 +243,7 @@ namespace SkywrathMagePlus
                             // Dagon
                             var Dagon = Main.Dagon;
                             if (Dagon != null
-                                && Menu.ItemsToggler.Value.IsEnabled("item_dagon_5")
+                                && Menu.ItemToggler.Value.IsEnabled("item_dagon_5")
                                 && Dagon.CanBeCasted
                                 && Dagon.CanHit(target))
                             {
@@ -256,7 +256,7 @@ namespace SkywrathMagePlus
                         // UrnOfShadows
                         var UrnOfShadows = Main.UrnOfShadows;
                         if (UrnOfShadows != null
-                            && Menu.ItemsToggler.Value.IsEnabled(UrnOfShadows.ToString())
+                            && Menu.ItemToggler.Value.IsEnabled(UrnOfShadows.ToString())
                             && UrnOfShadows.CanBeCasted
                             && UrnOfShadows.CanHit(target))
                         {
@@ -267,7 +267,7 @@ namespace SkywrathMagePlus
                         // SpiritVessel
                         var SpiritVessel = Main.SpiritVessel;
                         if (SpiritVessel != null
-                            && Menu.ItemsToggler.Value.IsEnabled(SpiritVessel.ToString())
+                            && Menu.ItemToggler.Value.IsEnabled(SpiritVessel.ToString())
                             && SpiritVessel.CanBeCasted
                             && SpiritVessel.CanHit(target))
                         {
@@ -343,7 +343,7 @@ namespace SkywrathMagePlus
             var AncientSeal = Main.AncientSeal;
 
             if (Hex != null
-                && Menu.ItemsToggler.Value.IsEnabled(Hex.ToString())
+                && Menu.ItemToggler.Value.IsEnabled(Hex.ToString())
                 && Hex.CanBeCasted
                 && Hex.CanHit(target))
             {
@@ -351,7 +351,7 @@ namespace SkywrathMagePlus
             }
             else
 
-            if (Menu.AbilitiesToggler.Value.IsEnabled(AncientSeal.ToString())
+            if (Menu.AbilityToggler.Value.IsEnabled(AncientSeal.ToString())
                 && AncientSeal.CanBeCasted
                 && !AncientSeal.CanHit(target))
             {

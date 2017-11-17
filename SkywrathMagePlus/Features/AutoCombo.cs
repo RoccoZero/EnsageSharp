@@ -109,7 +109,7 @@ namespace SkywrathMagePlus.Features
                         // Hex
                         var Hex = Main.Hex;
                         if (Hex != null
-                            && Menu.AutoItemsToggler.Value.IsEnabled(Hex.ToString())
+                            && Menu.AutoItemToggler.Value.IsEnabled(Hex.ToString())
                             && Hex.CanBeCasted
                             && Hex.CanHit(target)
                             && (stunDebuff == null || !stunDebuff.IsValid || stunDebuff.RemainingTime <= 0.3f)
@@ -122,7 +122,7 @@ namespace SkywrathMagePlus.Features
                         // Orchid
                         var Orchid = Main.Orchid;
                         if (Orchid != null
-                            && Menu.AutoItemsToggler.Value.IsEnabled(Orchid.ToString())
+                            && Menu.AutoItemToggler.Value.IsEnabled(Orchid.ToString())
                             && Orchid.CanBeCasted
                             && Orchid.CanHit(target))
                         {
@@ -133,7 +133,7 @@ namespace SkywrathMagePlus.Features
                         // Bloodthorn
                         var Bloodthorn = Main.Bloodthorn;
                         if (Bloodthorn != null
-                            && Menu.AutoItemsToggler.Value.IsEnabled(Bloodthorn.ToString())
+                            && Menu.AutoItemToggler.Value.IsEnabled(Bloodthorn.ToString())
                             && Bloodthorn.CanBeCasted
                             && Bloodthorn.CanHit(target))
                         {
@@ -143,7 +143,7 @@ namespace SkywrathMagePlus.Features
 
                         // Mystic Flare
                         var MysticFlare = Main.MysticFlare;
-                        if (Menu.AutoAbilitiesToggler.Value.IsEnabled(MysticFlare.ToString())
+                        if (Menu.AutoAbilityToggler.Value.IsEnabled(MysticFlare.ToString())
                             && Menu.AutoMinHealthToUltItem <= ((float)target.Health / target.MaximumHealth) * 100
                             && Main.MysticFlare.CanBeCasted
                             && Main.MysticFlare.CanHit(target))
@@ -175,7 +175,7 @@ namespace SkywrathMagePlus.Features
                         // Nullifier
                         var Nullifier = Main.Nullifier;
                         if (Nullifier != null
-                            && Menu.ItemsToggler.Value.IsEnabled(Nullifier.ToString())
+                            && Menu.ItemToggler.Value.IsEnabled(Nullifier.ToString())
                             && Nullifier.CanBeCasted
                             && Nullifier.CanHit(target)
                             && (stunDebuff == null || !stunDebuff.IsValid || stunDebuff.RemainingTime <= 0.5f)
@@ -188,7 +188,7 @@ namespace SkywrathMagePlus.Features
                         // RodofAtos
                         var RodofAtos = Main.RodofAtos;
                         if (RodofAtos != null
-                            && Menu.AutoItemsToggler.Value.IsEnabled(RodofAtos.ToString())
+                            && Menu.AutoItemToggler.Value.IsEnabled(RodofAtos.ToString())
                             && RodofAtos.CanBeCasted
                             && RodofAtos.CanHit(target)
                             && (stunDebuff == null || !stunDebuff.IsValid || stunDebuff.RemainingTime <= 0.5f)
@@ -200,7 +200,7 @@ namespace SkywrathMagePlus.Features
 
                         // AncientSeal
                         var AncientSeal = Main.AncientSeal;
-                        if (Menu.AutoAbilitiesToggler.Value.IsEnabled(AncientSeal.ToString())
+                        if (Menu.AutoAbilityToggler.Value.IsEnabled(AncientSeal.ToString())
                             && AncientSeal.CanBeCasted
                             && AncientSeal.CanHit(target))
                         {
@@ -212,7 +212,7 @@ namespace SkywrathMagePlus.Features
                         // Veil
                         var Veil = Main.Veil;
                         if (Veil != null
-                            && Menu.AutoItemsToggler.Value.IsEnabled(Veil.ToString())
+                            && Menu.AutoItemToggler.Value.IsEnabled(Veil.ToString())
                             && Veil.CanBeCasted
                             && Veil.CanHit(target))
                         {
@@ -223,7 +223,7 @@ namespace SkywrathMagePlus.Features
                         // Ethereal
                         var Ethereal = Main.Ethereal;
                         if (Ethereal != null
-                            && Menu.AutoItemsToggler.Value.IsEnabled(Ethereal.ToString())
+                            && Menu.AutoItemToggler.Value.IsEnabled(Ethereal.ToString())
                             && Ethereal.CanBeCasted
                             && Ethereal.CanHit(target))
                         {
@@ -235,7 +235,7 @@ namespace SkywrathMagePlus.Features
                         // Shivas
                         var Shivas = Main.Shivas;
                         if (Shivas != null
-                            && Menu.AutoItemsToggler.Value.IsEnabled(Shivas.ToString())
+                            && Menu.AutoItemToggler.Value.IsEnabled(Shivas.ToString())
                             && Shivas.CanBeCasted
                             && Shivas.CanHit(target))
                         {
@@ -247,7 +247,7 @@ namespace SkywrathMagePlus.Features
                         {
                             // ConcussiveShot
                             var ConcussiveShot = Main.ConcussiveShot;
-                            if (Menu.AutoAbilitiesToggler.Value.IsEnabled(ConcussiveShot.ToString())
+                            if (Menu.AutoAbilityToggler.Value.IsEnabled(ConcussiveShot.ToString())
                                 && Extensions.ConcussiveShotTarget(target, ConcussiveShot.TargetHit)
                                 && ConcussiveShot.CanBeCasted
                                 && Owner.Distance2D(target) < Menu.ConcussiveShotUseRadiusItem - Owner.HullRadius)
@@ -258,7 +258,7 @@ namespace SkywrathMagePlus.Features
 
                             // ArcaneBolt
                             var ArcaneBolt = Main.ArcaneBolt;
-                            if (Menu.AutoAbilitiesToggler.Value.IsEnabled(ArcaneBolt.ToString())
+                            if (Menu.AutoAbilityToggler.Value.IsEnabled(ArcaneBolt.ToString())
                                 && ArcaneBolt.CanBeCasted
                                 && ArcaneBolt.CanHit(target))
                             {
@@ -277,7 +277,7 @@ namespace SkywrathMagePlus.Features
                             // Dagon
                             var Dagon = Main.Dagon;
                             if (Dagon != null
-                                && Menu.AutoItemsToggler.Value.IsEnabled("item_dagon_5")
+                                && Menu.AutoItemToggler.Value.IsEnabled("item_dagon_5")
                                 && Dagon.CanBeCasted
                                 && Dagon.CanHit(target))
                             {

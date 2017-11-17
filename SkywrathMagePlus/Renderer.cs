@@ -36,10 +36,7 @@ namespace SkywrathMagePlus
 
         private void Texture(Vector2 pos, Vector2 size, string texture)
         {
-            Drawing.DrawRect(
-                pos,
-                size,
-                Drawing.GetTexture($"materials/ensage_ui/{ texture }.vmat"));
+            Drawing.DrawRect(pos, size, Drawing.GetTexture($"materials/ensage_ui/{ texture }.vmat"));
         }
 
         private void OnDraw(EventArgs args)
@@ -49,17 +46,20 @@ namespace SkywrathMagePlus
                 var setPosText = new Vector2(Config.Screen.X - Menu.TextXItem - 10, Menu.TextYItem - 20);
                 var posText = new Vector2(Config.Screen.X, Config.Screen.Y * 0.65f) - setPosText;
 
-                Text($"Combo { (Menu.ComboKeyItem ? "ON" : "OFF") }", posText, Menu.ComboKeyItem ? Color.Aqua : Color.Yellow);
-                Text($"Spam Q { (Menu.SpamArcaneBoltKeyItem ? "ON" : "OFF") }", posText + new Vector2(0, 30), Menu.SpamArcaneBoltKeyItem ? Color.Aqua : Color.Yellow);
-                Text($"Auto Q { (!Menu.ComboKeyItem && !Menu.SpamArcaneBoltKeyItem && Menu.AutoArcaneBoltKeyItem ? "ON" : "OFF") }",
-                    posText + new Vector2(0, 60),
-                    !Menu.ComboKeyItem && !Menu.SpamArcaneBoltKeyItem && Menu.AutoArcaneBoltKeyItem ? Color.Aqua : Color.Yellow);
+                var combo = Menu.ComboKeyItem;
+                Text($"Combo { (combo ? "ON" : "OFF") }", posText, combo ? Color.Aqua : Color.Yellow);
+
+                var spamArcaneBolt = Menu.SpamArcaneBoltKeyItem;
+                Text($"Spam Q { (spamArcaneBolt ? "ON" : "OFF") }", posText + new Vector2(0, 30), spamArcaneBolt ? Color.Aqua : Color.Yellow);
+
+                var autoArcaneBolt = !combo && !spamArcaneBolt && Menu.AutoArcaneBoltKeyItem;
+                Text($"Auto Q { (autoArcaneBolt ? "ON" : "OFF") }", posText + new Vector2(0, 60), !autoArcaneBolt ? Color.Aqua : Color.Yellow);
 
                 var i = 0;
                 if (Menu.AutoComboItem)
                 {
                     i += 30;
-                    Text($"Auto Combo { (!Menu.ComboKeyItem ? "ON" : "OFF") }", posText + new Vector2(0, 60 + i), !Menu.ComboKeyItem ? Color.Aqua : Color.Yellow);
+                    Text($"Auto Combo { (!combo ? "ON" : "OFF") }", posText + new Vector2(0, 60 + i), !combo ? Color.Aqua : Color.Yellow);
                 }
 
                 if (Menu.AutoDisableItem)
@@ -69,10 +69,9 @@ namespace SkywrathMagePlus
                 }
 
                 i += 30;
-                Text($"Start Combo Mute { (Menu.StartComboKeyItem ? "ON" : "OFF") }", posText + new Vector2(0, 60 + i), Menu.StartComboKeyItem ? Color.Aqua : Color.Yellow);
+                var startCombo = Menu.StartComboKeyItem;
+                Text($"Start Combo Mute { (startCombo ? "ON" : "OFF") }", posText + new Vector2(0, 60 + i), startCombo ? Color.Aqua : Color.Yellow);
             }
-
-            var setPosTexture = new Vector2(Config.Screen.X - Menu.CalculationXItem - 20, Menu.CalculationYItem - 110);
 
             var x = 0;
             foreach (var Data in Config.DamageCalculation.DamageList)
@@ -115,20 +114,21 @@ namespace SkywrathMagePlus
 
                 if (Menu.CalculationItem)
                 {
+                    var setPosTexture = new Vector2(Config.Screen.X - Menu.CalculationXItem - 20, Menu.CalculationYItem - 110);
                     var posTexture = new Vector2(Config.Screen.X, Config.Screen.Y * 0.65f + x) - setPosTexture;
+                    var reincarnation = Reincarnation(target);
 
-                    var ph = Math.Ceiling((float)health / target.MaximumHealth * 100);
-                    var doNotKill = Reincarnation(target);
+                    Texture(posTexture + 5, new Vector2(55), $"heroes_round/{ target.Name.Substring("npc_dota_hero_".Length) }");
+                    Texture(posTexture, new Vector2(65), "other/round_percentage/frame/white");
 
                     if (!target.IsVisible)
                     {
-                        Texture(posTexture + 5, new Vector2(55), $"heroes_round/{ target.Name.Substring("npc_dota_hero_".Length) }");
-                        Texture(posTexture, new Vector2(65), "other/round_percentage/frame/white");
-                        Texture(posTexture, new Vector2(65), $"other/round_percentage/hp/{ Math.Min(ph, 100) }");
+                        var hp = Math.Ceiling((float)health / target.MaximumHealth * 100);
+                        Texture(posTexture, new Vector2(65), $"other/round_percentage/hp/{ Math.Min(hp, 100) }");
 
-                        if (doNotKill != null)
+                        if (reincarnation != null)
                         {
-                            Texture(posTexture + new Vector2(42, 45), new Vector2(20), $"modifier_textures/round/{ doNotKill }");
+                            Texture(posTexture + new Vector2(42, 45), new Vector2(20), $"modifier_textures/round/{ reincarnation }");
                         }
 
                         x += 80;
@@ -147,9 +147,6 @@ namespace SkywrathMagePlus
                         Texture(posTexture - 10, new Vector2(85), $"other/round_percentage/alert/{ Alert() }");
                     }
 
-                    Texture(posTexture + 5, new Vector2(55), $"heroes_round/{ target.Name.Substring("npc_dota_hero_".Length) }");
-
-                    Texture(posTexture, new Vector2(65), "other/round_percentage/frame/white");
                     Texture(posTexture, new Vector2(65), $"other/round_percentage/no_percent_gray/{ Math.Min(totalDamagePercent, 100) }");
                     Texture(posTexture, new Vector2(65), $"other/round_percentage/no_percent_yellow/{ Math.Min(readyDamagePercent, 100) }");
 
@@ -161,9 +158,9 @@ namespace SkywrathMagePlus
                         Texture(posTexture, new Vector2(65), $"other/round_percentage/no_percent_gray/{ Math.Min(damagePercent - 100, 100) }");
                     }
 
-                    if (doNotKill != null)
+                    if (reincarnation != null)
                     {
-                        Texture(posTexture + new Vector2(42, 45), new Vector2(20), $"modifier_textures/round/{ doNotKill }");
+                        Texture(posTexture + new Vector2(42, 45), new Vector2(20), $"modifier_textures/round/{ reincarnation }");
                     }
 
                     x += 80;
@@ -178,7 +175,6 @@ namespace SkywrathMagePlus
             {
                 return reincarnation.TextureName;
             }
-
 
             return null;
         }

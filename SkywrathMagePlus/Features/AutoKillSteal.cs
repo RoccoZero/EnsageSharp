@@ -62,6 +62,8 @@ namespace SkywrathMagePlus.Features
 
         private void AutoKillStealChanged(object sender, PropertyChangedEventArgs e)
         {
+            UpdateManager.Unsubscribe(Stop);
+
             if (Menu.AutoKillStealItem)
             {
                 Handler.RunAsync();

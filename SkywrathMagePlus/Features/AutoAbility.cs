@@ -11,7 +11,7 @@ using Ensage.SDK.Helpers;
 
 namespace SkywrathMagePlus.Features
 {
-    internal class AutoAbilities
+    internal class AutoAbility
     {
         private Config Config { get; }
 
@@ -23,7 +23,7 @@ namespace SkywrathMagePlus.Features
 
         private TaskHandler Handler { get; }
 
-        public AutoAbilities(Config config)
+        public AutoAbility(Config config)
         {
             Config = config;
             Menu = config.Menu;

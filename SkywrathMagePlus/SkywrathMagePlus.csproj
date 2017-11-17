@@ -47,7 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions.cs" />
-    <Compile Include="Features\AutoAbilities.cs" />
+    <Compile Include="Features\AutoAbility.cs" />
     <Compile Include="Features\AutoCombo.cs" />
     <Compile Include="Features\AutoDisable.cs" />
     <Compile Include="Features\AutoKillSteal.cs" />
