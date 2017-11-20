@@ -26,7 +26,23 @@ namespace SkywrathMagePlus
 
         public MenuItem<Slider> BlinkDistanceEnemyItem { get; }
 
+        public MenuItem<bool> ComboBreakerItem { get; }
+
+        public MenuItem<KeyBind> ComboKeyItem { get; }
+
+        public MenuItem<StringList> OrbwalkerItem { get; }
+
+        public MenuItem<Slider> MinDisInOrbwalkItem { get; }
+
+        public MenuItem<StringList> TargetItem { get; }
+
+        public MenuItem<KeyBind> StartComboKeyItem { get; }
+
         public MenuItem<bool> AutoComboItem { get; }
+
+        public MenuItem<bool> AutoComboWhenComboItem { get; }
+
+        public MenuItem<Slider> AutoOwnerMinHealthItem { get; }
 
         public MenuItem<AbilityToggler> AutoAbilityToggler { get; }
 
@@ -35,6 +51,8 @@ namespace SkywrathMagePlus
         public MenuItem<Slider> AutoMinHealthToUltItem { get; }
 
         public MenuItem<bool> AutoKillStealItem { get; }
+
+        public MenuItem<bool> AutoKillWhenComboItem { get; }
 
         public MenuItem<AbilityToggler> AutoKillStealToggler { get; }
 
@@ -57,6 +75,8 @@ namespace SkywrathMagePlus
         public MenuItem<bool> EulBladeMailItem { get; }
 
         public MenuItem<KeyBind> AutoArcaneBoltKeyItem { get; }
+
+        public MenuItem<Slider> AutoArcaneBoltOwnerMinHealthItem { get; }
 
         public MenuItem<KeyBind> SpamArcaneBoltKeyItem { get; }
 
@@ -118,23 +138,14 @@ namespace SkywrathMagePlus
 
         public MenuItem<Slider> TextYItem { get; }
 
-        public MenuItem<KeyBind> ComboKeyItem { get; }
-
-        public MenuItem<StringList> OrbwalkerItem { get; }
-
-        public MenuItem<Slider> MinDisInOrbwalkItem { get; }
-
-        public MenuItem<StringList> TargetItem { get; }
-
-        public MenuItem<KeyBind> StartComboKeyItem { get; }
-
         public MenuManager(Config config)
         {
             Factory = MenuFactory.CreateWithTexture("SkywrathMagePlus", "npc_dota_hero_skywrath_mage");
             Factory.Target.SetFontColor(Color.Aqua);
 
-            var AbilitiesMenu = Factory.Menu("Abilities");
-            AbilityToggler = AbilitiesMenu.Item("Use: ", new AbilityToggler(new Dictionary<string, bool>
+            var comboMenu = Factory.Menu("Combo");
+            var abilitiesMenu = comboMenu.Menu("Abilities");
+            AbilityToggler = abilitiesMenu.Item("Use: ", new AbilityToggler(new Dictionary<string, bool>
             {
                 { "skywrath_mage_mystic_flare", true },
                 { "skywrath_mage_ancient_seal", true },
@@ -142,14 +153,14 @@ namespace SkywrathMagePlus
                 { "skywrath_mage_arcane_bolt", true }
             }));
 
-            MinHealthToUltItem = AbilitiesMenu.Item("Min Health % To Ult", new Slider(0, 0, 70));
-            BadUltItem = AbilitiesMenu.Item("Bad Ult", false);
+            MinHealthToUltItem = abilitiesMenu.Item("Target Min Health % To Ult", new Slider(0, 0, 70));
+            BadUltItem = abilitiesMenu.Item("Bad Ult", false);
             BadUltItem.Item.SetTooltip("It is not recommended to enable this. If you do not have these items (RodofAtos, Hex, Ethereal) then this function is activated");
-            BadUltMovementSpeedItem = AbilitiesMenu.Item("Bad Ult Movement Speed", new Slider(500, 240, 500));
+            BadUltMovementSpeedItem = abilitiesMenu.Item("Bad Ult Movement Speed", new Slider(500, 240, 500));
             BadUltMovementSpeedItem.Item.SetTooltip("If the enemy has less Movement Speed from this value, then immediately ULT");
 
-            var ItemsMenu = Factory.Menu("Items");
-            ItemToggler = ItemsMenu.Item("Use: ", new AbilityToggler(new Dictionary<string, bool>
+            var itemsMenu = comboMenu.Menu("Items");
+            ItemToggler = itemsMenu.Item("Use: ", new AbilityToggler(new Dictionary<string, bool>
             {
                 { "item_blink", false },
                 { "item_spirit_vessel", true },
@@ -165,12 +176,25 @@ namespace SkywrathMagePlus
                 { "item_sheepstick", true }
             }));
 
-            BlinkActivationItem = ItemsMenu.Item("Blink Activation Distance Mouse", new Slider(1000, 0, 1200));
-            BlinkDistanceEnemyItem = ItemsMenu.Item("Blink Distance From Enemy", new Slider(300, 0, 500));
+            BlinkActivationItem = itemsMenu.Item("Blink Activation Distance Mouse", new Slider(1000, 0, 1200));
+            BlinkDistanceEnemyItem = itemsMenu.Item("Blink Distance From Enemy", new Slider(300, 0, 500));
 
-            var AutoComboMenu = Factory.Menu("Auto Combo");
-            AutoComboItem = AutoComboMenu.Item("Enable", true);
-            AutoAbilityToggler = AutoComboMenu.Item("Abilities: ", "autoabilitiestoggler", new AbilityToggler(new Dictionary<string, bool>
+            var comboBreakerMenu = comboMenu.MenuWithTexture("Combo Breaker", "item_combo_breaker");
+            ComboBreakerItem = comboBreakerMenu.Item("Cancel Important Items and Abilities", true);
+            ComboBreakerItem.Item.SetTooltip("If Combo Breaker is ready then it will not use Important Items and Abilities");
+
+            ComboKeyItem = comboMenu.Item("Combo Key", new KeyBind('D'));
+            OrbwalkerItem = comboMenu.Item("Orbwalker", new StringList("Default", "Distance", "Free", "Only Attack", "No Move"));
+            MinDisInOrbwalkItem = comboMenu.Item("Min Distance In Orbwalker", new Slider(600, 200, 600));
+            TargetItem = comboMenu.Item("Target", new StringList("Lock", "Default"));
+            StartComboKeyItem = comboMenu.Item("Start Combo With Mute", new KeyBind('0', KeyBindType.Toggle, false));
+            StartComboKeyItem.Item.SetTooltip("Start Combo With Hex or Ancient Seal");
+
+            var autoComboMenu = Factory.Menu("Auto Combo");
+            AutoComboItem = autoComboMenu.Item("Enable", true);
+            AutoComboWhenComboItem = autoComboMenu.Item("Disable When Combo", true);
+            AutoOwnerMinHealthItem = autoComboMenu.Item("Owner Min Health % To Auto Combo", new Slider(0, 0, 70));
+            AutoAbilityToggler = autoComboMenu.Item("Abilities: ", "autoabilitiestoggler", new AbilityToggler(new Dictionary<string, bool>
             {
                 { "skywrath_mage_mystic_flare", true },
                 { "skywrath_mage_ancient_seal", true },
@@ -178,7 +202,7 @@ namespace SkywrathMagePlus
                 { "skywrath_mage_arcane_bolt", true }
             }));
 
-            AutoItemToggler = AutoComboMenu.Item("Items: ", "autoitemstoggler", new AbilityToggler(new Dictionary<string, bool>
+            AutoItemToggler = autoComboMenu.Item("Items: ", "autoitemstoggler", new AbilityToggler(new Dictionary<string, bool>
             {
                 { "item_shivas_guard", true },
                 { "item_dagon_5", true },
@@ -191,11 +215,12 @@ namespace SkywrathMagePlus
                 { "item_sheepstick", true }
             }));
 
-            AutoMinHealthToUltItem = AutoComboMenu.Item("Min Health % To Ult", new Slider(0, 0, 70));
+            AutoMinHealthToUltItem = autoComboMenu.Item("Target Min Health % To Ult", new Slider(0, 0, 70));
 
-            var AutoKillStealMenu = Factory.Menu("Auto Kill Steal");
-            AutoKillStealItem = AutoKillStealMenu.Item("Enable", true);
-            AutoKillStealToggler = AutoKillStealMenu.Item("Use: ", "autokillstealtoggler", new AbilityToggler(new Dictionary<string, bool>
+            var autoKillStealMenu = Factory.Menu("Auto Kill Steal");
+            AutoKillStealItem = autoKillStealMenu.Item("Enable", true);
+            AutoKillWhenComboItem = autoKillStealMenu.Item("Disable When Combo", false);
+            AutoKillStealToggler = autoKillStealMenu.Item("Use: ", "autokillstealtoggler", new AbilityToggler(new Dictionary<string, bool>
             {
                 { "skywrath_mage_arcane_bolt", true },
                 { "skywrath_mage_concussive_shot", true },
@@ -206,9 +231,9 @@ namespace SkywrathMagePlus
                 { "skywrath_mage_ancient_seal", true }
             }));
 
-            var AutoDisableMenu = Factory.MenuWithTexture("Auto Disable", "item_sheepstick");
-            AutoDisableItem = AutoDisableMenu.Item("Enable", true);
-            AutoDisableToggler = AutoDisableMenu.Item("Use: ", new AbilityToggler(new Dictionary<string, bool>
+            var autoDisableMenu = Factory.MenuWithTexture("Auto Disable", "item_sheepstick");
+            AutoDisableItem = autoDisableMenu.Item("Enable", true);
+            AutoDisableToggler = autoDisableMenu.Item("Use: ", new AbilityToggler(new Dictionary<string, bool>
             {
                 { "skywrath_mage_ancient_seal", true },
                 { "item_bloodthorn", true },
@@ -216,9 +241,9 @@ namespace SkywrathMagePlus
                 { "item_sheepstick", true }
             }));
 
-            var LinkenBreakerMenu = Factory.MenuWithTexture("Linken Breaker", "item_sphere");
-            LinkenBreakerMenu.Target.AddItem(new MenuItem("linkensphere", "Linkens Sphere:"));
-            LinkenBreakerToggler = LinkenBreakerMenu.Item("Use: ", "linkentoggler", new AbilityToggler(new Dictionary<string, bool>
+            var linkenBreakerMenu = Factory.MenuWithTexture("Linken Breaker", "item_sphere");
+            linkenBreakerMenu.Target.AddItem(new MenuItem("linkensphere", "Linkens Sphere:"));
+            LinkenBreakerToggler = linkenBreakerMenu.Item("Use: ", "linkentoggler", new AbilityToggler(new Dictionary<string, bool>
             {
                 { "skywrath_mage_ancient_seal", true },
                 { "skywrath_mage_arcane_bolt", true },
@@ -231,7 +256,7 @@ namespace SkywrathMagePlus
                 { "item_force_staff", true }
             }));
 
-            LinkenBreakerChanger = LinkenBreakerMenu.Item("Priority: ", "linkenchanger", new PriorityChanger(new List<string>
+            LinkenBreakerChanger = linkenBreakerMenu.Item("Priority: ", "linkenchanger", new PriorityChanger(new List<string>
             {
                 { "skywrath_mage_ancient_seal" },
                 { "skywrath_mage_arcane_bolt" },
@@ -244,10 +269,10 @@ namespace SkywrathMagePlus
                 { "item_force_staff" }
             }));
 
-            LinkenBreakerMenu.Target.AddItem(new MenuItem("empty", ""));
+            linkenBreakerMenu.Target.AddItem(new MenuItem("empty", ""));
 
-            LinkenBreakerMenu.Target.AddItem(new MenuItem("antimagespellshield", "Anti Mage Spell Shield:"));
-            AntiMageBreakerToggler = LinkenBreakerMenu.Item("Use: ", "antimagetoggler", new AbilityToggler(new Dictionary<string, bool>
+            linkenBreakerMenu.Target.AddItem(new MenuItem("antimagespellshield", "Anti Mage Spell Shield:"));
+            AntiMageBreakerToggler = linkenBreakerMenu.Item("Use: ", "antimagetoggler", new AbilityToggler(new Dictionary<string, bool>
             {
                 { "skywrath_mage_ancient_seal", true },
                 { "skywrath_mage_arcane_bolt", true },
@@ -256,7 +281,7 @@ namespace SkywrathMagePlus
                 { "item_force_staff", true }
             }));
 
-            AntiMageBreakerChanger = LinkenBreakerMenu.Item("Priority: ", "antimagechanger", new PriorityChanger(new List<string>
+            AntiMageBreakerChanger = linkenBreakerMenu.Item("Priority: ", "antimagechanger", new PriorityChanger(new List<string>
             {
                 { "skywrath_mage_ancient_seal" },
                 { "skywrath_mage_arcane_bolt" },
@@ -265,78 +290,74 @@ namespace SkywrathMagePlus
                 { "item_force_staff" }
             }));
 
-            UseOnlyFromRangeItem = LinkenBreakerMenu.Item("Use Only From Range", false);
+            UseOnlyFromRangeItem = linkenBreakerMenu.Item("Use Only From Range", false);
             UseOnlyFromRangeItem.Item.SetTooltip("Use only from the Range and do not use another Ability");
 
-            var BladeMailMenu = Factory.MenuWithTexture("Blade Mail", "item_blade_mail");
-            BladeMailItem = BladeMailMenu.Item("Cancel Combo", true);
-            BladeMailItem.Item.SetTooltip("Cancel Combo if there is enemy Blade Mail");
-            EulBladeMailItem = BladeMailMenu.Item("Use Eul", true);
-            EulBladeMailItem.Item.SetTooltip("Use Eul if there is BladeMail with ULT");
-
-            var ArcaneBoltMenu = Factory.MenuWithTexture("Smart Arcane Bolt", "skywrath_mage_arcane_bolt");
-            AutoArcaneBoltKeyItem = ArcaneBoltMenu.Item("Auto Arcane Bolt Key", new KeyBind('F', KeyBindType.Toggle, false));
+            var arcaneBoltMenu = Factory.MenuWithTexture("Smart Arcane Bolt", "skywrath_mage_arcane_bolt");
+            AutoArcaneBoltKeyItem = arcaneBoltMenu.Item("Auto Arcane Bolt Key", new KeyBind('F', KeyBindType.Toggle, false));
             AutoArcaneBoltKeyItem.Item.SetValue(new KeyBind(AutoArcaneBoltKeyItem.Item.GetValue<KeyBind>().Key, KeyBindType.Toggle, false));
-            SpamArcaneBoltKeyItem = ArcaneBoltMenu.Item("Spam Arcane Bolt Key", new KeyBind('Q'));
-            SpamArcaneBoltUnitItem = ArcaneBoltMenu.Item("Spam Arcane Bolt Units", true);
+            AutoArcaneBoltOwnerMinHealthItem = arcaneBoltMenu.Item("Owner Min Health % To Auto Arcane Bolt", new Slider(20, 0, 70));
 
-            OrbwalkerArcaneBoltItem = ArcaneBoltMenu.Item("Orbwalker", new StringList("Distance", "Default", "Free", "Only Attack", "No Move"));
-            MinDisInOrbwalkArcaneBoltItem = ArcaneBoltMenu.Item("Min Distance In Orbwalker", new Slider(600, 200, 600));
+            arcaneBoltMenu.Target.AddItem(new MenuItem("empty2", ""));
 
-            var ConcussiveShotMenu = Factory.MenuWithTexture("Smart Concussive Shot", "skywrath_mage_concussive_shot");
-            ConcussiveShotWithoutFailItem = ConcussiveShotMenu.Item("Without Fail", true);
-            ConcussiveShotTargetItem = ConcussiveShotMenu.Item("Use Only Target", true);
+            SpamArcaneBoltKeyItem = arcaneBoltMenu.Item("Spam Arcane Bolt Key", new KeyBind('Q'));
+            SpamArcaneBoltUnitItem = arcaneBoltMenu.Item("Spam Arcane Bolt Units", true);
+            OrbwalkerArcaneBoltItem = arcaneBoltMenu.Item("Orbwalker", new StringList("Distance", "Default", "Free", "Only Attack", "No Move"));
+            MinDisInOrbwalkArcaneBoltItem = arcaneBoltMenu.Item("Min Distance In Orbwalker", new Slider(600, 200, 600));
+
+            var concussiveShotMenu = Factory.MenuWithTexture("Smart Concussive Shot", "skywrath_mage_concussive_shot");
+            ConcussiveShotWithoutFailItem = concussiveShotMenu.Item("Without Fail", true);
+            ConcussiveShotTargetItem = concussiveShotMenu.Item("Use Only Target", true);
             ConcussiveShotTargetItem.Item.SetTooltip("This only works with Combo");
-            ConcussiveShotUseRadiusItem = ConcussiveShotMenu.Item("Use in Radius", new Slider(1400, 800, 1600));
+            ConcussiveShotUseRadiusItem = concussiveShotMenu.Item("Use in Radius", new Slider(1400, 800, 1600));
             ConcussiveShotUseRadiusItem.Item.SetTooltip("This only works with Combo");
 
-            var DrawingMenu = Factory.Menu("Drawing");
-            var TargetMenu = DrawingMenu.Menu("Target");
-            TargetEffectTypeItem = TargetMenu.Item("Target Effect Type", new StringList(EffectsName));
-            DrawTargetItem = TargetMenu.Item("Target Enable", true);
-            TargetRedItem = TargetMenu.Item("Red", "red", new Slider(255, 0, 255));
+            var bladeMailMenu = Factory.MenuWithTexture("Blade Mail", "item_blade_mail");
+            BladeMailItem = bladeMailMenu.Item("Cancel Combo", true);
+            BladeMailItem.Item.SetTooltip("Cancel Combo if there is enemy Blade Mail");
+            EulBladeMailItem = bladeMailMenu.Item("Use Eul", true);
+            EulBladeMailItem.Item.SetTooltip("Use Eul if there is BladeMail with ULT");
+
+            var drawingMenu = Factory.Menu("Drawing");
+            var targetMenu = drawingMenu.Menu("Target");
+            TargetEffectTypeItem = targetMenu.Item("Target Effect Type", new StringList(EffectsName));
+            DrawTargetItem = targetMenu.Item("Target Enable", true);
+            TargetRedItem = targetMenu.Item("Red", "red", new Slider(255, 0, 255));
             TargetRedItem.Item.SetFontColor(Color.Red);
-            TargetGreenItem = TargetMenu.Item("Green", "green", new Slider(0, 0, 255));
+            TargetGreenItem = targetMenu.Item("Green", "green", new Slider(0, 0, 255));
             TargetGreenItem.Item.SetFontColor(Color.Green);
-            TargetBlueItem = TargetMenu.Item("Blue", "blue", new Slider(0, 0, 255));
+            TargetBlueItem = targetMenu.Item("Blue", "blue", new Slider(0, 0, 255));
             TargetBlueItem.Item.SetFontColor(Color.Blue);
 
-            DrawOffTargetItem = TargetMenu.Item("Off Target Enable", true);
-            OffTargetRedItem = TargetMenu.Item("Red", "offred", new Slider(0, 0, 255));
+            DrawOffTargetItem = targetMenu.Item("Off Target Enable", true);
+            OffTargetRedItem = targetMenu.Item("Red", "offred", new Slider(0, 0, 255));
             OffTargetRedItem.Item.SetFontColor(Color.Red);
-            OffTargetGreenItem = TargetMenu.Item("Green", "offgreen", new Slider(255, 0, 255));
+            OffTargetGreenItem = targetMenu.Item("Green", "offgreen", new Slider(255, 0, 255));
             OffTargetGreenItem.Item.SetFontColor(Color.Green);
-            OffTargetBlueItem = TargetMenu.Item("Blue", "offblue", new Slider(255, 0, 255));
+            OffTargetBlueItem = targetMenu.Item("Blue", "offblue", new Slider(255, 0, 255));
             OffTargetBlueItem.Item.SetFontColor(Color.Blue);
 
-            var CalculationMenu = DrawingMenu.Menu("Damage Calculation");
-            CalculationItem = CalculationMenu.Item("Enable", true);
-            CalculationXItem = CalculationMenu.Item("X", new Slider(0, 0, (int)config.Screen.X + 65));
-            CalculationYItem = CalculationMenu.Item("Y", new Slider((int)config.Screen.Y - 260, 0, (int)config.Screen.Y - 200));
+            var calculationMenu = drawingMenu.Menu("Damage Calculation");
+            CalculationItem = calculationMenu.Item("Enable", true);
+            CalculationXItem = calculationMenu.Item("X", new Slider(0, 0, (int)config.Screen.X + 65));
+            CalculationYItem = calculationMenu.Item("Y", new Slider((int)config.Screen.Y - 260, 0, (int)config.Screen.Y - 200));
 
-            var HPBarCalculationMenu = DrawingMenu.Menu("HP Bar Damage Calculation");
-            HPBarCalculationItem = HPBarCalculationMenu.Item("Enable", true);
-            HPBarCalculationPosItem = HPBarCalculationMenu.Item("Damage Bar Position", new Slider(84, 0, 100));
+            var hpBarCalculationMenu = drawingMenu.Menu("HP Bar Damage Calculation");
+            HPBarCalculationItem = hpBarCalculationMenu.Item("Enable", true);
+            HPBarCalculationPosItem = hpBarCalculationMenu.Item("Damage Bar Position", new Slider(84, 0, 100));
 
-            var TextMenu = DrawingMenu.Menu("Text");
-            TextItem = TextMenu.Item("Enable", true);
-            TextXItem = TextMenu.Item("X", new Slider((int)config.Screen.X - 50, 0, (int)config.Screen.X - 50));
-            TextYItem = TextMenu.Item("Y", new Slider(0, 0, (int)config.Screen.Y - 280));
+            var textMenu = drawingMenu.Menu("Text");
+            TextItem = textMenu.Item("Enable", true);
+            TextXItem = textMenu.Item("X", new Slider((int)config.Screen.X, 0, (int)config.Screen.X));
+            TextYItem = textMenu.Item("Y", new Slider(0, 0, (int)config.Screen.Y - 240));
 
-            var RadiusMenu = DrawingMenu.Menu("Radius");
-            ArcaneBoltRadiusItem = RadiusMenu.Item("Arcane Bolt", true);
-            ConcussiveShotRadiusItem = RadiusMenu.Item("Concussive Shot", true);
-            AncientSealRadiusItem = RadiusMenu.Item("Ancient Seal", true);
-            MysticFlareRadiusItem = RadiusMenu.Item("Mystic Flare", true);
-            TargetHitConcussiveShotItem = RadiusMenu.Item("Target Hit Concussive Shot", true);
-            BlinkRadiusItem = RadiusMenu.Item("Blink", false);
-
-            ComboKeyItem = Factory.Item("Combo Key", new KeyBind('D'));
-            OrbwalkerItem = Factory.Item("Orbwalker", new StringList("Default", "Distance", "Free", "Only Attack", "No Move"));
-            MinDisInOrbwalkItem = Factory.Item("Min Distance In Orbwalker", new Slider(600, 200, 600));
-            TargetItem = Factory.Item("Target", new StringList("Lock", "Default"));
-            StartComboKeyItem = Factory.Item("Start Combo With Mute", new KeyBind('0', KeyBindType.Toggle, false));
-            StartComboKeyItem.Item.SetTooltip("Start Combo With Hex or Ancient Seal");
+            var radiusMenu = drawingMenu.Menu("Radius");
+            ArcaneBoltRadiusItem = radiusMenu.Item("Arcane Bolt", true);
+            ConcussiveShotRadiusItem = radiusMenu.Item("Concussive Shot", true);
+            AncientSealRadiusItem = radiusMenu.Item("Ancient Seal", true);
+            MysticFlareRadiusItem = radiusMenu.Item("Mystic Flare", true);
+            TargetHitConcussiveShotItem = radiusMenu.Item("Target Hit Concussive Shot", true);
+            BlinkRadiusItem = radiusMenu.Item("Blink", false);
 
             AbilityToggler.PropertyChanged += Changed;
             BadUltItem.PropertyChanged += Changed;
@@ -495,7 +516,6 @@ namespace SkywrathMagePlus
             "materials/ensage_ui/particles/visiblebyenemy_thin_thick.vpcf",
             "materials/ensage_ui/particles/visiblebyenemy_ring_wave.vpcf"
         };
-
         public void Dispose()
         {
             OrbwalkerItem.PropertyChanged -= Changed;

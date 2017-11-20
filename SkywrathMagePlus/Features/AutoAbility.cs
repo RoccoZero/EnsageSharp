@@ -50,14 +50,14 @@ namespace SkywrathMagePlus.Features
                 // Eul
                 if (Menu.EulBladeMailItem)
                 {
-                    var target = EntityManager<Hero>.Entities.FirstOrDefault(x =>
-                                                                             x.IsValid &&
-                                                                             x.IsVisible &&
-                                                                             x.IsAlive &&
-                                                                             !x.IsIllusion &&
-                                                                             x.IsEnemy(Owner) &&
-                                                                             x.HasModifier("modifier_item_blade_mail_reflect") &&
-                                                                             x.HasModifier("modifier_skywrath_mystic_flare_aura_effect"));
+                    var target = 
+                        EntityManager<Hero>.Entities.FirstOrDefault(x =>
+                                                                    x.IsValid &&
+                                                                    x.IsVisible &&
+                                                                    x.IsAlive &&
+                                                                    !x.IsIllusion &&
+                                                                    x.IsEnemy(Owner) &&
+                                                                    x.HasAnyModifiers("modifier_item_blade_mail_reflect", "modifier_skywrath_mystic_flare_aura_effect"));
 
                     if (target != null && Main.Eul != null && Main.Eul.CanBeCasted)
                     {
@@ -69,30 +69,33 @@ namespace SkywrathMagePlus.Features
                 // ArcaneBolt
                 if (Menu.AutoArcaneBoltKeyItem && !Menu.ComboKeyItem && !Menu.SpamArcaneBoltKeyItem)
                 {
-                    var ArcaneBolt = Main.ArcaneBolt;
-
-                    var target =
-                        EntityManager<Hero>.Entities.Where(x =>
-                                                           x.IsVisible &&
-                                                           x.IsAlive &&
-                                                           !x.IsIllusion &&
-                                                           x.IsValid &&
-                                                           x.IsEnemy(Owner) &&
-                                                           ArcaneBolt.CanHit(x)).OrderBy(x => x.Health).FirstOrDefault();
-
-                    if (target != null && Config.Extensions.Cancel(target) && !Owner.IsInvisible())
+                    if (Menu.AutoArcaneBoltOwnerMinHealthItem <= ((float)Owner.Health / Owner.MaximumHealth) * 100)
                     {
-                        if (ArcaneBolt.CanBeCasted)
+                        var arcaneBolt = Main.ArcaneBolt;
+
+                        var target =
+                            EntityManager<Hero>.Entities.Where(x =>
+                                                               x.IsValid &&
+                                                               x.IsVisible &&
+                                                               x.IsAlive &&
+                                                               !x.IsIllusion &&
+                                                               x.IsEnemy(Owner) &&
+                                                               arcaneBolt.CanHit(x)).OrderBy(x => x.Health).FirstOrDefault();
+
+                        if (target != null && Config.Extensions.Cancel(target) && !Owner.IsInvisible())
                         {
-                            ArcaneBolt.UseAbility(target);
-
-                            UpdateManager.BeginInvoke(() =>
+                            if (arcaneBolt.CanBeCasted)
                             {
-                                Config.MultiSleeper.Sleep(ArcaneBolt.GetHitTime(target) - (ArcaneBolt.GetCastDelay(target) + 350), $"arcanebolt_{ target.Name }");
-                            },
-                            ArcaneBolt.GetCastDelay(target) + 50);
+                                arcaneBolt.UseAbility(target);
 
-                            await Await.Delay(ArcaneBolt.GetCastDelay(target), token);
+                                UpdateManager.BeginInvoke(() =>
+                                {
+                                    Config.MultiSleeper.Sleep(arcaneBolt.GetHitTime(target) - (arcaneBolt.GetCastDelay(target) + 350), $"arcanebolt_{ target.Name }");
+                                },
+                                arcaneBolt.GetCastDelay(target) + 50);
+
+                                await Await.Delay(arcaneBolt.GetCastDelay(target), token);
+                            }
                         }
                     }
                 }

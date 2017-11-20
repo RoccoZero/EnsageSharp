@@ -42,67 +42,67 @@ namespace SkywrathMagePlus
 
         private void OnUpdate()
         {
-            var ArcaneBolt = Main.ArcaneBolt;
-            if (Menu.ArcaneBoltRadiusItem && ArcaneBolt.Ability.Level > 0)
+            var arcaneBolt = Main.ArcaneBolt;
+            if (Menu.ArcaneBoltRadiusItem && arcaneBolt.Ability.Level > 0)
             {
                 Particle.DrawRange(
                     Owner,
                     "ArcaneBolt",
-                    ArcaneBolt.CastRange,
-                    ArcaneBolt.IsReady ? Color.Aqua : Color.Gray);
+                    arcaneBolt.CastRange,
+                    arcaneBolt.IsReady ? Color.Aqua : Color.Gray);
             }
             else
             {
                 Particle.Remove("ArcaneBolt");
             }
 
-            var ConcussiveShot = Main.ConcussiveShot;
-            if (Menu.ConcussiveShotRadiusItem && ConcussiveShot.Ability.Level > 0)
+            var concussiveShot = Main.ConcussiveShot;
+            if (Menu.ConcussiveShotRadiusItem && concussiveShot.Ability.Level > 0)
             {
                 Particle.DrawRange(
                     Owner,
                     "ConcussiveShot",
-                    ConcussiveShot.Radius,
-                    ConcussiveShot.IsReady ? Color.Aqua : Color.Gray);
+                    concussiveShot.Radius,
+                    concussiveShot.IsReady ? Color.Aqua : Color.Gray);
             }
             else
             {
                 Particle.Remove("ConcussiveShot");
             }
 
-            var AncientSeal = Main.AncientSeal;
-            if (Menu.AncientSealRadiusItem && AncientSeal.Ability.Level > 0)
+            var ancientSeal = Main.AncientSeal;
+            if (Menu.AncientSealRadiusItem && ancientSeal.Ability.Level > 0)
             {
                 Particle.DrawRange(
                     Owner,
                     "AncientSeal",
-                    AncientSeal.CastRange,
-                    AncientSeal.IsReady ? Color.Aqua : Color.Gray);
+                    ancientSeal.CastRange,
+                    ancientSeal.IsReady ? Color.Aqua : Color.Gray);
             }
             else
             {
                 Particle.Remove("AncientSeal");
             }
 
-            var MysticFlare = Main.MysticFlare;
-            if (Menu.MysticFlareRadiusItem && MysticFlare.Ability.Level > 0)
+            var mysticFlare = Main.MysticFlare;
+            if (Menu.MysticFlareRadiusItem && mysticFlare.Ability.Level > 0)
             {
                 Particle.DrawRange(
                     Owner,
                     "MysticFlare",
-                    MysticFlare.CastRange,
-                    MysticFlare.IsReady ? Color.Aqua : Color.Gray);
+                    mysticFlare.CastRange,
+                    mysticFlare.IsReady ? Color.Aqua : Color.Gray);
             }
             else
             {
                 Particle.Remove("MysticFlare");
             }
 
-            var Blink = Main.Blink;
-            if (Menu.BlinkRadiusItem && Blink != null)
+            var blink = Main.Blink;
+            if (Menu.BlinkRadiusItem && blink != null)
             {
                 var color = Color.Red;
-                if (!Blink.IsReady)
+                if (!blink.IsReady)
                 {
                     color = Color.Gray;
                 }
@@ -114,7 +114,7 @@ namespace SkywrathMagePlus
                 Particle.DrawRange(
                     Owner,
                     "Blink",
-                    Blink.CastRange,
+                    blink.CastRange,
                     color);
             }
             else
@@ -122,8 +122,8 @@ namespace SkywrathMagePlus
                 Particle.Remove("Blink");
             }
 
-            var targetHit = ConcussiveShot.TargetHit;
-            if (Menu.TargetHitConcussiveShotItem && targetHit != null && ConcussiveShot.Ability.Cooldown <= 1 && ConcussiveShot.Ability.Level > 0)
+            var targetHit = concussiveShot.TargetHit;
+            if (Menu.TargetHitConcussiveShotItem && targetHit != null && concussiveShot.Ability.Cooldown <= 1 && concussiveShot.Ability.Level > 0)
             {
                 Particle.AddOrUpdate(
                     targetHit,

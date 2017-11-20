@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Ensage;
+using Ensage.Common.Objects.UtilityObjects;
 using Ensage.Common.Threading;
 using Ensage.SDK.Extensions;
 using Ensage.SDK.Handlers;
@@ -20,7 +21,11 @@ namespace SkywrathMagePlus.Features
 
         private SkywrathMagePlus Main { get; }
 
+        private Extensions Extensions { get; }
+
         private DamageCalculation DamageCalculation { get; }
+
+        private MultiSleeper MultiSleeper { get; }
 
         private Unit Owner { get; }
 
@@ -35,7 +40,9 @@ namespace SkywrathMagePlus.Features
             Config = config;
             Menu = config.Menu;
             Main = config.Main;
+            Extensions = config.Extensions;
             DamageCalculation = config.DamageCalculation;
+            MultiSleeper = config.MultiSleeper;
             Owner = config.Main.Context.Owner;
 
             Handler = UpdateManager.Run(ExecuteAsync, true, false);
@@ -83,6 +90,11 @@ namespace SkywrathMagePlus.Features
                     return;
                 }
 
+                if (Menu.AutoKillWhenComboItem && Menu.ComboKeyItem)
+                {
+                    return;
+                }
+
                 var damageCalculation = DamageCalculation.DamageList.Where(x => (x.GetHealth - x.GetDamage) / x.GetTarget.MaximumHealth <= 0.0f).ToList();
                 Damage = damageCalculation.OrderByDescending(x => x.GetHealth).OrderByDescending(x => x.GetTarget.Player.Kills).FirstOrDefault();
 
@@ -97,9 +109,8 @@ namespace SkywrathMagePlus.Features
                 }
 
                 var target = Damage.GetTarget;
-                var multiSleeper = Config.MultiSleeper;
 
-                if (!Cancel(target))
+                if (!Cancel(target) || Extensions.ComboBreaker(target, false))
                 {
                     return;
                 }
@@ -107,90 +118,90 @@ namespace SkywrathMagePlus.Features
                 if (!target.IsBlockingAbilities())
                 {
                     // AncientSeal
-                    var AncientSeal = Main.AncientSeal;
-                    if (Menu.AutoKillStealToggler.Value.IsEnabled(AncientSeal.ToString())
-                        && AncientSeal.CanBeCasted
-                        && AncientSeal.CanHit(target))
+                    var ancientSeal = Main.AncientSeal;
+                    if (Menu.AutoKillStealToggler.Value.IsEnabled(ancientSeal.ToString())
+                        && ancientSeal.CanBeCasted
+                        && ancientSeal.CanHit(target))
                     {
-                        AncientSeal.UseAbility(target);
-                        await Await.Delay(AncientSeal.GetCastDelay(target), token);
+                        ancientSeal.UseAbility(target);
+                        await Await.Delay(ancientSeal.GetCastDelay(target), token);
                         return;
                     }
 
                     // Veil
-                    var Veil = Main.Veil;
-                    if (Veil != null
-                        && Menu.AutoKillStealToggler.Value.IsEnabled(Veil.ToString())
-                        && Veil.CanBeCasted
-                        && Veil.CanHit(target))
+                    var veil = Main.Veil;
+                    if (veil != null
+                        && Menu.AutoKillStealToggler.Value.IsEnabled(veil.ToString())
+                        && veil.CanBeCasted
+                        && veil.CanHit(target))
                     {
-                        Veil.UseAbility(target.Position);
-                        await Await.Delay(Veil.GetCastDelay(target.Position), token);
+                        veil.UseAbility(target.Position);
+                        await Await.Delay(veil.GetCastDelay(target.Position), token);
                     }
 
                     // Ethereal
-                    var Ethereal = Main.Ethereal;
-                    if (Ethereal != null
-                        && Menu.AutoKillStealToggler.Value.IsEnabled(Ethereal.ToString())
-                        && Ethereal.CanBeCasted
-                        && Ethereal.CanHit(target))
+                    var ethereal = Main.Ethereal;
+                    if (ethereal != null
+                        && Menu.AutoKillStealToggler.Value.IsEnabled(ethereal.ToString())
+                        && ethereal.CanBeCasted
+                        && ethereal.CanHit(target))
                     {
-                        Ethereal.UseAbility(target);
-                        multiSleeper.Sleep(Ethereal.GetHitTime(target), "ethereal");
-                        await Await.Delay(Ethereal.GetCastDelay(target), token);
+                        ethereal.UseAbility(target);
+                        MultiSleeper.Sleep(ethereal.GetHitTime(target), "ethereal");
+                        await Await.Delay(ethereal.GetCastDelay(target), token);
                     }
 
                     // Shivas
-                    var Shivas = Main.Shivas;
-                    if (Shivas != null
-                        && Menu.AutoKillStealToggler.Value.IsEnabled(Shivas.ToString())
-                        && Shivas.CanBeCasted
-                        && Shivas.CanHit(target))
+                    var shivas = Main.Shivas;
+                    if (shivas != null
+                        && Menu.AutoKillStealToggler.Value.IsEnabled(shivas.ToString())
+                        && shivas.CanBeCasted
+                        && shivas.CanHit(target))
                     {
-                        Shivas.UseAbility();
-                        await Await.Delay(Shivas.GetCastDelay(), token);
+                        shivas.UseAbility();
+                        await Await.Delay(shivas.GetCastDelay(), token);
                     }
 
-                    if (!multiSleeper.Sleeping("ethereal") || target.IsEthereal())
+                    if (!MultiSleeper.Sleeping("ethereal") || target.IsEthereal())
                     {
                         // ConcussiveShot
-                        var ConcussiveShot = Main.ConcussiveShot;
-                        if (Menu.AutoKillStealToggler.Value.IsEnabled(ConcussiveShot.ToString())
-                            && target == ConcussiveShot.TargetHit
-                            && ConcussiveShot.CanBeCasted
-                            && ConcussiveShot.CanHit(target))
+                        var concussiveShot = Main.ConcussiveShot;
+                        if (Menu.AutoKillStealToggler.Value.IsEnabled(concussiveShot.ToString())
+                            && target == concussiveShot.TargetHit
+                            && concussiveShot.CanBeCasted
+                            && concussiveShot.CanHit(target))
                         {
-                            ConcussiveShot.UseAbility();
-                            await Await.Delay(ConcussiveShot.GetCastDelay(), token);
+                            concussiveShot.UseAbility();
+                            await Await.Delay(concussiveShot.GetCastDelay(), token);
                         }
 
                         // ArcaneBolt
-                        var ArcaneBolt = Main.ArcaneBolt;
-                        if (Menu.AutoKillStealToggler.Value.IsEnabled(ArcaneBolt.ToString())
-                            && ArcaneBolt.CanBeCasted
-                            && ArcaneBolt.CanHit(target))
+                        var arcaneBolt = Main.ArcaneBolt;
+                        if (Menu.AutoKillStealToggler.Value.IsEnabled(arcaneBolt.ToString())
+                            && arcaneBolt.CanBeCasted
+                            && arcaneBolt.CanHit(target))
                         {
-                            ArcaneBolt.UseAbility(target);
+                            arcaneBolt.UseAbility(target);
 
                             UpdateManager.BeginInvoke(() =>
                             {
-                                multiSleeper.Sleep(ArcaneBolt.GetHitTime(target) - (ArcaneBolt.GetCastDelay(target) + 350), $"arcanebolt_{ target.Name }");
+                                MultiSleeper.Sleep(arcaneBolt.GetHitTime(target) - (arcaneBolt.GetCastDelay(target) + 350), $"arcanebolt_{ target.Name }");
                             },
-                            ArcaneBolt.GetCastDelay(target) + 50);
+                            arcaneBolt.GetCastDelay(target) + 50);
 
-                            await Await.Delay(ArcaneBolt.GetCastDelay(target), token);
+                            await Await.Delay(arcaneBolt.GetCastDelay(target), token);
                             return;
                         }
 
                         // Dagon
-                        var Dagon = Main.Dagon;
-                        if (Dagon != null
+                        var dagon = Main.Dagon;
+                        if (dagon != null
                             && Menu.AutoKillStealToggler.Value.IsEnabled("item_dagon_5")
-                            && Dagon.CanBeCasted
-                            && Dagon.CanHit(target))
+                            && dagon.CanBeCasted
+                            && dagon.CanHit(target))
                         {
-                            Dagon.UseAbility(target);
-                            await Await.Delay(Dagon.GetCastDelay(target), token);
+                            dagon.UseAbility(target);
+                            await Await.Delay(dagon.GetCastDelay(target), token);
                             return;
                         }
                     }
@@ -223,7 +234,6 @@ namespace SkywrathMagePlus.Features
         private bool Reincarnation(Hero target)
         {
             var reincarnation = target.GetAbilityById(AbilityId.skeleton_king_reincarnation);
-
             return reincarnation != null && reincarnation.Cooldown == 0 && reincarnation.Level > 0;
         }
 

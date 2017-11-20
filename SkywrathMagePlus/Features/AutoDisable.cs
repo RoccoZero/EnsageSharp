@@ -86,49 +86,49 @@ namespace SkywrathMagePlus.Features
                 }
 
                 // Hex
-                var Hex = Main.Hex;
-                if (Hex != null
-                    && Menu.AutoDisableToggler.Value.IsEnabled(Hex.ToString())
-                    && Hex.CanBeCasted
-                    && Hex.CanHit(target))
+                var hex = Main.Hex;
+                if (hex != null
+                    && Menu.AutoDisableToggler.Value.IsEnabled(hex.ToString())
+                    && hex.CanBeCasted
+                    && hex.CanHit(target))
                 {
-                    Hex.UseAbility(target);
-                    await Await.Delay(Hex.GetCastDelay(target), token);
+                    hex.UseAbility(target);
+                    await Await.Delay(hex.GetCastDelay(target), token);
                     return;
                 }
 
                 // Orchid
-                var Orchid = Main.Orchid;
-                if (Orchid != null
-                    && Menu.AutoDisableToggler.Value.IsEnabled(Orchid.ToString())
-                    && Orchid.CanBeCasted
-                    && Orchid.CanHit(target))
+                var orchid = Main.Orchid;
+                if (orchid != null
+                    && Menu.AutoDisableToggler.Value.IsEnabled(orchid.ToString())
+                    && orchid.CanBeCasted
+                    && orchid.CanHit(target))
                 {
-                    Orchid.UseAbility(target);
-                    await Await.Delay(Orchid.GetCastDelay(target), token);
+                    orchid.UseAbility(target);
+                    await Await.Delay(orchid.GetCastDelay(target), token);
                     return;
                 }
 
                 // Bloodthorn
-                var Bloodthorn = Main.Bloodthorn;
-                if (Bloodthorn != null
-                    && Menu.AutoDisableToggler.Value.IsEnabled(Bloodthorn.ToString())
-                    && Bloodthorn.CanBeCasted
-                    && Bloodthorn.CanHit(target))
+                var bloodthorn = Main.Bloodthorn;
+                if (bloodthorn != null
+                    && Menu.AutoDisableToggler.Value.IsEnabled(bloodthorn.ToString())
+                    && bloodthorn.CanBeCasted
+                    && bloodthorn.CanHit(target))
                 {
-                    Bloodthorn.UseAbility(target);
-                    await Await.Delay(Bloodthorn.GetCastDelay(target), token);
+                    bloodthorn.UseAbility(target);
+                    await Await.Delay(bloodthorn.GetCastDelay(target), token);
                     return;
                 }
 
                 // AncientSeal
-                var AncientSeal = Main.AncientSeal;
-                if (Menu.AutoDisableToggler.Value.IsEnabled(AncientSeal.ToString())
-                    && AncientSeal.CanBeCasted
-                    && AncientSeal.CanHit(target))
+                var ancientSeal = Main.AncientSeal;
+                if (Menu.AutoDisableToggler.Value.IsEnabled(ancientSeal.ToString())
+                    && ancientSeal.CanBeCasted
+                    && ancientSeal.CanHit(target))
                 {
-                    AncientSeal.UseAbility(target);
-                    await Await.Delay(AncientSeal.GetCastDelay(target), token);
+                    ancientSeal.UseAbility(target);
+                    await Await.Delay(ancientSeal.GetCastDelay(target), token);
                     return;
                 }
             }
@@ -144,41 +144,34 @@ namespace SkywrathMagePlus.Features
 
         private bool Disable(Hero target)
         {
-            var queenofPainBlink = target.GetAbilityById(AbilityId.queenofpain_blink);
-            var antiMageBlink = target.GetAbilityById(AbilityId.antimage_blink);
-            var manaVoid = target.GetAbilityById(AbilityId.antimage_mana_void);
-            var duel = target.GetAbilityById(AbilityId.legion_commander_duel);
-            var doom = target.GetAbilityById(AbilityId.doom_bringer_doom);
-            var timeWalk = target.GetAbilityById(AbilityId.faceless_void_time_walk);
-            var chronoSphere = target.GetAbilityById(AbilityId.faceless_void_chronosphere);
-            var deathWard = target.GetAbilityById(AbilityId.witch_doctor_death_ward);
-            var powerCogs = target.GetAbilityById(AbilityId.rattletrap_power_cogs);
-            var ravage = target.GetAbilityById(AbilityId.tidehunter_ravage);
-            var berserkersCall = target.GetAbilityById(AbilityId.axe_berserkers_call);
-            var primalSplit = target.GetAbilityById(AbilityId.brewmaster_primal_split);
-            var guardianAngel = target.GetAbilityById(AbilityId.omniknight_guardian_angel);
-            var sonicWave = target.GetAbilityById(AbilityId.queenofpain_sonic_wave);
-            var slithereenCrush = target.GetAbilityById(AbilityId.slardar_slithereen_crush);
-            var fingerofDeath = target.GetAbilityById(AbilityId.lion_finger_of_death);
-            var lagunaBlade = target.GetAbilityById(AbilityId.lina_laguna_blade);
+            var ability = target.Spellbook.Spells.Any(x => Abilities.Contains(x.Id) && x.IsInAbilityPhase);
+            if (ability)
+            {
+                return true;
+            }
 
-            return (queenofPainBlink != null && queenofPainBlink.IsInAbilityPhase)
-                || (antiMageBlink != null && antiMageBlink.IsInAbilityPhase)
-                || (manaVoid != null && manaVoid.IsInAbilityPhase)
-                || (duel != null && duel.IsInAbilityPhase)
-                || (doom != null && doom.IsInAbilityPhase)
-                || (timeWalk != null && timeWalk.IsInAbilityPhase)
-                || (chronoSphere != null && chronoSphere.IsInAbilityPhase)
-                || (deathWard != null && deathWard.IsInAbilityPhase)
-                || (powerCogs != null && powerCogs.IsInAbilityPhase)
-                || (ravage != null && ravage.IsInAbilityPhase)
-                || (berserkersCall != null && berserkersCall.IsInAbilityPhase)
-                || (primalSplit != null && primalSplit.IsInAbilityPhase)
-                || (guardianAngel != null && guardianAngel.IsInAbilityPhase)
-                || (sonicWave != null && sonicWave.IsInAbilityPhase)
-                || (slithereenCrush != null && slithereenCrush.IsInAbilityPhase)
-                || (fingerofDeath != null && fingerofDeath.IsInAbilityPhase)
-                || (lagunaBlade != null && lagunaBlade.IsInAbilityPhase);
+            return false;
         }
+
+        private AbilityId[] Abilities { get; } =
+        {
+            AbilityId.queenofpain_blink,
+            AbilityId.antimage_blink,
+            AbilityId.antimage_mana_void,
+            AbilityId.legion_commander_duel,
+            AbilityId.doom_bringer_doom,
+            AbilityId.faceless_void_time_walk,
+            AbilityId.faceless_void_chronosphere,
+            AbilityId.witch_doctor_death_ward,
+            AbilityId.rattletrap_power_cogs,
+            AbilityId.tidehunter_ravage,
+            AbilityId.axe_berserkers_call,
+            AbilityId.brewmaster_primal_split,
+            AbilityId.omniknight_guardian_angel,
+            AbilityId.queenofpain_sonic_wave,
+            AbilityId.slardar_slithereen_crush,
+            AbilityId.lion_finger_of_death,
+            AbilityId.lina_laguna_blade
+        };
     }
 }

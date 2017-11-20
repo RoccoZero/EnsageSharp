@@ -60,15 +60,15 @@ namespace SkywrathMagePlus.Features
                 foreach (var order in breakerChanger)
                 {
                     // Eul
-                    var Eul = Main.Eul;
-                    if (Eul != null
-                        && Eul.ToString() == order.Key
-                        && Eul.CanBeCasted)
+                    var eul = Main.Eul;
+                    if (eul != null
+                        && eul.ToString() == order.Key
+                        && eul.CanBeCasted)
                     {
-                        if (Eul.CanHit(target))
+                        if (eul.CanHit(target))
                         {
-                            Eul.UseAbility(target);
-                            await Await.Delay(Eul.GetCastDelay(target), token);
+                            eul.UseAbility(target);
+                            await Await.Delay(eul.GetCastDelay(target), token);
                             return;
                         }
                         else if (Menu.UseOnlyFromRangeItem)
@@ -78,15 +78,15 @@ namespace SkywrathMagePlus.Features
                     }
 
                     // ForceStaff
-                    var ForceStaff = Main.ForceStaff;
-                    if (ForceStaff != null
-                        && ForceStaff.ToString() == order.Key
-                        && ForceStaff.CanBeCasted)
+                    var forceStaff = Main.ForceStaff;
+                    if (forceStaff != null
+                        && forceStaff.ToString() == order.Key
+                        && forceStaff.CanBeCasted)
                     {
-                        if (ForceStaff.CanHit(target))
+                        if (forceStaff.CanHit(target))
                         {
-                            ForceStaff.UseAbility(target);
-                            await Await.Delay(ForceStaff.GetCastDelay(target), token);
+                            forceStaff.UseAbility(target);
+                            await Await.Delay(forceStaff.GetCastDelay(target), token);
                             return;
                         }
                         else if (Menu.UseOnlyFromRangeItem)
@@ -96,15 +96,15 @@ namespace SkywrathMagePlus.Features
                     }
 
                     // Orchid
-                    var Orchid = Main.Orchid;
-                    if (Orchid != null
-                        && Orchid.ToString() == order.Key
-                        && Orchid.CanBeCasted)
+                    var orchid = Main.Orchid;
+                    if (orchid != null
+                        && orchid.ToString() == order.Key
+                        && orchid.CanBeCasted)
                     {
-                        if (Orchid.CanHit(target))
+                        if (orchid.CanHit(target))
                         {
-                            Orchid.UseAbility(target);
-                            await Await.Delay(Orchid.GetCastDelay(target), token);
+                            orchid.UseAbility(target);
+                            await Await.Delay(orchid.GetCastDelay(target), token);
                             return;
                         }
                         else if (Menu.UseOnlyFromRangeItem)
@@ -114,15 +114,15 @@ namespace SkywrathMagePlus.Features
                     }
 
                     // Bloodthorn
-                    var Bloodthorn = Main.Bloodthorn;
-                    if (Bloodthorn != null
-                        && Bloodthorn.ToString() == order.Key
-                        && Bloodthorn.CanBeCasted)
+                    var bloodthorn = Main.Bloodthorn;
+                    if (bloodthorn != null
+                        && bloodthorn.ToString() == order.Key
+                        && bloodthorn.CanBeCasted)
                     {
-                        if (Bloodthorn.CanHit(target))
+                        if (bloodthorn.CanHit(target))
                         {
-                            Bloodthorn.UseAbility(target);
-                            await Await.Delay(Bloodthorn.GetCastDelay(target), token);
+                            bloodthorn.UseAbility(target);
+                            await Await.Delay(bloodthorn.GetCastDelay(target), token);
                             return;
                         }
                         else if (Menu.UseOnlyFromRangeItem)
@@ -132,15 +132,15 @@ namespace SkywrathMagePlus.Features
                     }
 
                     // Nullifier
-                    var Nullifier = Main.Nullifier;
-                    if (Nullifier != null
-                        && Nullifier.ToString() == order.Key
-                        && Nullifier.CanBeCasted)
+                    var nullifier = Main.Nullifier;
+                    if (nullifier != null
+                        && nullifier.ToString() == order.Key
+                        && nullifier.CanBeCasted)
                     {
-                        if (Nullifier.CanHit(target))
+                        if (nullifier.CanHit(target))
                         {
-                            Nullifier.UseAbility(target);
-                            await Await.Delay(Nullifier.GetCastDelay(target) + Nullifier.GetHitTime(target), token);
+                            nullifier.UseAbility(target);
+                            await Await.Delay(nullifier.GetCastDelay(target) + nullifier.GetHitTime(target), token);
                             return;
                         }
                         else if (Menu.UseOnlyFromRangeItem)
@@ -150,15 +150,15 @@ namespace SkywrathMagePlus.Features
                     }
 
                     // RodofAtos
-                    var RodofAtos = Main.RodofAtos;
-                    if (RodofAtos != null
-                        && RodofAtos.ToString() == order.Key
-                        && RodofAtos.CanBeCasted)
+                    var rodofAtos = Main.RodofAtos;
+                    if (rodofAtos != null
+                        && rodofAtos.ToString() == order.Key
+                        && rodofAtos.CanBeCasted)
                     {
-                        if (RodofAtos.CanHit(target))
+                        if (rodofAtos.CanHit(target))
                         {
-                            RodofAtos.UseAbility(target);
-                            await Await.Delay(RodofAtos.GetCastDelay(target) + RodofAtos.GetHitTime(target), token);
+                            rodofAtos.UseAbility(target);
+                            await Await.Delay(rodofAtos.GetCastDelay(target) + rodofAtos.GetHitTime(target), token);
                             return;
                         }
                         else if (Menu.UseOnlyFromRangeItem)
@@ -168,15 +168,15 @@ namespace SkywrathMagePlus.Features
                     }
 
                     // Hex
-                    var Hex = Main.Hex;
-                    if (Hex != null
-                        && Hex.ToString() == order.Key
-                        && Hex.CanBeCasted)
+                    var hex = Main.Hex;
+                    if (hex != null
+                        && hex.ToString() == order.Key
+                        && hex.CanBeCasted)
                     {
-                        if (Hex.CanHit(target))
+                        if (hex.CanHit(target))
                         {
-                            Hex.UseAbility(target);
-                            await Await.Delay(Hex.GetCastDelay(target), token);
+                            hex.UseAbility(target);
+                            await Await.Delay(hex.GetCastDelay(target), token);
                             return;
                         }
                         else if (Menu.UseOnlyFromRangeItem)
@@ -186,14 +186,14 @@ namespace SkywrathMagePlus.Features
                     }
 
                     // ArcaneBolt
-                    var ArcaneBolt = Main.ArcaneBolt;
-                    if (ArcaneBolt.ToString() == order.Key
-                        && ArcaneBolt.CanBeCasted)
+                    var arcaneBolt = Main.ArcaneBolt;
+                    if (arcaneBolt.ToString() == order.Key
+                        && arcaneBolt.CanBeCasted)
                     {
-                        if (ArcaneBolt.CanHit(target))
+                        if (arcaneBolt.CanHit(target))
                         {
-                            ArcaneBolt.UseAbility(target);
-                            await Await.Delay(ArcaneBolt.GetCastDelay(target), token);
+                            arcaneBolt.UseAbility(target);
+                            await Await.Delay(arcaneBolt.GetCastDelay(target), token);
                             return;
                         }
                         else if (Menu.UseOnlyFromRangeItem)
@@ -203,14 +203,14 @@ namespace SkywrathMagePlus.Features
                     }
 
                     // AncientSeal
-                    var AncientSeal = Main.AncientSeal;
-                    if (AncientSeal.ToString() == order.Key
-                        && AncientSeal.CanBeCasted)
+                    var ancientSeal = Main.AncientSeal;
+                    if (ancientSeal.ToString() == order.Key
+                        && ancientSeal.CanBeCasted)
                     {
-                        if (AncientSeal.CanHit(target))
+                        if (ancientSeal.CanHit(target))
                         {
-                            AncientSeal.UseAbility(target);
-                            await Await.Delay(AncientSeal.GetCastDelay(target), token);
+                            ancientSeal.UseAbility(target);
+                            await Await.Delay(ancientSeal.GetCastDelay(target), token);
                             return;
                         }
                         else if (Menu.UseOnlyFromRangeItem)

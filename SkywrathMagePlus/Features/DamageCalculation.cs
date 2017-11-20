@@ -2,6 +2,7 @@
 using System.Linq;
 
 using Ensage;
+using Ensage.Common.Objects.UtilityObjects;
 using Ensage.SDK.Abilities;
 using Ensage.SDK.Extensions;
 using Ensage.SDK.Helpers;
@@ -10,19 +11,19 @@ namespace SkywrathMagePlus.Features
 {
     internal class DamageCalculation
     {
-        private Config Config { get; }
-
         private MenuManager Menu { get; }
 
         private SkywrathMagePlus Main { get; }
+
+        private MultiSleeper MultiSleeper { get; }
 
         private Unit Owner { get; }
 
         public DamageCalculation(Config config)
         {
-            Config = config;
             Menu = config.Menu;
             Main = config.Main;
+            MultiSleeper = config.MultiSleeper;
             Owner = config.Main.Context.Owner;
 
             UpdateManager.Subscribe(OnUpdate);
@@ -48,57 +49,57 @@ namespace SkywrathMagePlus.Features
                 if (target.IsVisible)
                 {
                     // AncientSeal
-                    var AncientSeal = Main.AncientSeal;
-                    if (AncientSeal.Ability.Level > 0 && Menu.AutoKillStealToggler.Value.IsEnabled(AncientSeal.ToString()))
+                    var ancientSeal = Main.AncientSeal;
+                    if (ancientSeal.Ability.Level > 0 && Menu.AutoKillStealToggler.Value.IsEnabled(ancientSeal.ToString()))
                     {
-                        abilities.Add(AncientSeal);
+                        abilities.Add(ancientSeal);
                     }
 
                     // Veil
-                    var Veil = Main.Veil;
-                    if (Veil != null && Veil.Ability.IsValid && Menu.AutoKillStealToggler.Value.IsEnabled(Veil.ToString()))
+                    var veil = Main.Veil;
+                    if (veil != null && veil.Ability.IsValid && Menu.AutoKillStealToggler.Value.IsEnabled(veil.ToString()))
                     {
-                        abilities.Add(Veil);
+                        abilities.Add(veil);
                     }
 
                     // Ethereal
-                    var Ethereal = Main.Ethereal;
-                    if (Ethereal != null && Ethereal.Ability.IsValid && Menu.AutoKillStealToggler.Value.IsEnabled(Ethereal.ToString()))
+                    var ethereal = Main.Ethereal;
+                    if (ethereal != null && ethereal.Ability.IsValid && Menu.AutoKillStealToggler.Value.IsEnabled(ethereal.ToString()))
                     {
-                        abilities.Add(Ethereal);
+                        abilities.Add(ethereal);
                     }
 
                     // Shivas
-                    var Shivas = Main.Shivas;
-                    if (Shivas != null && Shivas.Ability.IsValid && Menu.AutoKillStealToggler.Value.IsEnabled(Shivas.ToString()))
+                    var shivas = Main.Shivas;
+                    if (shivas != null && shivas.Ability.IsValid && Menu.AutoKillStealToggler.Value.IsEnabled(shivas.ToString()))
                     {
-                        abilities.Add(Shivas);
+                        abilities.Add(shivas);
                     }
 
                     // ConcussiveShot
-                    var ConcussiveShot = Main.ConcussiveShot;
-                    if (ConcussiveShot.Ability.Level > 0 && Menu.AutoKillStealToggler.Value.IsEnabled(ConcussiveShot.ToString()) && target == ConcussiveShot.TargetHit)
+                    var concussiveShot = Main.ConcussiveShot;
+                    if (concussiveShot.Ability.Level > 0 && Menu.AutoKillStealToggler.Value.IsEnabled(concussiveShot.ToString()) && target == concussiveShot.TargetHit)
                     {
-                        abilities.Add(ConcussiveShot);
+                        abilities.Add(concussiveShot);
                     }
 
                     // ArcaneBolt
-                    var ArcaneBolt = Main.ArcaneBolt;
-                    if (ArcaneBolt.Ability.Level > 0 && Menu.AutoKillStealToggler.Value.IsEnabled(ArcaneBolt.ToString()))
+                    var arcaneBolt = Main.ArcaneBolt;
+                    if (arcaneBolt.Ability.Level > 0 && Menu.AutoKillStealToggler.Value.IsEnabled(arcaneBolt.ToString()))
                     {
-                        abilities.Add(ArcaneBolt);
+                        abilities.Add(arcaneBolt);
 
-                        if (Config.MultiSleeper.Sleeping($"arcanebolt_{ target.Name }"))
+                        if (MultiSleeper.Sleeping($"arcanebolt_{ target.Name }"))
                         {
-                            hitArcaneBolt += ArcaneBolt.GetDamage(target);
+                            hitArcaneBolt += arcaneBolt.GetDamage(target);
                         }
                     }
 
                     // Dagon
-                    var Dagon = Main.Dagon;
-                    if (Dagon != null && Dagon.Ability.IsValid && Menu.AutoKillStealToggler.Value.IsEnabled("item_dagon_5"))
+                    var dagon = Main.Dagon;
+                    if (dagon != null && dagon.Ability.IsValid && Menu.AutoKillStealToggler.Value.IsEnabled("item_dagon_5"))
                     {
-                        abilities.Add(Dagon);
+                        abilities.Add(dagon);
                     }
                 }
 
@@ -111,10 +112,7 @@ namespace SkywrathMagePlus.Features
                 var readyDamage = DamageHelpers.GetSpellDamage(damageCalculation.GetDamage(target, true, false) + damageBlock, 0, damageReduction) - livingArmor;
                 var totalDamage = DamageHelpers.GetSpellDamage(damageCalculation.GetDamage(target, false, false) + damageBlock, 0, damageReduction) - livingArmor;
 
-                if (target.IsInvulnerable()
-                    || target.HasAnyModifiers("modifier_abaddon_borrowed_time", "modifier_item_combo_breaker_buff")
-                    || target.HasModifier("modifier_templar_assassin_refraction_absorb")
-                    || target.HasAnyModifiers("modifier_winter_wyvern_winters_curse_aura", "modifier_winter_wyvern_winters_curse"))
+                if (target.IsInvulnerable() || target.HasAnyModifiers(BlockModifiers))
                 {
                     damage = 0.0f;
                     readyDamage = 0.0f;
@@ -123,6 +121,16 @@ namespace SkywrathMagePlus.Features
                 DamageList.Add(new Damage(target, damage, readyDamage, totalDamage, target.Health));
             }
         }
+
+        private string[] BlockModifiers { get; } =
+        {
+            "modifier_abaddon_borrowed_time",
+            "modifier_item_combo_breaker_buff",
+            "modifier_winter_wyvern_winters_curse_aura",
+            "modifier_winter_wyvern_winters_curse",
+            "modifier_templar_assassin_refraction_absorb",
+            "modifier_oracle_fates_edict"
+        };
 
         private float LivingArmor(Hero target, List<Hero> heroes, IReadOnlyCollection<BaseAbility> abilities)
         {

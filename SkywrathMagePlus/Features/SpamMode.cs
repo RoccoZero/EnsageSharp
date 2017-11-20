@@ -78,6 +78,13 @@ namespace SkywrathMagePlus
                     {
                         Target =
                             EntityManager<Unit>.Entities.Where(x =>
+                                                               x.IsValid &&
+                                                               x.IsVisible &&
+                                                               x.IsAlive &&
+                                                               !x.IsIllusion &&
+                                                               x.IsSpawned &&
+                                                               x.IsEnemy(Owner) &&
+                                                               x.Distance2D(Game.MousePosition) <= 100 &&
                                                                (x.NetworkName == "CDOTA_BaseNPC_Creep_Neutral" ||
                                                                x.NetworkName == "CDOTA_BaseNPC_Invoker_Forged_Spirit" ||
                                                                x.NetworkName == "CDOTA_BaseNPC_Warlock_Golem" ||
@@ -85,15 +92,8 @@ namespace SkywrathMagePlus
                                                                x.NetworkName == "CDOTA_BaseNPC_Creep_Lane" ||
                                                                x.NetworkName == "CDOTA_BaseNPC_Creep_Siege" ||
                                                                x.NetworkName == "CDOTA_Unit_Hero_Beastmaster_Boar" ||
-                                                               x.NetworkName == "CDOTA_Unit_SpiritBear" ||
-                                                               x.NetworkName == "CDOTA_Unit_Broodmother_Spiderling") &&
-                                                               x.IsValid &&
-                                                               x.IsVisible &&
-                                                               x.IsAlive &&
-                                                               !x.IsIllusion &&
-                                                               x.IsSpawned &&
-                                                               x.IsEnemy(Owner) &&
-                                                               x.Distance2D(Game.MousePosition) <= 100).OrderBy(x => x.Distance2D(Game.MousePosition)).FirstOrDefault();
+                                                               x.NetworkName == "CDOTA_Unit_Broodmother_Spiderling" ||
+                                                               x.NetworkName == "CDOTA_Unit_SpiritBear")).OrderBy(x => x.Distance2D(Game.MousePosition)).FirstOrDefault();
                     }
 
                     if (Target == null)
@@ -113,21 +113,21 @@ namespace SkywrathMagePlus
                     if (!Target.IsMagicImmune())
                     {
                         // ArcaneBolt
-                        var ArcaneBolt = Main.ArcaneBolt;
-                        if (ArcaneBolt.CanBeCasted && ArcaneBolt.CanHit(Target))
+                        var arcaneBolt = Main.ArcaneBolt;
+                        if (arcaneBolt.CanBeCasted && arcaneBolt.CanHit(Target))
                         {
-                            ArcaneBolt.UseAbility(Target);
+                            arcaneBolt.UseAbility(Target);
 
                             if (Target is Hero)
                             {
                                 UpdateManager.BeginInvoke(() =>
                                 {
-                                    Config.MultiSleeper.Sleep(ArcaneBolt.GetHitTime(Target) - (ArcaneBolt.GetCastDelay(Target) + 350), $"arcanebolt_{ Target.Name }");
+                                    Config.MultiSleeper.Sleep(arcaneBolt.GetHitTime(Target) - (arcaneBolt.GetCastDelay(Target) + 350), $"arcanebolt_{ Target.Name }");
                                 },
-                                ArcaneBolt.GetCastDelay(Target) + 50);
+                                arcaneBolt.GetCastDelay(Target) + 50);
                             }
 
-                            await Await.Delay(ArcaneBolt.GetCastDelay(Target), token);
+                            await Await.Delay(arcaneBolt.GetCastDelay(Target), token);
                         }
                     }
 

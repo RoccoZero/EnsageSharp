@@ -17,49 +17,71 @@ namespace SkywrathMagePlus
 
         public bool Active(Hero target)
         {
-            var stunDebuff = target.Modifiers.FirstOrDefault(x => x.IsStunDebuff);
-
             var borrowedTime = target.GetAbilityById(AbilityId.abaddon_borrowed_time);
-            var powerCogs = target.GetAbilityById(AbilityId.rattletrap_power_cogs);
-            var blackHole = target.GetAbilityById(AbilityId.enigma_black_hole);
-            var fiendsGrip = target.GetAbilityById(AbilityId.bane_fiends_grip);
-            var deathWard = target.GetAbilityById(AbilityId.witch_doctor_death_ward);
+            if (borrowedTime != null && borrowedTime.Owner.Health <= 2000 && borrowedTime.Cooldown <= 0 && borrowedTime.Level > 0)
+            {
+                return false;
+            }
 
-            return (target.MovementSpeed < 240
-                || (stunDebuff != null && stunDebuff.Duration >= 1)
-                || target.HasModifier("modifier_skywrath_mystic_flare_aura_effect")
-                || target.HasModifier("modifier_rod_of_atos_debuff")
-                || target.HasModifier("modifier_crystal_maiden_frostbite")
-                || target.HasModifier("modifier_crystal_maiden_freezing_field")
-                || target.HasModifier("modifier_naga_siren_ensnare")
-                || target.HasModifier("modifier_meepo_earthbind")
-                || target.HasModifier("modifier_lone_druid_spirit_bear_entangle_effect")
-                || target.HasModifier("modifier_legion_commander_duel")
-                || target.HasModifier("modifier_kunkka_torrent")
-                || target.HasModifier("modifier_enigma_black_hole_pull")
-                || (blackHole != null && blackHole.IsInAbilityPhase)
-                || target.HasModifier("modifier_ember_spirit_searing_chains")
-                || target.HasModifier("modifier_dark_troll_warlord_ensnare")
-                || target.HasModifier("modifier_rattletrap_cog_marker")
-                || (powerCogs != null && powerCogs.IsInAbilityPhase)
-                || target.HasModifier("modifier_axe_berserkers_call")
-                || target.HasModifier("modifier_faceless_void_chronosphere_freeze")
-                || (fiendsGrip != null && fiendsGrip.IsInAbilityPhase)
-                || (deathWard != null && deathWard.IsInAbilityPhase)
-                || target.HasModifier("modifier_winter_wyvern_cold_embrace"))
-                && (borrowedTime == null || borrowedTime.Owner.Health > 2000 || borrowedTime.Cooldown > 0)
-                && !target.HasModifier("modifier_dazzle_shallow_grave")
-                && !target.HasModifier("modifier_spirit_breaker_charge_of_darkness")
-                && !target.HasModifier("modifier_pugna_nether_ward_aura");
+            if (target.HasAnyModifiers("modifier_dazzle_shallow_grave", "modifier_spirit_breaker_charge_of_darkness", "modifier_pugna_nether_ward_aura"))
+            {
+                return false;
+            }
+
+            var ability = target.Spellbook.Spells.Any(x => ActiveAbilities.Contains(x.Id) && x.IsInAbilityPhase);
+            if (ability)
+            {
+                return true;
+            }
+
+            var stunDebuff = target.Modifiers.Any(x => x.IsStunDebuff && x.Duration > 1);
+            return target.MovementSpeed < 240 || stunDebuff || target.HasAnyModifiers(ActiveModifiers);
         }
+
+        private AbilityId[] ActiveAbilities { get; } =
+        {
+            AbilityId.rattletrap_power_cogs,
+            AbilityId.enigma_black_hole,
+            AbilityId.bane_fiends_grip,
+            AbilityId.witch_doctor_death_ward
+        };
+
+        private string[] ActiveModifiers { get; } =
+        {
+            "modifier_skywrath_mystic_flare_aura_effect",
+            "modifier_rod_of_atos_debuff",
+            "modifier_crystal_maiden_frostbite",
+            "modifier_crystal_maiden_freezing_field",
+            "modifier_naga_siren_ensnare",
+            "modifier_meepo_earthbind",
+            "modifier_lone_druid_spirit_bear_entangle_effect",
+            "modifier_legion_commander_duel",
+            "modifier_kunkka_torrent",
+            "modifier_enigma_black_hole_pull",
+            "modifier_ember_spirit_searing_chains",
+            "modifier_dark_troll_warlord_ensnare",
+            "modifier_rattletrap_cog_marker",
+            "modifier_axe_berserkers_call",
+            "modifier_faceless_void_chronosphere_freeze",
+            "modifier_winter_wyvern_cold_embrace"
+        };
 
         public bool Cancel(Hero target)
         {
-            return !target.IsMagicImmune() && !target.IsInvulnerable()
-                && !target.HasAnyModifiers("modifier_abaddon_borrowed_time", "modifier_item_combo_breaker_buff")
-                && !target.HasAnyModifiers("modifier_winter_wyvern_winters_curse_aura", "modifier_winter_wyvern_winters_curse")
-                && !DuelAghanimsScepter(target);
+            return !target.IsMagicImmune() 
+                && !target.IsInvulnerable()
+                && !DuelAghanimsScepter(target)
+                && !target.HasAnyModifiers(CancelModifiers);
         }
+
+        private string[] CancelModifiers { get; } =
+        {
+            "modifier_abaddon_borrowed_time",
+            "modifier_item_combo_breaker_buff",
+            "modifier_winter_wyvern_winters_curse_aura",
+            "modifier_winter_wyvern_winters_curse",
+            "modifier_oracle_fates_edict"
+        };
 
         public bool DuelAghanimsScepter(Hero target)
         {
@@ -95,6 +117,22 @@ namespace SkywrathMagePlus
             }
 
             if (target.Distance2D(targetHit) < 200)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool ComboBreaker(Hero target, bool menu = true)
+        {
+            if (!Menu.ComboBreakerItem && menu)
+            {
+                return false;
+            }
+
+            var comboBreaker = target.GetItemById(AbilityId.item_combo_breaker);
+            if (comboBreaker != null && comboBreaker.Cooldown <= 0)
             {
                 return true;
             }
