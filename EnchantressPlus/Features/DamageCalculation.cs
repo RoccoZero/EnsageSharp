@@ -227,7 +227,7 @@ namespace EnchantressPlus.Features
                 value += ability.GetAbilitySpecialData("bonus_damage_taken") / 100f;
             }
 
-            return value + DamageBlock(hero, heroes);
+            return value;
         }
 
         private float DamageBlock(Hero hero, List<Hero> heroes)
@@ -305,7 +305,7 @@ namespace EnchantressPlus.Features
                 }
             }
 
-            return value;
+            return value + DamageBlock(hero, heroes);
         }
 
         public List<Damage> DamageList { get; } = new List<Damage>();
