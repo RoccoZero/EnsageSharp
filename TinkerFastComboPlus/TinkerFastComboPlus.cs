@@ -138,7 +138,7 @@ namespace TinkerFastComboPlus
             me = ObjectManager.LocalHero;
             if (me == null)
                 return;
-            if (me.ClassId != ClassId.CDOTA_Unit_Hero_Tinker)
+            if (me.HeroId != HeroId.npc_dota_hero_tinker)
                 return;
 
             // Menu Options	                                                          
@@ -345,7 +345,7 @@ namespace TinkerFastComboPlus
             me = ObjectManager.LocalHero;
             if (me == null)
                 return;
-            if (me.ClassId != ClassId.CDOTA_Unit_Hero_Tinker)
+            if (me.HeroId != HeroId.CDOTA_Unit_Hero_Tinker)
                 return;
 		
             switch (args.OrderId) {
@@ -429,15 +429,15 @@ namespace TinkerFastComboPlus
             me = ObjectManager.LocalHero;
             if (me == null)
                 return;
-            if (me.ClassId != ClassId.CDOTA_Unit_Hero_Tinker)
+            if (me.HeroId != HeroId.npc_dota_hero_tinker)
                 return;
 
-            List<Unit> fount = ObjectManager.GetEntities<Unit>().Where(x => x.Team == me.Team && x.ClassId == ClassId.CDOTA_Unit_Fountain).ToList();
+            List<Unit> fount = ObjectManager.GetEntities<Unit>().Where(x => x.Team == me.Team && x.NetworkName == "CDOTA_Unit_Fountain").ToList();
             var creeps = ObjectManager.GetEntities<Creep>().Where(creep =>
-                   (creep.ClassId == ClassId.CDOTA_BaseNPC_Creep_Lane
-                   || creep.ClassId == ClassId.CDOTA_BaseNPC_Creep_Siege
-                   || creep.ClassId == ClassId.CDOTA_BaseNPC_Creep_Neutral
-                   || creep.ClassId == ClassId.CDOTA_BaseNPC_Creep) &&
+                   (creep.NetworkName == "CDOTA_BaseNPC_Creep_Lane"
+                   || creep.NetworkName == "CDOTA_BaseNPC_Creep_Siege"
+                   || creep.NetworkName == "CDOTA_BaseNPC_Creep_Neutral"
+                   || creep.NetworkName == "CDOTA_BaseNPC_Creep") &&
                    creep.IsAlive && creep.Team != me.Team && creep.IsVisible && creep.IsSpawned).ToList();
 
             Vector3 safe = GetClosestToVector(TinkerCords.SafePos, me);
@@ -524,10 +524,10 @@ namespace TinkerFastComboPlus
                           )
                         {
                             var closestCreep = ObjectManager.GetEntities<Creep>().Where(creep =>
-                                   (creep.ClassId == ClassId.CDOTA_BaseNPC_Creep_Lane
-                                   || creep.ClassId == ClassId.CDOTA_BaseNPC_Creep_Siege
-                                   || creep.ClassId == ClassId.CDOTA_BaseNPC_Creep_Neutral
-                                   || creep.ClassId == ClassId.CDOTA_BaseNPC_Creep) &&
+                                   (creep.NetworkName == "CDOTA_BaseNPC_Creep_Lane"
+                                   || creep.NetworkName == "CDOTA_BaseNPC_Creep_Siege"
+                                   || creep.NetworkName == "CDOTA_BaseNPC_Creep_Neutral"
+                                   || creep.NetworkName == "CDOTA_BaseNPC_Creep") &&
                                    creep.IsAlive && creep.Team != me.Team && creep.IsVisible && creep.IsSpawned).MinOrDefault(x => x.Distance2D(me)).Position;
 
                             March.UseAbility(Vector3.Add(me.Position, Vector3.Multiply(Vector3.Subtract(closestCreep, me.Position), 0.1f)));
@@ -544,10 +544,10 @@ namespace TinkerFastComboPlus
                           )
                         {
                             var closestCreep = ObjectManager.GetEntities<Creep>().Where(creep =>
-                                   (creep.ClassId == ClassId.CDOTA_BaseNPC_Creep_Lane
-                                   || creep.ClassId == ClassId.CDOTA_BaseNPC_Creep_Siege
-                                   || creep.ClassId == ClassId.CDOTA_BaseNPC_Creep_Neutral
-                                   || creep.ClassId == ClassId.CDOTA_BaseNPC_Creep) &&
+                                   (creep.NetworkName == "CDOTA_BaseNPC_Creep_Lane"
+                                   || creep.NetworkName == "CDOTA_BaseNPC_Creep_Siege"
+                                   || creep.NetworkName == "CDOTA_BaseNPC_Creep_Neutral"
+                                   || creep.NetworkName == "CDOTA_BaseNPC_Creep") &&
                                    creep.IsAlive && creep.Team != me.Team && creep.IsVisible && creep.IsSpawned).MinOrDefault(x => x.Distance2D(me)).Position;
                             March.UseAbility(Vector3.Add(me.Position, Vector3.Multiply(Vector3.Subtract(closestCreep, me.Position), 0.1f)));
                             //Console.WriteLine("March2");
@@ -1476,7 +1476,7 @@ namespace TinkerFastComboPlus
             if (!Game.IsInGame || Game.IsPaused || Game.IsWatchingGame)
                 return;
             me = ObjectManager.LocalHero;
-            if (me == null || me.ClassId != ClassId.CDOTA_Unit_Hero_Tinker)
+            if (me == null || me.HeroId != HeroId.npc_dota_hero_tinker)
                 return;
 
             //aether = me.FindItem("item_aether_lens");
@@ -1585,172 +1585,172 @@ namespace TinkerFastComboPlus
                         && (e.IsChanneling()
                             || (e.FindItem("item_blink") != null && IsCasted(e.FindItem("item_blink")))
                             //break escape spells (1 hex, 2 seal) no need cyclone
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_QueenOfPain && e.FindSpell("queenofpain_blink").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_AntiMage && e.FindSpell("antimage_blink").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_StormSpirit && e.FindSpell("storm_spirit_ball_lightning").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Shredder && e.FindSpell("shredder_timber_chain").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Weaver && e.FindSpell("weaver_time_lapse").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_FacelessVoid && e.FindSpell("faceless_void_time_walk").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Phoenix && e.FindSpell("phoenix_icarus_dive").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Magnataur && e.FindSpell("magnataur_skewer").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Morphling && e.FindSpell("morphling_waveform").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_PhantomAssassin && e.FindSpell("phantom_assassin_phantom_strike").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Riki && e.FindSpell("riki_blink_strike").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Spectre && e.FindSpell("spectre_haunt").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Furion && e.FindSpell("furion_sprout").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_queenofpain && e.FindSpell("queenofpain_blink").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_antimage && e.FindSpell("antimage_blink").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_storm_spirit && e.FindSpell("storm_spirit_ball_lightning").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_shredder && e.FindSpell("shredder_timber_chain").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_weaver && e.FindSpell("weaver_time_lapse").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_faceless_void && e.FindSpell("faceless_void_time_walk").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_phoenix && e.FindSpell("phoenix_icarus_dive").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_magnataur && e.FindSpell("magnataur_skewer").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_morphling && e.FindSpell("morphling_waveform").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_phantom_assassin && e.FindSpell("phantom_assassin_phantom_strike").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_riki && e.FindSpell("riki_blink_strike").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_spectre && e.FindSpell("spectre_haunt").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_furion && e.FindSpell("furion_sprout").IsInAbilityPhase
 
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_PhantomLancer && e.FindSpell("phantom_lancer_doppelwalk").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_phantom_lancer && e.FindSpell("phantom_lancer_doppelwalk").IsInAbilityPhase
 
 
 
                             //break special (1 hex, 2 cyclone)
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Riki && me.Modifiers.Any(y => y.Name == "modifier_riki_smoke_screen")
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_SpiritBreaker && e.Modifiers.Any(y => y.Name == "modifier_spirit_breaker_charge_of_darkness")
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Phoenix && e.Modifiers.Any(y => y.Name == "modifier_phoenix_icarus_dive")
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Magnataur && e.Modifiers.Any(y => y.Name == "modifier_magnataur_skewer_movement")
+                            || e.HeroId == HeroId.npc_dota_hero_riki && me.Modifiers.Any(y => y.Name == "modifier_riki_smoke_screen")
+                            || e.HeroId == HeroId.npc_dota_hero_spirit_breaker && e.Modifiers.Any(y => y.Name == "modifier_spirit_breaker_charge_of_darkness")
+                            || e.HeroId == HeroId.npc_dota_hero_phoenix && e.Modifiers.Any(y => y.Name == "modifier_phoenix_icarus_dive")
+                            || e.HeroId == HeroId.npc_dota_hero_magnataur && e.Modifiers.Any(y => y.Name == "modifier_magnataur_skewer_movement")
 
 
 
                             //break rats shadow blades and invis (1 hex, 2 seal, 3 cyclone)
                             || e.IsMelee && me.Distance2D(e) <= 350 //test
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Legion_Commander && e.FindSpell("legion_commander_duel").Cooldown < 2 && me.Distance2D(e) < 480 && !me.IsAttackImmune()
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Tiny && me.Distance2D(e) <= 350
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Pudge && me.Distance2D(e) <= 350
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Nyx_Assassin && me.Distance2D(e) <= 350
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_BountyHunter && me.Distance2D(e) <= 350
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Nevermore && me.Distance2D(e) <= 350
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Weaver && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Riki && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Clinkz && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Broodmother && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Slark && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Ursa && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Earthshaker && (e.Spellbook.SpellQ.Cooldown <= 1 || e.Spellbook.SpellR.Cooldown <= 1)
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Alchemist && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_TrollWarlord && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_legion_commander && e.FindSpell("legion_commander_duel").Cooldown < 2 && me.Distance2D(e) < 480 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_tiny && me.Distance2D(e) <= 350
+                            || e.HeroId == HeroId.npc_dota_hero_pudge && me.Distance2D(e) <= 350
+                            || e.HeroId == HeroId.npc_dota_hero_nyx_assassin && me.Distance2D(e) <= 350
+                            || e.HeroId == HeroId.npc_dota_hero_bounty_hunter && me.Distance2D(e) <= 350
+                            || e.HeroId == HeroId.npc_dota_hero_nevermore && me.Distance2D(e) <= 350
+                            || e.HeroId == HeroId.npc_dota_hero_weaver && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_riki && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_clinkz && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_broodmother && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_slark && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_ursa && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_earthshaker && (e.Spellbook.SpellQ.Cooldown <= 1 || e.Spellbook.SpellR.Cooldown <= 1)
+                            || e.HeroId == HeroId.npc_dota_hero_alchemist && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_troll_warlord && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
 
                             //break rats blinkers (1 hex, 2 seal, 3 cyclone)
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Ursa && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_PhantomAssassin && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Riki && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Spectre && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_AntiMage && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_ursa && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_phantom_assassin && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_riki && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_spectre && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_antimage && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
 
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_TemplarAssassin && me.Distance2D(e) <= e.GetAttackRange() + 50 && !me.IsAttackImmune()
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Morphling && me.Distance2D(e) <= e.GetAttackRange() + 50 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_templar_assassin && me.Distance2D(e) <= e.GetAttackRange() + 50 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_morphling && me.Distance2D(e) <= e.GetAttackRange() + 50 && !me.IsAttackImmune()
 
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_QueenOfPain && me.Distance2D(e) <= 800 + castrange + ensage_error
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Puck && me.Distance2D(e) <= 800 + castrange + ensage_error
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_StormSpirit && me.Distance2D(e) <= 800 + castrange + ensage_error
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Phoenix && me.Distance2D(e) <= 800 + castrange + ensage_error
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Magnataur && me.Distance2D(e) <= 800 + castrange + ensage_error
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_FacelessVoid && me.Distance2D(e) <= 800 + castrange + ensage_error
+                            || e.HeroId == HeroId.npc_dota_hero_queenofpain && me.Distance2D(e) <= 800 + castrange + ensage_error
+                            || e.HeroId == HeroId.npc_dota_hero_puck && me.Distance2D(e) <= 800 + castrange + ensage_error
+                            || e.HeroId == HeroId.npc_dota_hero_storm_spirit && me.Distance2D(e) <= 800 + castrange + ensage_error
+                            || e.HeroId == HeroId.npc_dota_hero_phoenix && me.Distance2D(e) <= 800 + castrange + ensage_error
+                            || e.HeroId == HeroId.npc_dota_hero_magnataur && me.Distance2D(e) <= 800 + castrange + ensage_error
+                            || e.HeroId == HeroId.npc_dota_hero_faceless_void && me.Distance2D(e) <= 800 + castrange + ensage_error
 
 
                             //break mass dangerous spells (1 hex, 2 seal, 3 cyclone)
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Necrolyte && e.FindSpell("necrolyte_reapers_scythe").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_FacelessVoid && e.FindSpell("faceless_void_chronosphere").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Magnataur && e.FindSpell("magnataur_reverse_polarity").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_DoomBringer && e.FindSpell("doom_bringer_doom").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Tidehunter && e.FindSpell("tidehunter_ravage").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Enigma && e.FindSpell("enigma_black_hole").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Rattletrap && e.FindSpell("rattletrap_power_cogs").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Luna && e.FindSpell("luna_eclipse").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Nevermore && e.FindSpell("nevermore_requiem").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_SpiritBreaker && e.FindSpell("spirit_breaker_nether_strike").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Naga_Siren && e.FindSpell("naga_siren_song_of_the_siren").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Medusa && e.FindSpell("medusa_stone_gaze").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Treant && e.FindSpell("treant_overgrowth").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_AntiMage && e.FindSpell("antimage_mana_void").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Warlock && e.FindSpell("warlock_rain_of_chaos").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Terrorblade && e.FindSpell("terrorblade_sunder").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_DarkSeer && e.FindSpell("dark_seer_wall_of_replica").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_DarkSeer && e.FindSpell("dark_seer_surge").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Dazzle && e.FindSpell("dazzle_shallow_grave").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Omniknight && e.FindSpell("omniknight_guardian_angel").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Omniknight && e.FindSpell("omniknight_repel").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Beastmaster && e.FindSpell("beastmaster_primal_roar").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_ChaosKnight && e.FindSpell("chaos_knight_reality_rift").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_ChaosKnight && e.FindSpell("chaos_knight_phantasm").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Life_Stealer && e.FindSpell("life_stealer_infest").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Sven && e.FindSpell("sven_gods_strength").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_DrowRanger && e.FindSpell("drow_ranger_wave_of_silence").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Nyx_Assassin && e.FindSpell("nyx_assassin_mana_burn").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_necrolyte && e.FindSpell("necrolyte_reapers_scythe").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_faceless_void && e.FindSpell("faceless_void_chronosphere").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_magnataur && e.FindSpell("magnataur_reverse_polarity").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_doom_bringer && e.FindSpell("doom_bringer_doom").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_tidehunter && e.FindSpell("tidehunter_ravage").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_enigma && e.FindSpell("enigma_black_hole").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_rattletrap && e.FindSpell("rattletrap_power_cogs").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_luna && e.FindSpell("luna_eclipse").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_nevermore && e.FindSpell("nevermore_requiem").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_spirit_breaker && e.FindSpell("spirit_breaker_nether_strike").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_naga_siren && e.FindSpell("naga_siren_song_of_the_siren").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_medusa && e.FindSpell("medusa_stone_gaze").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_treant && e.FindSpell("treant_overgrowth").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_antimage && e.FindSpell("antimage_mana_void").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_warlock && e.FindSpell("warlock_rain_of_chaos").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_terrorblade && e.FindSpell("terrorblade_sunder").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_dark_seer && e.FindSpell("dark_seer_wall_of_replica").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_dark_seer && e.FindSpell("dark_seer_surge").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_dazzle && e.FindSpell("dazzle_shallow_grave").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_omniknight && e.FindSpell("omniknight_guardian_angel").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_omniknight && e.FindSpell("omniknight_repel").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_beastmaster && e.FindSpell("beastmaster_primal_roar").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_chaos_knight && e.FindSpell("chaos_knight_reality_rift").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_chaos_knight && e.FindSpell("chaos_knight_phantasm").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_life_stealer && e.FindSpell("life_stealer_infest").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_sven && e.FindSpell("sven_gods_strength").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_drow_ranger && e.FindSpell("drow_ranger_wave_of_silence").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_nyx_assassin && e.FindSpell("nyx_assassin_mana_burn").IsInAbilityPhase
 
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Mirana && e.Spellbook.SpellW.IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_BountyHunter && e.Spellbook.SpellR.IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Phoenix && e.FindSpell("phoenix_icarus_dive").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_EarthSpirit && e.FindSpell("earth_spirit_magnetize").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_mirana && e.Spellbook.SpellW.IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_bounty_hunter && e.Spellbook.SpellR.IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_phoenix && e.FindSpell("phoenix_icarus_dive").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_earth_spirit && e.FindSpell("earth_spirit_magnetize").IsInAbilityPhase
 
 
                             //break stun spells (1 hex, 2 seal, 3 cyclone)
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Ogre_Magi && e.FindSpell("ogre_magi_fireblast").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Axe && e.FindSpell("axe_berserkers_call").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Lion && e.FindSpell("lion_impale").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Nyx_Assassin && e.FindSpell("nyx_assassin_impale").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Rubick && e.FindSpell("rubick_telekinesis").IsInAbilityPhase
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Rubick && me.Distance2D(e) < e.Spellbook.SpellQ.GetCastRange() + ensage_error)
-                            //|| (e.ClassId == ClassId.CDOTA_Unit_Hero_Alchemist && e.FindSpell("alchemist_unstable_concoction_throw").IsInAbilityPhase)
+                            || e.HeroId == HeroId.npc_dota_hero_ogre_magi && e.FindSpell("ogre_magi_fireblast").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_axe && e.FindSpell("axe_berserkers_call").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_lion && e.FindSpell("lion_impale").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_nyx_assassin && e.FindSpell("nyx_assassin_impale").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_rubick && e.FindSpell("rubick_telekinesis").IsInAbilityPhase
+                            || (e.HeroId == HeroId.npc_dota_hero_rubick && me.Distance2D(e) < e.Spellbook.SpellQ.GetCastRange() + ensage_error)
+                            //|| (e.HeroId == HeroId.CDOTA_Unit_Hero_Alchemist && e.FindSpell("alchemist_unstable_concoction_throw").IsInAbilityPhase)
 
 
                             //break flying stun spells if enemy close (1 hex, 2 seal, 3 cyclone)  have cyclone
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Sniper && e.Spellbook.SpellR.IsInAbilityPhase && angle <= 0.03 && me.Distance2D(e) <= 300)//e.FindSpell("sniper_assassinate").Cooldown > 0 && me.Modifiers.Any(y => y.Name == "modifier_sniper_assassinate"))
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Windrunner && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.1 && me.Distance2D(e) <= 400)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Sven && e.Spellbook.SpellQ.IsInAbilityPhase && me.Distance2D(e) <= 300)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_SkeletonKing && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.03 && me.Distance2D(e) <= 300)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_ChaosKnight && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.03 && me.Distance2D(e) <= 300)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_VengefulSpirit && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.03 && me.Distance2D(e) <= 300)
+                            || (e.HeroId == HeroId.npc_dota_hero_sniper && e.Spellbook.SpellR.IsInAbilityPhase && angle <= 0.03 && me.Distance2D(e) <= 300)//e.FindSpell("sniper_assassinate").Cooldown > 0 && me.Modifiers.Any(y => y.Name == "modifier_sniper_assassinate"))
+                            || (e.HeroId == HeroId.npc_dota_hero_windrunner && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.1 && me.Distance2D(e) <= 400)
+                            || (e.HeroId == HeroId.npc_dota_hero_sven && e.Spellbook.SpellQ.IsInAbilityPhase && me.Distance2D(e) <= 300)
+                            || (e.HeroId == HeroId.npc_dota_hero_skeleton_king && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.03 && me.Distance2D(e) <= 300)
+                            || (e.HeroId == HeroId.npc_dota_hero_chaos_knight && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.03 && me.Distance2D(e) <= 300)
+                            || (e.HeroId == HeroId.npc_dota_hero_vengefulspirit && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.03 && me.Distance2D(e) <= 300)
 
 
                             //break flying stun spells if enemy close (1 hex, 2 seal, 3 cyclone)  no cyclone
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Sniper && e.Spellbook.SpellR.IsInAbilityPhase && angle <= 0.03 && (cyclone == null || !cyclone.CanBeCasted()))//e.FindSpell("sniper_assassinate").Cooldown > 0 && me.Modifiers.Any(y => y.Name == "modifier_sniper_assassinate"))
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Windrunner && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.1 && (cyclone == null || !cyclone.CanBeCasted()))
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Sven && e.Spellbook.SpellQ.IsInAbilityPhase && (cyclone == null || !cyclone.CanBeCasted()))
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_SkeletonKing && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.03 && (cyclone == null || !cyclone.CanBeCasted()))
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_ChaosKnight && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.03 && (cyclone == null || !cyclone.CanBeCasted()))
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_VengefulSpirit && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.03 && (cyclone == null || !cyclone.CanBeCasted()))
+                            || (e.HeroId == HeroId.npc_dota_hero_sniper && e.Spellbook.SpellR.IsInAbilityPhase && angle <= 0.03 && (cyclone == null || !cyclone.CanBeCasted()))//e.FindSpell("sniper_assassinate").Cooldown > 0 && me.Modifiers.Any(y => y.Name == "modifier_sniper_assassinate"))
+                            || (e.HeroId == HeroId.npc_dota_hero_windrunner && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.1 && (cyclone == null || !cyclone.CanBeCasted()))
+                            || (e.HeroId == HeroId.npc_dota_hero_sven && e.Spellbook.SpellQ.IsInAbilityPhase && (cyclone == null || !cyclone.CanBeCasted()))
+                            || (e.HeroId == HeroId.npc_dota_hero_skeleton_king && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.03 && (cyclone == null || !cyclone.CanBeCasted()))
+                            || (e.HeroId == HeroId.npc_dota_hero_chaos_knight && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.03 && (cyclone == null || !cyclone.CanBeCasted()))
+                            || (e.HeroId == HeroId.npc_dota_hero_vengefulspirit && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.03 && (cyclone == null || !cyclone.CanBeCasted()))
 
 
 
 
                             //break common dangerous spell (1 hex, 2 seal) //no need cyclone
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Bloodseeker && e.FindSpell("bloodseeker_rupture").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Mirana && e.FindSpell("mirana_invis").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Riki && e.FindSpell("riki_smoke_screen").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Riki && e.FindSpell("riki_tricks_of_the_trade").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Viper && e.FindSpell("viper_viper_strike").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Chen && e.FindSpell("chen_hand_of_god").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_DeathProphet && e.FindSpell("death_prophet_silence").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_DeathProphet && e.FindSpell("death_prophet_exorcism").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Invoker // =)
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_EmberSpirit // =)
+                            || e.HeroId == HeroId.npc_dota_hero_bloodseeker && e.FindSpell("bloodseeker_rupture").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_mirana && e.FindSpell("mirana_invis").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_riki && e.FindSpell("riki_smoke_screen").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_riki && e.FindSpell("riki_tricks_of_the_trade").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_viper && e.FindSpell("viper_viper_strike").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_chen && e.FindSpell("chen_hand_of_god").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_death_prophet && e.FindSpell("death_prophet_silence").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_death_prophet && e.FindSpell("death_prophet_exorcism").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_invoker // =)
+                            || e.HeroId == HeroId.npc_dota_hero_ember_spirit // =)
 
 
 
                             //break hex spell
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Lion && e.Spellbook.SpellW.Level > 0 && e.Spellbook.SpellW.Cooldown < 1 && me.Distance2D(e) < e.Spellbook.SpellW.GetCastRange() + ensage_error)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_ShadowShaman && e.Spellbook.SpellW.Level > 0 && e.Spellbook.SpellW.Cooldown < 1 && me.Distance2D(e) < e.Spellbook.SpellW.GetCastRange() + ensage_error)
+                            || (e.HeroId == HeroId.npc_dota_hero_lion && e.Spellbook.SpellW.Level > 0 && e.Spellbook.SpellW.Cooldown < 1 && me.Distance2D(e) < e.Spellbook.SpellW.GetCastRange() + ensage_error)
+                            || (e.HeroId == HeroId.npc_dota_hero_shadow_shaman && e.Spellbook.SpellW.Level > 0 && e.Spellbook.SpellW.Cooldown < 1 && me.Distance2D(e) < e.Spellbook.SpellW.GetCastRange() + ensage_error)
                             || (e.FindItem("item_sheepstick") != null && e.FindItem("item_sheepstick").Cooldown < 1 && me.Distance2D(e) < e.FindItem("item_sheepstick").GetCastRange() + ensage_error)
 
 
 
 
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Omniknight && e.FindSpell("omniknight_purification").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Ursa && e.FindSpell("ursa_overpower").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Silencer && e.FindSpell("silencer_last_word").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Silencer && e.FindSpell("silencer_global_silence").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_ShadowShaman && e.FindSpell("shadow_shaman_mass_serpent_ward").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_QueenOfPain && e.FindSpell("queenofpain_sonic_wave").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Obsidian_Destroyer && e.FindSpell("obsidian_destroyer_astral_imprisonment").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Obsidian_Destroyer && e.FindSpell("obsidian_destroyer_sanity_eclipse").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Pugna && e.FindSpell("pugna_nether_ward").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Lich && e.FindSpell("lich_chain_frost").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_StormSpirit && e.FindSpell("storm_spirit_electric_vortex").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Zuus && e.FindSpell("zuus_thundergods_wrath").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Brewmaster && e.FindSpell("brewmaster_primal_split").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Bane && e.FindSpell("bane_fiends_grip").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Bane && e.FindSpell("bane_nightmare").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Undying && e.FindSpell("undying_tombstone").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_omniknight && e.FindSpell("omniknight_purification").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_ursa && e.FindSpell("ursa_overpower").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_silencer && e.FindSpell("silencer_last_word").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_silencer && e.FindSpell("silencer_global_silence").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_shadow_shaman && e.FindSpell("shadow_shaman_mass_serpent_ward").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_queenofpain && e.FindSpell("queenofpain_sonic_wave").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_obsidian_destroyer && e.FindSpell("obsidian_destroyer_astral_imprisonment").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_obsidian_destroyer && e.FindSpell("obsidian_destroyer_sanity_eclipse").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_pugna && e.FindSpell("pugna_nether_ward").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_lich && e.FindSpell("lich_chain_frost").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_storm_spirit && e.FindSpell("storm_spirit_electric_vortex").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_zuus && e.FindSpell("zuus_thundergods_wrath").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_brewmaster && e.FindSpell("brewmaster_primal_split").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_bane && e.FindSpell("bane_fiends_grip").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_bane && e.FindSpell("bane_nightmare").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_undying && e.FindSpell("undying_tombstone").IsInAbilityPhase
 
                             )
                         )
@@ -1778,85 +1778,85 @@ namespace TinkerFastComboPlus
 
                             //break rats shadow blades and invis if they appear close(1 hex, 2 seal, 3 cyclone)
                             || (e.IsMelee && me.Distance2D(e) <= 350 && (me.Spellbook.SpellR == null || !me.Spellbook.SpellR.CanBeCasted())) //test
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Legion_Commander && e.FindSpell("legion_commander_duel").Cooldown < 2 && me.Distance2D(e) < 480 && !me.IsAttackImmune()
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Tiny && me.Distance2D(e) <= 350
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Pudge && me.Distance2D(e) <= 350
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Nyx_Assassin && me.Distance2D(e) <= 350
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_BountyHunter && me.Distance2D(e) <= 350
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Weaver && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Clinkz && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Broodmother && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Slark && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Earthshaker && (e.Spellbook.SpellQ.Cooldown <= 1 || e.Spellbook.SpellR.Cooldown <= 1)
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Alchemist && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_TrollWarlord && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_legion_commander && e.FindSpell("legion_commander_duel").Cooldown < 2 && me.Distance2D(e) < 480 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_tiny && me.Distance2D(e) <= 350
+                            || e.HeroId == HeroId.npc_dota_hero_pudge && me.Distance2D(e) <= 350
+                            || e.HeroId == HeroId.npc_dota_hero_nyx_assassin && me.Distance2D(e) <= 350
+                            || e.HeroId == HeroId.npc_dota_hero_bounty_hunter && me.Distance2D(e) <= 350
+                            || e.HeroId == HeroId.npc_dota_hero_weaver && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_clinkz && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_broodmother && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_slark && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_earthshaker && (e.Spellbook.SpellQ.Cooldown <= 1 || e.Spellbook.SpellR.Cooldown <= 1)
+                            || e.HeroId == HeroId.npc_dota_hero_alchemist && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
+                            || e.HeroId == HeroId.npc_dota_hero_troll_warlord && me.Distance2D(e) <= 350 && !me.IsAttackImmune()
 
 
                             //break rats blinkers (1 hex, 2 seal, 3 cyclone)
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_QueenOfPain && me.Distance2D(e) <= 575 + castrange + ensage_error
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Puck && me.Distance2D(e) <= 575 + castrange + ensage_error
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_StormSpirit && me.Distance2D(e) <= 575 + castrange + ensage_error
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_FacelessVoid && me.Distance2D(e) <= 575 + castrange + ensage_error
+                            || e.HeroId == HeroId.npc_dota_hero_queenofpain && me.Distance2D(e) <= 575 + castrange + ensage_error
+                            || e.HeroId == HeroId.npc_dota_hero_puck && me.Distance2D(e) <= 575 + castrange + ensage_error
+                            || e.HeroId == HeroId.npc_dota_hero_storm_spirit && me.Distance2D(e) <= 575 + castrange + ensage_error
+                            || e.HeroId == HeroId.npc_dota_hero_faceless_void && me.Distance2D(e) <= 575 + castrange + ensage_error
 
 
                             //break mass dangerous spells (1 hex, 2 seal, 3 cyclone)
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Necrolyte && e.FindSpell("necrolyte_reapers_scythe").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_FacelessVoid && e.FindSpell("faceless_void_chronosphere").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Magnataur && e.FindSpell("magnataur_reverse_polarity").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_DoomBringer && e.FindSpell("doom_bringer_doom").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Tidehunter && e.FindSpell("tidehunter_ravage").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Enigma && e.FindSpell("enigma_black_hole").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Rattletrap && e.FindSpell("rattletrap_power_cogs").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Luna && e.FindSpell("luna_eclipse").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Nevermore && e.FindSpell("nevermore_requiem").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_SpiritBreaker && e.FindSpell("spirit_breaker_nether_strike").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Naga_Siren && e.FindSpell("naga_siren_song_of_the_siren").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Medusa && e.FindSpell("medusa_stone_gaze").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Treant && e.FindSpell("treant_overgrowth").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_AntiMage && e.FindSpell("antimage_mana_void").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Warlock && e.FindSpell("warlock_rain_of_chaos").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Terrorblade && e.FindSpell("terrorblade_sunder").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_DarkSeer && e.FindSpell("dark_seer_wall_of_replica").IsInAbilityPhase
-                            //|| e.ClassId == ClassId.CDOTA_Unit_Hero_DarkSeer && e.FindSpell("dark_seer_surge").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Dazzle && e.FindSpell("dazzle_shallow_grave").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Omniknight && e.FindSpell("omniknight_guardian_angel").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Omniknight && e.FindSpell("omniknight_repel").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Beastmaster && e.FindSpell("beastmaster_primal_roar").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_ChaosKnight && e.FindSpell("chaos_knight_reality_rift").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_ChaosKnight && e.FindSpell("chaos_knight_phantasm").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Life_Stealer && e.FindSpell("life_stealer_infest").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Sven && e.FindSpell("sven_gods_strength").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_DrowRanger && e.FindSpell("drow_ranger_wave_of_silence").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Nyx_Assassin && e.FindSpell("nyx_assassin_mana_burn").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_necrolyte && e.FindSpell("necrolyte_reapers_scythe").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_faceless_void && e.FindSpell("faceless_void_chronosphere").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_magnataur && e.FindSpell("magnataur_reverse_polarity").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_doom_bringer && e.FindSpell("doom_bringer_doom").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_tidehunter && e.FindSpell("tidehunter_ravage").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_enigma && e.FindSpell("enigma_black_hole").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_rattletrap && e.FindSpell("rattletrap_power_cogs").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_luna && e.FindSpell("luna_eclipse").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_nevermore && e.FindSpell("nevermore_requiem").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_spirit_breaker && e.FindSpell("spirit_breaker_nether_strike").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_naga_siren && e.FindSpell("naga_siren_song_of_the_siren").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_medusa && e.FindSpell("medusa_stone_gaze").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_treant && e.FindSpell("treant_overgrowth").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_antimage && e.FindSpell("antimage_mana_void").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_warlock && e.FindSpell("warlock_rain_of_chaos").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_terrorblade && e.FindSpell("terrorblade_sunder").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_dark_seer && e.FindSpell("dark_seer_wall_of_replica").IsInAbilityPhase
+                            //|| e.HeroId == HeroId.CDOTA_Unit_Hero_DarkSeer && e.FindSpell("dark_seer_surge").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_dazzle && e.FindSpell("dazzle_shallow_grave").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_omniknight && e.FindSpell("omniknight_guardian_angel").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_omniknight && e.FindSpell("omniknight_repel").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_beastmaster && e.FindSpell("beastmaster_primal_roar").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_chaos_knight && e.FindSpell("chaos_knight_reality_rift").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_chaos_knight && e.FindSpell("chaos_knight_phantasm").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_life_stealer && e.FindSpell("life_stealer_infest").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_sven && e.FindSpell("sven_gods_strength").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_drow_ranger && e.FindSpell("drow_ranger_wave_of_silence").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_nyx_assassin && e.FindSpell("nyx_assassin_mana_burn").IsInAbilityPhase
 
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Phoenix && e.FindSpell("phoenix_icarus_dive").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_EarthSpirit && e.FindSpell("earth_spirit_magnetize").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_phoenix && e.FindSpell("phoenix_icarus_dive").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_earth_spirit && e.FindSpell("earth_spirit_magnetize").IsInAbilityPhase
 
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Furion && e.FindSpell("furion_sprout").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_furion && e.FindSpell("furion_sprout").IsInAbilityPhase
 
 
                             //break stun spells (1 hex, 2 seal, 3 cyclone)
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Ogre_Magi && e.FindSpell("ogre_magi_fireblast").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Axe && e.FindSpell("axe_berserkers_call").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Lion && e.FindSpell("lion_impale").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Nyx_Assassin && e.FindSpell("nyx_assassin_impale").IsInAbilityPhase
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Rubick && e.FindSpell("rubick_telekinesis").IsInAbilityPhase
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Rubick && me.Distance2D(e) < e.Spellbook.SpellQ.GetCastRange() + ensage_error)
+                            || e.HeroId == HeroId.npc_dota_hero_ogre_magi && e.FindSpell("ogre_magi_fireblast").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_axe && e.FindSpell("axe_berserkers_call").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_lion && e.FindSpell("lion_impale").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_nyx_assassin && e.FindSpell("nyx_assassin_impale").IsInAbilityPhase
+                            || e.HeroId == HeroId.npc_dota_hero_rubick && e.FindSpell("rubick_telekinesis").IsInAbilityPhase
+                            || (e.HeroId == HeroId.npc_dota_hero_rubick && me.Distance2D(e) < e.Spellbook.SpellQ.GetCastRange() + ensage_error)
 
 
                             //break hex spell
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Lion && e.Spellbook.SpellW.Level > 0 && e.Spellbook.SpellW.Cooldown < 1 && me.Distance2D(e) < e.Spellbook.SpellW.GetCastRange() + ensage_error)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_ShadowShaman && e.Spellbook.SpellW.Level > 0 && e.Spellbook.SpellW.Cooldown < 1 && me.Distance2D(e) < e.Spellbook.SpellW.GetCastRange() + ensage_error)
+                            || (e.HeroId == HeroId.npc_dota_hero_lion && e.Spellbook.SpellW.Level > 0 && e.Spellbook.SpellW.Cooldown < 1 && me.Distance2D(e) < e.Spellbook.SpellW.GetCastRange() + ensage_error)
+                            || (e.HeroId == HeroId.npc_dota_hero_shadow_shaman && e.Spellbook.SpellW.Level > 0 && e.Spellbook.SpellW.Cooldown < 1 && me.Distance2D(e) < e.Spellbook.SpellW.GetCastRange() + ensage_error)
                             || (e.FindItem("item_sheepstick") != null && e.FindItem("item_sheepstick").Cooldown < 1 && me.Distance2D(e) < e.FindItem("item_sheepstick").GetCastRange() + ensage_error)
 
 
                             //break flying stun spells if enemy close (1 hex, 2 seal, 3 cyclone)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Sniper && e.Spellbook.SpellR.IsInAbilityPhase && angle <= 0.03 && me.Distance2D(e) <= 300)//e.FindSpell("sniper_assassinate").Cooldown > 0 && me.Modifiers.Any(y => y.Name == "modifier_sniper_assassinate"))
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Windrunner && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.1 && me.Distance2D(e) <= 400)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Sven && e.Spellbook.SpellQ.IsInAbilityPhase && me.Distance2D(e) <= 300)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_SkeletonKing && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.03 && me.Distance2D(e) <= 300)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_ChaosKnight && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.03 && me.Distance2D(e) <= 300)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_VengefulSpirit && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.03 && me.Distance2D(e) <= 300)
+                            || (e.HeroId == HeroId.npc_dota_hero_sniper && e.Spellbook.SpellR.IsInAbilityPhase && angle <= 0.03 && me.Distance2D(e) <= 300)//e.FindSpell("sniper_assassinate").Cooldown > 0 && me.Modifiers.Any(y => y.Name == "modifier_sniper_assassinate"))
+                            || (e.HeroId == HeroId.npc_dota_hero_windrunner && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.1 && me.Distance2D(e) <= 400)
+                            || (e.HeroId == HeroId.npc_dota_hero_sven && e.Spellbook.SpellQ.IsInAbilityPhase && me.Distance2D(e) <= 300)
+                            || (e.HeroId == HeroId.npc_dota_hero_skeleton_king && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.03 && me.Distance2D(e) <= 300)
+                            || (e.HeroId == HeroId.npc_dota_hero_chaos_knight && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.03 && me.Distance2D(e) <= 300)
+                            || (e.HeroId == HeroId.npc_dota_hero_vengefulspirit && e.Spellbook.SpellQ.IsInAbilityPhase && angle <= 0.03 && me.Distance2D(e) <= 300)
 
                             )
                         )
@@ -1885,29 +1885,29 @@ namespace TinkerFastComboPlus
                         if (cyclone != null && cyclone.CanBeCasted() &&
                             (mod != null
                             || (me.IsRooted() && !me.Modifiers.Any(y => y.Name == "modifier_razor_unstablecurrent_slow"))
-                            //|| e.ClassId == ClassId.CDOTA_Unit_Hero_Zuus && e.FindSpell("zuus_thundergods_wrath").IsInAbilityPhase  //zuus can cancel
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Huskar && IsCasted(e.Spellbook.SpellR) && angle <= 0.15 && me.Distance2D(e) < e.Spellbook.SpellQ.GetCastRange() + 250) //( (e.FindSpell("huskar_life_break").Cooldown >= 3 && e.AghanimState()) || (e.FindSpell("huskar_life_break").Cooldown >= 11 && !e.AghanimState())) && me.Distance2D(e) <= 400)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Juggernaut && e.Modifiers.Any(y => y.Name == "modifier_juggernaut_omnislash") && me.Distance2D(e) <= 300 && !me.IsAttackImmune())// && (ghost == null || !ghost.CanBeCasted()) && (ghost == null || !ghost.CanBeCasted())&& !me.Modifiers.Any(y => y.Name == "modifier_item_ghost_scepter")
+                            //|| e.HeroId == HeroId.CDOTA_Unit_Hero_Zuus && e.FindSpell("zuus_thundergods_wrath").IsInAbilityPhase  //zuus can cancel
+                            || (e.HeroId == HeroId.npc_dota_hero_huskar && IsCasted(e.Spellbook.SpellR) && angle <= 0.15 && me.Distance2D(e) < e.Spellbook.SpellQ.GetCastRange() + 250) //( (e.FindSpell("huskar_life_break").Cooldown >= 3 && e.AghanimState()) || (e.FindSpell("huskar_life_break").Cooldown >= 11 && !e.AghanimState())) && me.Distance2D(e) <= 400)
+                            || (e.HeroId == HeroId.npc_dota_hero_juggernaut && e.Modifiers.Any(y => y.Name == "modifier_juggernaut_omnislash") && me.Distance2D(e) <= 300 && !me.IsAttackImmune())// && (ghost == null || !ghost.CanBeCasted()) && (ghost == null || !ghost.CanBeCasted())&& !me.Modifiers.Any(y => y.Name == "modifier_item_ghost_scepter")
 
 
                             //dodge flying stuns
                             || (e.FindItem("item_ethereal_blade") != null && IsCasted(e.FindItem("item_ethereal_blade")) && angle <= 0.1 && me.Distance2D(e) < e.FindItem("item_ethereal_blade").GetCastRange() + 250)
 
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Sniper && IsCasted(e.Spellbook.SpellR) && me.Distance2D(e) > 300 && me.Modifiers.Any(y => y.Name == "modifier_sniper_assassinate"))//e.FindSpell("sniper_assassinate").Cooldown > 0 && me.Modifiers.Any(y => y.Name == "modifier_sniper_assassinate"))
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Tusk && angle <= 0.35 && e.Modifiers.Any(y => y.Name == "modifier_tusk_snowball_movement") && me.Distance2D(e) <= 575)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Windrunner && IsCasted(e.Spellbook.SpellQ) && angle <= 0.12 && me.Distance2D(e) > 400 && me.Distance2D(e) < e.Spellbook.SpellQ.GetCastRange() + 550)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Sven && IsCasted(e.Spellbook.SpellQ) && angle <= 0.3 && me.Distance2D(e) > 300 && me.Distance2D(e) < e.Spellbook.SpellQ.GetCastRange() + 500)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_SkeletonKing && IsCasted(e.Spellbook.SpellQ) && angle <= 0.1 && me.Distance2D(e) > 300 && me.Distance2D(e) < e.Spellbook.SpellQ.GetCastRange() + 350)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_ChaosKnight && IsCasted(e.Spellbook.SpellQ) && angle <= 0.1 && me.Distance2D(e) > 300 && me.Distance2D(e) < e.Spellbook.SpellQ.GetCastRange() + 350)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_VengefulSpirit && IsCasted(e.Spellbook.SpellQ) && angle <= 0.1 && me.Distance2D(e) > 300 && me.Distance2D(e) < e.Spellbook.SpellQ.GetCastRange() + 350)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Alchemist && e.FindSpell("alchemist_unstable_concoction_throw").IsInAbilityPhase && angle <= 0.3 && me.Distance2D(e) < e.FindSpell("alchemist_unstable_concoction_throw").GetCastRange() + 500)
+                            || (e.HeroId == HeroId.npc_dota_hero_sniper && IsCasted(e.Spellbook.SpellR) && me.Distance2D(e) > 300 && me.Modifiers.Any(y => y.Name == "modifier_sniper_assassinate"))//e.FindSpell("sniper_assassinate").Cooldown > 0 && me.Modifiers.Any(y => y.Name == "modifier_sniper_assassinate"))
+                            || (e.HeroId == HeroId.npc_dota_hero_tusk && angle <= 0.35 && e.Modifiers.Any(y => y.Name == "modifier_tusk_snowball_movement") && me.Distance2D(e) <= 575)
+                            || (e.HeroId == HeroId.npc_dota_hero_windrunner && IsCasted(e.Spellbook.SpellQ) && angle <= 0.12 && me.Distance2D(e) > 400 && me.Distance2D(e) < e.Spellbook.SpellQ.GetCastRange() + 550)
+                            || (e.HeroId == HeroId.npc_dota_hero_sven && IsCasted(e.Spellbook.SpellQ) && angle <= 0.3 && me.Distance2D(e) > 300 && me.Distance2D(e) < e.Spellbook.SpellQ.GetCastRange() + 500)
+                            || (e.HeroId == HeroId.npc_dota_hero_skeleton_king && IsCasted(e.Spellbook.SpellQ) && angle <= 0.1 && me.Distance2D(e) > 300 && me.Distance2D(e) < e.Spellbook.SpellQ.GetCastRange() + 350)
+                            || (e.HeroId == HeroId.npc_dota_hero_chaos_knight && IsCasted(e.Spellbook.SpellQ) && angle <= 0.1 && me.Distance2D(e) > 300 && me.Distance2D(e) < e.Spellbook.SpellQ.GetCastRange() + 350)
+                            || (e.HeroId == HeroId.npc_dota_hero_vengefulspirit && IsCasted(e.Spellbook.SpellQ) && angle <= 0.1 && me.Distance2D(e) > 300 && me.Distance2D(e) < e.Spellbook.SpellQ.GetCastRange() + 350)
+                            || (e.HeroId == HeroId.npc_dota_hero_alchemist && e.FindSpell("alchemist_unstable_concoction_throw").IsInAbilityPhase && angle <= 0.3 && me.Distance2D(e) < e.FindSpell("alchemist_unstable_concoction_throw").GetCastRange() + 500)
 
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Viper && IsCasted(e.Spellbook.SpellR) && angle <= 0.1 && me.Distance2D(e) < e.Spellbook.SpellR.GetCastRange() + 350)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_PhantomLancer && IsCasted(e.Spellbook.SpellQ) && angle <= 0.1 && me.Distance2D(e) > 300 && me.Distance2D(e) < e.Spellbook.SpellQ.GetCastRange() + 350)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Morphling && IsCasted(e.Spellbook.SpellW) && angle <= 0.1 && me.Distance2D(e) < e.Spellbook.SpellW.GetCastRange() + 350)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Tidehunter && IsCasted(e.Spellbook.SpellQ) && angle <= 0.1 && me.Distance2D(e) > 300 && me.Distance2D(e) < e.Spellbook.SpellQ.GetCastRange() + 150)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Visage && IsCasted(e.Spellbook.SpellW) && angle <= 0.1 && me.Distance2D(e) > 300 && me.Distance2D(e) < e.Spellbook.SpellW.GetCastRange() + 250)
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Lich && IsCasted(e.Spellbook.SpellR) && angle <= 0.5 && me.Distance2D(e) < e.Spellbook.SpellR.GetCastRange() + 350)
+                            || (e.HeroId == HeroId.npc_dota_hero_viper && IsCasted(e.Spellbook.SpellR) && angle <= 0.1 && me.Distance2D(e) < e.Spellbook.SpellR.GetCastRange() + 350)
+                            || (e.HeroId == HeroId.npc_dota_hero_phantom_assassin && IsCasted(e.Spellbook.SpellQ) && angle <= 0.1 && me.Distance2D(e) > 300 && me.Distance2D(e) < e.Spellbook.SpellQ.GetCastRange() + 350)
+                            || (e.HeroId == HeroId.npc_dota_hero_morphling && IsCasted(e.Spellbook.SpellW) && angle <= 0.1 && me.Distance2D(e) < e.Spellbook.SpellW.GetCastRange() + 350)
+                            || (e.HeroId == HeroId.npc_dota_hero_tidehunter && IsCasted(e.Spellbook.SpellQ) && angle <= 0.1 && me.Distance2D(e) > 300 && me.Distance2D(e) < e.Spellbook.SpellQ.GetCastRange() + 150)
+                            || (e.HeroId == HeroId.npc_dota_hero_visage && IsCasted(e.Spellbook.SpellW) && angle <= 0.1 && me.Distance2D(e) > 300 && me.Distance2D(e) < e.Spellbook.SpellW.GetCastRange() + 250)
+                            || (e.HeroId == HeroId.npc_dota_hero_lich && IsCasted(e.Spellbook.SpellR) && angle <= 0.5 && me.Distance2D(e) < e.Spellbook.SpellR.GetCastRange() + 350)
 
 
                             //free silence
@@ -1928,8 +1928,8 @@ namespace TinkerFastComboPlus
 						else if (cyclone != null 
 								&& cyclone.CanBeCasted() 
 								&& me.Distance2D(e) <= 575 + 50 + castrange 
-								&& (e.ClassId == ClassId.CDOTA_Unit_Hero_Riki && me.Modifiers.Any(y => y.Name == "modifier_riki_smoke_screen")
-									|| e.ClassId == ClassId.CDOTA_Unit_Hero_SpiritBreaker && e.Modifiers.Any(y => y.Name == "modifier_spirit_breaker_charge_of_darkness")
+								&& (e.HeroId == HeroId.CDOTA_Unit_Hero_Riki && me.Modifiers.Any(y => y.Name == "modifier_riki_smoke_screen")
+									|| e.HeroId == HeroId.CDOTA_Unit_Hero_SpiritBreaker && e.Modifiers.Any(y => y.Name == "modifier_spirit_breaker_charge_of_darkness")
 									)
 								)
 						{
@@ -1942,8 +1942,8 @@ namespace TinkerFastComboPlus
 						else if ((cyclone ==null || !cyclone.CanBeCasted() || me.Distance2D(e) > 575 + 50 + castrange) 
 								&& sheep != null && sheep.CanBeCasted()
 								&& me.Distance2D(e) <= 800 + 50 + castrange
-								&& (e.ClassId == ClassId.CDOTA_Unit_Hero_Riki && me.Modifiers.Any(y => y.Name == "modifier_riki_smoke_screen")
-									|| e.ClassId == ClassId.CDOTA_Unit_Hero_SpiritBreaker && e.Modifiers.Any(y => y.Name == "modifier_spirit_breaker_charge_of_darkness")
+								&& (e.HeroId == HeroId.CDOTA_Unit_Hero_Riki && me.Modifiers.Any(y => y.Name == "modifier_riki_smoke_screen")
+									|| e.HeroId == HeroId.CDOTA_Unit_Hero_SpiritBreaker && e.Modifiers.Any(y => y.Name == "modifier_spirit_breaker_charge_of_darkness")
 									)
 								)
 						{
@@ -1970,13 +1970,13 @@ namespace TinkerFastComboPlus
                         && !me.IsChanneling()
                         && angle <= 0.03
                         && ((e.IsMelee && me.Position.Distance2D(e) < 250)
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_TemplarAssassin && me.Distance2D(e) <= e.GetAttackRange() + 50
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_TrollWarlord && me.Distance2D(e) <= e.GetAttackRange() + 50
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Clinkz && me.Distance2D(e) <= e.GetAttackRange() + 50
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Weaver && me.Distance2D(e) <= e.GetAttackRange() + 50
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Huskar && me.Distance2D(e) <= e.GetAttackRange() + 50
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Nevermore && me.Distance2D(e) <= e.GetAttackRange() + 50
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Windrunner && me.Distance2D(e) <= e.GetAttackRange() + 50 && IsCasted(e.Spellbook.SpellR)// && e.Modifiers.Any(y => y.Name == "modifier_windrunner_focusfire"))
+                            || e.HeroId == HeroId.npc_dota_hero_templar_assassin && me.Distance2D(e) <= e.GetAttackRange() + 50
+                            || e.HeroId == HeroId.npc_dota_hero_troll_warlord && me.Distance2D(e) <= e.GetAttackRange() + 50
+                            || e.HeroId == HeroId.npc_dota_hero_clinkz && me.Distance2D(e) <= e.GetAttackRange() + 50
+                            || e.HeroId == HeroId.npc_dota_hero_weaver && me.Distance2D(e) <= e.GetAttackRange() + 50
+                            || e.HeroId == HeroId.npc_dota_hero_huskar && me.Distance2D(e) <= e.GetAttackRange() + 50
+                            || e.HeroId == HeroId.npc_dota_hero_nevermore && me.Distance2D(e) <= e.GetAttackRange() + 50
+                            || e.HeroId == HeroId.npc_dota_hero_windrunner && me.Distance2D(e) <= e.GetAttackRange() + 50 && IsCasted(e.Spellbook.SpellR)// && e.Modifiers.Any(y => y.Name == "modifier_windrunner_focusfire"))
                             )
                         && e.IsAttacking()
                         && Utils.SleepCheck("Ghost"))
@@ -1988,7 +1988,7 @@ namespace TinkerFastComboPlus
                     else if (Laser != null
                             && Laser.CanBeCasted()
                             && !me.IsAttackImmune()
-                            && e.ClassId == ClassId.CDOTA_Unit_Hero_Windrunner && IsCasted(e.Spellbook.SpellR)//&& e.Modifiers.Any(y => y.Name == "modifier_windrunner_focusfire")
+                            && e.HeroId == HeroId.CDOTA_Unit_Hero_Windrunner && IsCasted(e.Spellbook.SpellR)//&& e.Modifiers.Any(y => y.Name == "modifier_windrunner_focusfire")
                             //&& e.IsAttacking() 
                            && angle <= 0.03
                             && Utils.SleepCheck("Ghost")
@@ -2010,20 +2010,20 @@ namespace TinkerFastComboPlus
                         && !me.IsChanneling()
                         && angle <= 0.03
                         && ((e.IsMelee && me.Position.Distance2D(e) < 250)
-                            && e.ClassId != ClassId.CDOTA_Unit_Hero_Tiny
-                            && e.ClassId != ClassId.CDOTA_Unit_Hero_Shredder
-                            && e.ClassId != ClassId.CDOTA_Unit_Hero_Nyx_Assassin
-                            && e.ClassId != ClassId.CDOTA_Unit_Hero_Meepo
-                            && e.ClassId != ClassId.CDOTA_Unit_Hero_Earthshaker
-                            && e.ClassId != ClassId.CDOTA_Unit_Hero_Centaur
+                            && e.HeroId != HeroId.npc_dota_hero_tiny
+                            && e.HeroId != HeroId.npc_dota_hero_shredder
+                            && e.HeroId != HeroId.npc_dota_hero_nyx_assassin
+                            && e.HeroId != HeroId.npc_dota_hero_meepo
+                            && e.HeroId != HeroId.npc_dota_hero_earthshaker
+                            && e.HeroId != HeroId.npc_dota_hero_centaur
 
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_TemplarAssassin && me.Distance2D(e) <= e.GetAttackRange() + 50
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_TrollWarlord && me.Distance2D(e) <= e.GetAttackRange() + 50
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Clinkz && me.Distance2D(e) <= e.GetAttackRange() + 50
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Weaver && me.Distance2D(e) <= e.GetAttackRange() + 50
-                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Huskar && me.Distance2D(e) <= e.GetAttackRange() + 50
+                            || e.HeroId == HeroId.npc_dota_hero_templar_assassin && me.Distance2D(e) <= e.GetAttackRange() + 50
+                            || e.HeroId == HeroId.npc_dota_hero_troll_warlord && me.Distance2D(e) <= e.GetAttackRange() + 50
+                            || e.HeroId == HeroId.npc_dota_hero_clinkz && me.Distance2D(e) <= e.GetAttackRange() + 50
+                            || e.HeroId == HeroId.npc_dota_hero_weaver && me.Distance2D(e) <= e.GetAttackRange() + 50
+                            || e.HeroId == HeroId.npc_dota_hero_huskar && me.Distance2D(e) <= e.GetAttackRange() + 50
                             //|| e.Modifiers.Any(y => y.Name == "modifier_juggernaut_omnislash")
-                            || (e.ClassId == ClassId.CDOTA_Unit_Hero_Windrunner && IsCasted(e.Spellbook.SpellR))// && e.Modifiers.Any(y => y.Name == "modifier_windrunner_focusfire"))
+                            || (e.HeroId == HeroId.npc_dota_hero_windrunner && IsCasted(e.Spellbook.SpellR))// && e.Modifiers.Any(y => y.Name == "modifier_windrunner_focusfire"))
 
                             )
                         && e.IsAttacking()
@@ -2036,7 +2036,7 @@ namespace TinkerFastComboPlus
                     else if (ghost != null
                             && ghost.CanBeCasted()
                             && !me.IsAttackImmune()
-                            && e.ClassId == ClassId.CDOTA_Unit_Hero_Windrunner && IsCasted(e.Spellbook.SpellR)//&& e.Modifiers.Any(y => y.Name == "modifier_windrunner_focusfire")
+                            && e.HeroId == HeroId.CDOTA_Unit_Hero_Windrunner && IsCasted(e.Spellbook.SpellR)//&& e.Modifiers.Any(y => y.Name == "modifier_windrunner_focusfire")
                             //&& e.IsAttacking() 
                            && angle <= 0.03
                             && Utils.SleepCheck("Ghost")
@@ -2064,16 +2064,16 @@ namespace TinkerFastComboPlus
                                         && !e.Modifiers.Any(y => y.Name == "modifier_skywrath_mystic_flare_aura_effect")
 
                                         && angle <= 0.03
-                                        && (e.ClassId == ClassId.CDOTA_Unit_Hero_Ursa
-                                            || e.ClassId == ClassId.CDOTA_Unit_Hero_PhantomAssassin
-                                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Riki
+                                        && (e.HeroId == HeroId.npc_dota_hero_ursa
+                                            || e.HeroId == HeroId.npc_dota_hero_phantom_assassin
+                                            || e.HeroId == HeroId.npc_dota_hero_riki
 
-                                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Sven
-                                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Spectre
-                                            || e.ClassId == ClassId.CDOTA_Unit_Hero_AntiMage
+                                            || e.HeroId == HeroId.npc_dota_hero_sven
+                                            || e.HeroId == HeroId.npc_dota_hero_spectre
+                                            || e.HeroId == HeroId.npc_dota_hero_antimage
 
-                                            || e.ClassId == ClassId.CDOTA_Unit_Hero_TemplarAssassin
-                                            || e.ClassId == ClassId.CDOTA_Unit_Hero_Morphling
+                                            || e.HeroId == HeroId.npc_dota_hero_templar_assassin
+                                            || e.HeroId == HeroId.npc_dota_hero_morphling
 
                                             )
 
@@ -2096,14 +2096,14 @@ namespace TinkerFastComboPlus
                                     && e.Modifiers.Any(y => y.Name == "modifier_skywrath_mystic_flare_aura_effect") ////!!!!!!!!
 
                                     && angle <= 0.03
-                                    && (e.ClassId == ClassId.CDOTA_Unit_Hero_Ursa
-                                        || e.ClassId == ClassId.CDOTA_Unit_Hero_PhantomAssassin
-                                        || e.ClassId == ClassId.CDOTA_Unit_Hero_Riki
-                                        || e.ClassId == ClassId.CDOTA_Unit_Hero_Spectre
-                                        || e.ClassId == ClassId.CDOTA_Unit_Hero_AntiMage
+                                    && (e.HeroId == HeroId.npc_dota_hero_ursa
+                                        || e.HeroId == HeroId.npc_dota_hero_phantom_assassin
+                                        || e.HeroId == HeroId.npc_dota_hero_riki
+                                        || e.HeroId == HeroId.npc_dota_hero_spectre
+                                        || e.HeroId == HeroId.npc_dota_hero_antimage
 
-                                        || e.ClassId == ClassId.CDOTA_Unit_Hero_TemplarAssassin
-                                        || e.ClassId == ClassId.CDOTA_Unit_Hero_Morphling
+                                        || e.HeroId == HeroId.npc_dota_hero_templar_assassin
+                                        || e.HeroId == HeroId.npc_dota_hero_morphling
                                         )
 
                                     && e.IsAttacking()
@@ -2126,10 +2126,10 @@ namespace TinkerFastComboPlus
 
                                     && (
                                         //break special (1 hex, 2 cyclone)
-                                        e.ClassId == ClassId.CDOTA_Unit_Hero_Riki && me.Modifiers.Any(y => y.Name == "modifier_riki_smoke_screen")
-                                        || e.ClassId == ClassId.CDOTA_Unit_Hero_SpiritBreaker && e.Modifiers.Any(y => y.Name == "modifier_spirit_breaker_charge_of_darkness")
-                                        || e.ClassId == ClassId.CDOTA_Unit_Hero_Phoenix && e.Modifiers.Any(y => y.Name == "modifier_phoenix_icarus_dive")
-                                        || e.ClassId == ClassId.CDOTA_Unit_Hero_Magnataur && e.Modifiers.Any(y => y.Name == "modifier_magnataur_skewer_movement")
+                                        e.HeroId == HeroId.npc_dota_hero_riki && me.Modifiers.Any(y => y.Name == "modifier_riki_smoke_screen")
+                                        || e.HeroId == HeroId.npc_dota_hero_spirit_breaker && e.Modifiers.Any(y => y.Name == "modifier_spirit_breaker_charge_of_darkness")
+                                        || e.HeroId == HeroId.npc_dota_hero_phoenix && e.Modifiers.Any(y => y.Name == "modifier_phoenix_icarus_dive")
+                                        || e.HeroId == HeroId.npc_dota_hero_magnataur && e.Modifiers.Any(y => y.Name == "modifier_magnataur_skewer_movement")
 
                                         )
                                     && Utils.SleepCheck("Ghost"))
@@ -2145,7 +2145,7 @@ namespace TinkerFastComboPlus
                             && cyclone.CanBeCasted()
                             && !me.IsAttackImmune()
                             && !e.Modifiers.Any(y => y.Name == "modifier_skywrath_mystic_flare_aura_effect")
-                            && e.ClassId == ClassId.CDOTA_Unit_Hero_Windrunner && IsCasted(e.Spellbook.SpellR)//&& e.Modifiers.Any(y => y.Name == "modifier_windrunner_focusfire")
+                            && e.HeroId == HeroId.npc_dota_hero_windrunner && IsCasted(e.Spellbook.SpellR)//&& e.Modifiers.Any(y => y.Name == "modifier_windrunner_focusfire")
                                                                                                               //&& e.IsAttacking() 
                            && angle <= 0.03
                             && Utils.SleepCheck("Ghost")
@@ -2306,7 +2306,7 @@ namespace TinkerFastComboPlus
 			//Utils.Sleep(150, "VisibilitySleep");
 				
             me = ObjectManager.LocalHero;
-            if (me == null || me.ClassId != ClassId.CDOTA_Unit_Hero_Tinker)
+            if (me == null || me.HeroId != HeroId.npc_dota_hero_tinker)
                 return;
 
             castrange = 0;
@@ -2427,8 +2427,8 @@ namespace TinkerFastComboPlus
 					||(x is Creep && x.Team == me.Team)
 					|| (x is Building && x.Team == me.Team)
 					|| (!(x is Hero) && !(x is Building) && !(x is Creep) 
-						&& x.ClassId != ClassId.CDOTA_NPC_TechiesMines && x.ClassId != ClassId.CDOTA_NPC_Observer_Ward
-						&& x.ClassId != ClassId.CDOTA_NPC_Observer_Ward_TrueSight && x.Team == me.Team)
+						&& x.NetworkName != "CDOTA_NPC_TechiesMines" && x.NetworkName != "CDOTA_NPC_Observer_Ward"
+						&& x.NetworkName != "CDOTA_NPC_Observer_Ward_TrueSight" && x.Team == me.Team)
 					).ToList();
 					
 					foreach (var unit in units)
@@ -2491,7 +2491,7 @@ namespace TinkerFastComboPlus
             if (unit == null) return;
             ParticleEffect effect;
             me = ObjectManager.LocalHero;
-            if (me == null || me.ClassId != ClassId.CDOTA_Unit_Hero_Tinker)
+            if (me == null || me.HeroId != HeroId.npc_dota_hero_tinker)
                 return;
 			
             if (unit.Modifiers.Any(y => y.Name == "modifier_boots_of_travel_incoming") && me.HasModifier("modifier_teleporting"))
@@ -2516,7 +2516,7 @@ namespace TinkerFastComboPlus
 						
             if (unit == null) return;
             me = ObjectManager.LocalHero;
-            if (me == null || me.ClassId != ClassId.CDOTA_Unit_Hero_Tinker)
+            if (me == null || me.HeroId != HeroId.npc_dota_hero_tinker)
                 return;
 			
 			
@@ -2646,7 +2646,7 @@ namespace TinkerFastComboPlus
 									|| x.Name == "modifier_ghost_state" 
 									|| x.Name == "modifier_item_ethereal_blade_ethereal"
 									)
-                || (v.ClassId == ClassId.CDOTA_Unit_Hero_Tiny && v.Spellbook.SpellE.Level > 0)
+                || (v.HeroId == HeroId.npc_dota_hero_tiny && v.Spellbook.SpellE.Level > 0)
 				|| v.IsInvul()
 				)
                 return true;
@@ -2893,7 +2893,7 @@ namespace TinkerFastComboPlus
             me = ObjectManager.LocalHero;
             if (me == null)
                 return;
-            if (me.ClassId != ClassId.CDOTA_Unit_Hero_Tinker)
+            if (me.HeroId != HeroId.npc_dota_hero_tinker)
                 return;
 
             //GetRocketDamage();
