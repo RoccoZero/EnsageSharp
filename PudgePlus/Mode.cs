@@ -109,15 +109,13 @@ namespace PudgePlus
                 if (blink != null
                     && Menu.ItemToggler.Value.IsEnabled(blink.ToString())
                     && !HookModifierDetected
-                    && Owner.Distance2D(target) > 500
-                    && blink.CanBeCasted)
+                    && blink.CanBeCasted
+                    && Owner.Distance2D(target, true) <= blink.CastRange
+                    && Owner.Distance2D(target) > 500)
                 {
-                    if (Owner.Distance2D(target) < blink.CastRange)
-                    {
-                        blink.UseAbility(target.Position);
-                        await Task.Delay(blink.GetCastDelay(target.Position), token);
-                        return;
-                    }
+                    blink.UseAbility(target.Position);
+                    await Task.Delay(blink.GetCastDelay(target.Position), token);
+                    return;
                 }
 
                 if (Extensions.Cancel(target))
