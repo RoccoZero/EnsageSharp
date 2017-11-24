@@ -87,7 +87,7 @@ namespace PudgePlus
         
         public MenuManager(Config config)
         {
-            Factory = MenuFactory.CreateWithTexture("SkywrathMagePlus", HeroId.npc_dota_hero_pudge.ToString());
+            Factory = MenuFactory.CreateWithTexture("PudgePlus", HeroId.npc_dota_hero_pudge.ToString());
             Factory.Target.SetFontColor(Color.Aqua);
 
             var comboMenu = Factory.Menu("Combo");
