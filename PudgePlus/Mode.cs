@@ -6,7 +6,6 @@ using System.Windows.Input;
 
 using Ensage;
 using Ensage.Common.Objects.UtilityObjects;
-using Ensage.Common.Threading;
 using Ensage.SDK.Extensions;
 using Ensage.SDK.Geometry;
 using Ensage.SDK.Handlers;
