@@ -304,7 +304,6 @@ namespace SkywrathMagePlus
             {
                 if (Menu.OrbwalkerItem.Value.SelectedValue.Contains("Default"))
                 {
-                    Orbwalker.OrbwalkingPoint = Vector3.Zero;
                     Orbwalker.OrbwalkTo(target);
                 }
                 else if (Menu.OrbwalkerItem.Value.SelectedValue.Contains("Distance"))
@@ -313,14 +312,14 @@ namespace SkywrathMagePlus
                     var ownerPos = Owner.Position.Extend(Game.MousePosition, ownerDis);
                     var pos = target.Position.Extend(ownerPos, Menu.MinDisInOrbwalkItem);
 
-                    Orbwalker.OrbwalkTo(target);
                     Orbwalker.OrbwalkingPoint = pos;
+                    Orbwalker.OrbwalkTo(target);
+                    Orbwalker.OrbwalkingPoint = Vector3.Zero;
                 }
                 else if (Menu.OrbwalkerItem.Value.SelectedValue.Contains("Free"))
                 {
                     if (Owner.Distance2D(target) < Owner.AttackRange(target) && target.Distance2D(Game.MousePosition) < Owner.AttackRange(target))
                     {
-                        Orbwalker.OrbwalkingPoint = Vector3.Zero;
                         Orbwalker.OrbwalkTo(target);
                     }
                     else
