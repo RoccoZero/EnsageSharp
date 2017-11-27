@@ -190,7 +190,7 @@ namespace LegionCommanderPlus.Features
                         && abyssalBlade.ToString() == order.Key
                         && abyssalBlade.CanBeCasted)
                     {
-                        if (abyssalBlade.CanHit(target))
+                        if (Owner.Distance2D(target) < abyssalBlade.CastRange + 60)
                         {
                             abyssalBlade.UseAbility(target);
                             await Task.Delay(abyssalBlade.GetCastDelay(target), token);

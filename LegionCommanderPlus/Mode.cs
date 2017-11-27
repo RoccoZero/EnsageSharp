@@ -71,6 +71,21 @@ namespace LegionCommanderPlus
                                 var stunDebuff = modifiers.FirstOrDefault(x => x.IsStunDebuff);
                                 var hexDebuff = modifiers.FirstOrDefault(x => x.Name == "modifier_sheepstick_debuff");
 
+                                // Abyssal Blade
+                                var abyssalBlade = Main.AbyssalBlade;
+                                if (abyssalBlade != null
+                                    && Menu.ItemToggler.Value.IsEnabled(abyssalBlade.ToString())
+                                    && abyssalBlade.CanBeCasted
+                                    && Owner.Distance2D(target) < abyssalBlade.CastRange + 60
+                                    && !comboBreaker
+                                    && (stunDebuff == null || !stunDebuff.IsValid || stunDebuff.RemainingTime <= 0.3f)
+                                    && (hexDebuff == null || !hexDebuff.IsValid || hexDebuff.RemainingTime <= 0.3f))
+                                {
+                                    abyssalBlade.UseAbility(target);
+                                    await Task.Delay(abyssalBlade.GetCastDelay(target), token);
+                                    return;
+                                }
+
                                 // Hex
                                 var hex = Main.Hex;
                                 if (hex != null
@@ -326,7 +341,7 @@ namespace LegionCommanderPlus
                             var duel = Main.Duel;
                             if (Menu.AbilityToggler.Value.IsEnabled(duel.ToString())
                                 && duel.CanBeCasted
-                                && duel.CanHit(target)
+                                && Owner.Distance2D(target) < duel.CastRange + 50
                                 && !comboBreaker)
                             {
                                 duel.UseAbility(target);
