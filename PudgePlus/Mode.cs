@@ -28,6 +28,8 @@ namespace PudgePlus
 
         private PudgePlus Main { get; }
 
+        private UpdateMode UpdateMode { get; }
+
         private Extensions Extensions { get; }
 
         private MultiSleeper MultiSleeper { get; }
@@ -46,6 +48,7 @@ namespace PudgePlus
             Config = config;
             Menu = config.Menu;
             Main = config.Main;
+            UpdateMode = config.UpdateMode;
             Extensions = config.Extensions;
             MultiSleeper = config.MultiSleeper;
 
@@ -69,7 +72,12 @@ namespace PudgePlus
         {
             try
             {
-                var target = Config.UpdateMode.Target;
+                if (Owner.IsChanneling())
+                {
+                    return;
+                }
+
+                var target = UpdateMode.Target;
                 if (target == null || Menu.BladeMailItem && target.HasModifier("modifier_item_blade_mail_reflect"))
                 {
                     Orbwalker.Move(Game.MousePosition);
@@ -118,33 +126,21 @@ namespace PudgePlus
                     return;
                 }
 
-                if (Extensions.Cancel(target))
+                var dismember = Main.Dismember;
+                var comboBreaker = Extensions.ComboBreaker(target);
+                var isBlockingAbilities = target.IsBlockingAbilities();
+
+                var cancel = Extensions.Cancel(target);
+                var cancelMagicImmune = Extensions.CancelMagicImmune(target);
+                if (cancel || cancelMagicImmune)
                 {
-                    // Rot
-                    var rot = Main.Rot;
-                    if (Menu.AbilityToggler.Value.IsEnabled(rot.ToString())
-                        && rot.CanBeCasted
-                        && rot.CanHit(target)
-                        && !rot.Enabled)
+                    if (!isBlockingAbilities)
                     {
-                        rot.Enabled = true;
-                        await Task.Delay(rot.GetCastDelay(), token);
-                    }
-
-                    if (Owner.IsChanneling())
-                    {
-                        return;
-                    }
-
-                    if (!target.IsBlockingAbilities())
-                    {
-                        var comboBreaker = Extensions.ComboBreaker(target);
                         var modifiers = target.Modifiers.ToList();
                         var stunDebuff = modifiers.FirstOrDefault(x => x.IsStunDebuff);
                         var hexDebuff = modifiers.FirstOrDefault(x => x.Name == "modifier_sheepstick_debuff");
 
                         // Hex
-                        var dismember = Main.Dismember;
                         var dismemberReady = !Menu.AbilityToggler.Value.IsEnabled(dismember.ToString()) || !dismember.CanBeCasted || !dismember.CanHit(target);
                         var hex = Main.Hex;
                         if (hex != null
@@ -265,7 +261,7 @@ namespace PudgePlus
                                 && !comboBreaker)
                             {
                                 dismember.UseAbility(target);
-                                await Task.Delay(dismember.GetCastDelay(target), token);
+                                await Task.Delay(dismember.GetCastDelay(target) + 50, token);
                                 return;
                             }
 
@@ -347,6 +343,37 @@ namespace PudgePlus
                     }
                 }
 
+                if (Menu.DismemberIsMagicImmune && cancel && !cancelMagicImmune && !isBlockingAbilities)
+                {
+                    // Dismember
+                    if (Menu.AbilityToggler.Value.IsEnabled(dismember.ToString())
+                        && dismember.CanBeCasted
+                        && dismember.CanHit(target)
+                        && !comboBreaker)
+                    {
+                        dismember.UseAbility(target);
+                        await Task.Delay(dismember.GetCastDelay(target) + 50, token);
+                        return;
+                    }
+                }
+
+                if (isBlockingAbilities)
+                {
+                    // Hook
+                    if (Menu.AbilityToggler.Value.IsEnabled(hook.ToString())
+                        && hook.CanBeCasted
+                        && hook.CanHit(target))
+                    {
+                        var hookOutput = hook.GetPredictionOutput(hook.GetPredictionInput(target));
+                        if (Extensions.ShouldCastHook(hookOutput))
+                        {
+                            HookCastPosition = hookOutput.UnitPosition;
+                            hook.UseAbility(HookCastPosition);
+                            await Task.Delay(hook.GetCastDelay(HookCastPosition), token);
+                        }
+                    }
+                }
+
                 if (HookModifierDetected)
                 {
                     return;
@@ -363,7 +390,6 @@ namespace PudgePlus
                         var attackRange = Owner.AttackRange(target);
                         if (Owner.Distance2D(target) <= attackRange && !Menu.FullFreeModeItem || target.Distance2D(Game.MousePosition) <= attackRange)
                         {
-                            Orbwalker.OrbwalkingPoint = Vector3.Zero;
                             Orbwalker.OrbwalkTo(target);
                         }
                         else
@@ -373,7 +399,6 @@ namespace PudgePlus
                     }
                     else if (Menu.OrbwalkerItem.Value.SelectedValue.Contains("Default"))
                     {
-                        Orbwalker.OrbwalkingPoint = Vector3.Zero;
                         Orbwalker.OrbwalkTo(target);
                     }
                     else if (Menu.OrbwalkerItem.Value.SelectedValue.Contains("Only Attack"))
@@ -424,7 +449,7 @@ namespace PudgePlus
 
         private void HookHitCheck()
         {
-            var target = Config.UpdateMode.Target;
+            var target = UpdateMode.Target;
             if (target == null || !target.IsVisible)
             {
                 return;

@@ -15,6 +15,8 @@ namespace PudgePlus
 
         public MenuItem<AbilityToggler> AbilityToggler { get; }
 
+        public MenuItem<bool> DismemberIsMagicImmune { get; }
+
         public MenuItem<AbilityToggler> ItemToggler { get; }
 
         public MenuItem<bool> ComboBreakerItem { get; }
@@ -98,6 +100,8 @@ namespace PudgePlus
                 { "pudge_rot", true },
                 { "pudge_meat_hook", true }
             }));
+
+            DismemberIsMagicImmune = abilitiesMenu.Item("Dismember Is Magic Immune", false);
 
             var itemsMenu = comboMenu.Menu("Items");
             ItemToggler = itemsMenu.Item("", "items", new AbilityToggler(new Dictionary<string, bool>
@@ -225,6 +229,7 @@ namespace PudgePlus
 
             DrawHookPredictionItem = drawingMenu.Item("Meat Hook Prediction", true);
 
+            AbilityToggler.PropertyChanged += Changed;
             OrbwalkerItem.PropertyChanged += Changed;
             DrawTargetItem.PropertyChanged += Changed;
             DrawOffTargetItem.PropertyChanged += Changed;
@@ -234,6 +239,16 @@ namespace PudgePlus
 
         private void Changed(object sender, PropertyChangedEventArgs e)
         {
+            // Dismember Is Magic Immune
+            if (AbilityToggler.Value.IsEnabled(AbilityId.pudge_dismember.ToString()))
+            {
+                DismemberIsMagicImmune.Item.ShowItem = true;
+            }
+            else
+            {
+                DismemberIsMagicImmune.Item.ShowItem = false;
+            }
+
             // Orbwalker Free
             if (OrbwalkerItem.Value.SelectedValue.Contains("Free"))
             {
@@ -314,6 +329,7 @@ namespace PudgePlus
             DrawOffTargetItem.PropertyChanged -= Changed;
             DrawTargetItem.PropertyChanged -= Changed;
             OrbwalkerItem.PropertyChanged -= Changed;
+            AbilityToggler.PropertyChanged -= Changed;
 
             Factory.Dispose();
         }

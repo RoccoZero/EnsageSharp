@@ -39,12 +39,14 @@ namespace PudgePlus
             return true;
         }
 
+        public bool CancelMagicImmune(Hero target)
+        {
+            return !target.IsMagicImmune() && !DuelAghanimsScepter(target);
+        }
+
         public bool Cancel(Hero target)
         {
-            return !target.IsMagicImmune() 
-                && !target.IsInvulnerable()
-                && !DuelAghanimsScepter(target)
-                && !target.HasAnyModifiers(CancelModifiers);
+            return !target.IsInvulnerable() && !target.HasAnyModifiers(CancelModifiers);
         }
 
         private string[] CancelModifiers { get; } =

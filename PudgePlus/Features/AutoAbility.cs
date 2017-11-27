@@ -16,6 +16,10 @@ namespace PudgePlus.Features
 
         private PudgePlus Main { get; }
 
+        private UpdateMode UpdateMode { get; }
+
+        private Extensions Extensions { get; }
+
         private Unit Owner { get; }
 
         private TaskHandler Handler { get; }
@@ -26,6 +30,8 @@ namespace PudgePlus.Features
         {
             Menu = config.Menu;
             Main = config.Main;
+            UpdateMode = config.UpdateMode;
+            Extensions = config.Extensions;
             Owner = config.Main.Context.Owner;
 
             Player.OnExecuteOrder += OnExecuteOrder;
@@ -53,16 +59,28 @@ namespace PudgePlus.Features
                     return;
                 }
 
-                // Rot
-                if (Menu.AbilityToggler.Value.IsEnabled(rot.ToString())
-                    && rot.Enabled
-                    && !HasUserEnabledRot)
+                if (Menu.AbilityToggler.Value.IsEnabled(rot.ToString()))
                 {
-                    var enemyNear = EntityManager<Hero>.Entities.Any(x => x.IsVisible && x.IsAlive && Owner.IsEnemy(x) && rot.CanHit(x));
-                    if (!enemyNear)
+                    var target = UpdateMode.Target;
+                    if (target != null && Menu.ComboKeyItem && Extensions.CancelMagicImmune(target))
                     {
-                        rot.Enabled = false;
-                        await Task.Delay(rot.GetCastDelay(), token);
+                        // Rot Enabled
+                        if (rot.CanHit(target) && !rot.Enabled)
+                        {
+                            rot.Enabled = true;
+                            await Task.Delay(rot.GetCastDelay(), token);
+                        }
+                    }
+
+                    // Rot Disable
+                    if (rot.Enabled && !HasUserEnabledRot)
+                    {
+                        var enemyNear = EntityManager<Hero>.Entities.Any(x => x.IsVisible && x.IsAlive && Owner.IsEnemy(x) && rot.CanHit(x));
+                        if (!enemyNear)
+                        {
+                            rot.Enabled = false;
+                            await Task.Delay(rot.GetCastDelay(), token);
+                        }
                     }
                 }
 
