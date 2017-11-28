@@ -51,18 +51,20 @@ namespace SkywrathMagePlus.Features
                 if (Menu.EulBladeMailItem)
                 {
                     var target = 
-                        EntityManager<Hero>.Entities.FirstOrDefault(x =>
-                                                                    x.IsValid &&
-                                                                    x.IsVisible &&
-                                                                    x.IsAlive &&
-                                                                    !x.IsIllusion &&
-                                                                    x.IsEnemy(Owner) &&
-                                                                    x.HasAnyModifiers("modifier_item_blade_mail_reflect", "modifier_skywrath_mystic_flare_aura_effect"));
+                        EntityManager<Hero>.Entities.Any(x =>
+                                                         x.IsValid &&
+                                                         x.IsVisible &&
+                                                         x.IsAlive &&
+                                                         !x.IsIllusion &&
+                                                         x.IsEnemy(Owner) &&
+                                                         x.HasModifier("modifier_skywrath_mystic_flare_aura_effect") &&
+                                                         x.HasModifier("modifier_item_blade_mail_reflect"));
 
-                    if (target != null && Main.Eul != null && Main.Eul.CanBeCasted)
+                    var eul = Main.Eul;
+                    if (target && eul != null && eul.CanBeCasted)
                     {
-                        Main.Eul.UseAbility(Owner);
-                        await Await.Delay(Main.Eul.GetCastDelay(), token);
+                        eul.UseAbility(Owner);
+                        await Await.Delay(eul.GetCastDelay(), token);
                     }
                 }
 
