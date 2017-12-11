@@ -51,14 +51,14 @@ namespace JungleScanPlus
                 ExtraSize = 25;
             }
             
-            Entity.OnParticleEffectAdded += OnParticleEvent;
-            RendererManager.Value.Draw += OnDraw;
+            //Entity.OnParticleEffectAdded += OnParticleEvent;
+            //RendererManager.Value.Draw += OnDraw;
         }
 
         protected override void OnDeactivate()
         {
-            RendererManager.Value.Draw -= OnDraw;
-            Entity.OnParticleEffectAdded -= OnParticleEvent;
+            //RendererManager.Value.Draw -= OnDraw;
+            //Entity.OnParticleEffectAdded -= OnParticleEvent;
             
             Config?.Dispose();
         }
