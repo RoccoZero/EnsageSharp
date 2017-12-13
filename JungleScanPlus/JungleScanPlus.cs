@@ -17,7 +17,7 @@ using Color = System.Drawing.Color;
 
 namespace JungleScanPlus
 {
-    [ExportPlugin("JungleScanPlus", StartupMode.Auto, "YEEEEEEE", "2.0.1.0")]
+    [ExportPlugin("JungleScanPlus", StartupMode.Auto, "YEEEEEEE", "2.0.1.1")]
     public class JungleScanPlus : Plugin
     {
         private Config Config { get; set; }
@@ -112,12 +112,16 @@ namespace JungleScanPlus
 
                 if (Config.DrawWorldItem)
                 {
-                    RendererManager.Value.DrawText(
-                        Drawing.WorldToScreen(pos),
+                    var screenPos = Drawing.WorldToScreen(pos);
+                    if (!screenPos.IsZero)
+                    {
+                        RendererManager.Value.DrawText(
+                        screenPos,
                         "Enemy",
                         color,
                         35,
                         "Arial Black");
+                    }
                 }
             }
         }
