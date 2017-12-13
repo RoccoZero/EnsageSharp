@@ -19,7 +19,6 @@ namespace JungleScanPlus
 
         public MenuItem<Slider> BlueItem { get; }
 
-
         public MenuItem<Slider> TimerItem { get; }
 
         private bool Disposed { get; set; }
