@@ -17,7 +17,7 @@ using Color = System.Drawing.Color;
 
 namespace JungleScanPlus
 {
-    [ExportPlugin("JungleScanPlus", StartupMode.Auto, "YEEEEEEE", "2.0.0.1")]
+    [ExportPlugin("JungleScanPlus", StartupMode.Auto, "YEEEEEEE", "2.0.1.0")]
     public class JungleScanPlus : Plugin
     {
         private Config Config { get; set; }
@@ -70,7 +70,7 @@ namespace JungleScanPlus
                 return;
             }
 
-            if (!sender.Name.Contains("npc_dota_neutral_") || args.Name.Contains("generic_creep_sleep"))
+            if (!args.Name.Contains("generic_hit_blood") || !sender.Name.Contains("npc_dota_neutral_") && !sender.Name.Contains("npc_dota_roshan"))
             {
                 return;
             }
@@ -78,12 +78,10 @@ namespace JungleScanPlus
             UpdateManager.BeginInvoke(
                     () =>
                     {
-                        var rawGameTime = Game.RawGameTime;
-
                         Pos.RemoveAll(x => x.GetPos.Distance(args.ParticleEffect.GetControlPoint(0)) < 500);
-
                         Pos.Add(new Position(args.ParticleEffect.GetControlPoint(0)));
 
+                        var rawGameTime = Game.RawGameTime;
                         UpdateManager.BeginInvoke(
                             () =>
                             {
@@ -96,21 +94,28 @@ namespace JungleScanPlus
 
         private void OnDraw(object sender, EventArgs e)
         {
-            foreach (var pos in Pos.ToList())
+            var color = Color.FromArgb(Config.RedItem, Config.GreenItem, Config.BlueItem);
+            foreach (var position in Pos.ToList())
             {
+                var pos = position.GetPos;
+                if (pos.IsZero)
+                {
+                    continue;
+                }
+
                 RendererManager.Value.DrawText(
-                    pos.GetPos.WorldToMinimap() - ExtraPos,
+                    pos.WorldToMinimap() - ExtraPos,
                     "○",
-                    Color.FromArgb(Config.RedItem, Config.GreenItem, Config.BlueItem),
+                    color,
                     ExtraSize,
                     "Arial Black");
 
                 if (Config.DrawWorldItem)
                 {
                     RendererManager.Value.DrawText(
-                        Drawing.WorldToScreen(pos.GetPos),
+                        Drawing.WorldToScreen(pos),
                         "Enemy",
-                        Color.FromArgb(Config.AlphaItem, Config.RedItem, Config.GreenItem, Config.BlueItem),
+                        color,
                         35,
                         "Arial Black");
                 }

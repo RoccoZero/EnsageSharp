@@ -9,8 +9,6 @@ namespace JungleScanPlus
 {
     internal class Config : IDisposable
     {
-        private bool Disposed { get; set; }
-
         private MenuFactory Factory { get; }
 
         public MenuItem<bool> DrawWorldItem { get; }
@@ -21,9 +19,10 @@ namespace JungleScanPlus
 
         public MenuItem<Slider> BlueItem { get; }
 
-        public MenuItem<Slider> AlphaItem { get; }
 
         public MenuItem<Slider> TimerItem { get; }
+
+        private bool Disposed { get; set; }
 
         public Config()
         {
@@ -41,7 +40,6 @@ namespace JungleScanPlus
             BlueItem = Factory.Item("Blue", new Slider(255, 0, 255));
             BlueItem.Item.SetFontColor(Color.Blue);
 
-            AlphaItem = Factory.Item("Alpha", new Slider(255, 0, 255));
             TimerItem = Factory.Item("Timer", new Slider(6, 1, 9));
         }
 
