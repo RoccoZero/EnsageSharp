@@ -47,7 +47,6 @@ namespace LegionCommanderPlus
                 var target = data.GetTarget;
                 var health = data.GetHealth;
                 var damage = data.GetDamage;
-                var readyDamage = data.GetReadyDamage;
 
                 if (Menu.HPBarCalculationItem)
                 {
@@ -57,18 +56,6 @@ namespace LegionCommanderPlus
                         var hpBarSizeX = HUDInfo.GetHPBarSizeX(target);
                         var hpBarSizeY = HUDInfo.GetHpBarSizeY(target) / 1.7f;
                         var hpBarPos = hpBarPosition + new Vector2(0, hpBarSizeY * (Menu.HPBarCalculationPosItem / 70f));
-
-                        var readyDamageBar = Math.Max(readyDamage, 0) / target.MaximumHealth;
-                        if (readyDamageBar > 0)
-                        {
-                            var readyDamagePos = Math.Max(health - readyDamage, 0) / target.MaximumHealth;
-                            var readyDamagePosition = new Vector2(hpBarPos.X + ((hpBarSizeX + readyDamageBar) * readyDamagePos), hpBarPos.Y);
-                            var readyDamageSize = new Vector2(hpBarSizeX * (readyDamageBar + Math.Min(health - readyDamage, 0) / target.MaximumHealth), hpBarSizeY);
-                            var readyDamageColor = ((float)health / target.MaximumHealth) - readyDamageBar > 0 ? new Color(100, 0, 0, 200) : new Color(191, 255, 0, 200);
-
-                            Drawing.DrawRect(readyDamagePosition, readyDamageSize, readyDamageColor);
-                            Drawing.DrawRect(readyDamagePosition, readyDamageSize, Color.Black, true);
-                        }
 
                         var damageBar = Math.Max(damage, 0) / target.MaximumHealth;
                         if (damageBar > 0)
@@ -107,20 +94,13 @@ namespace LegionCommanderPlus
                         continue;
                     }
 
-                    var totalDamage = data.GetTotalDamage;
-
                     var maxHealth = target.MaximumHealth + (health - target.MaximumHealth);
                     var damagePercent = Math.Ceiling(100 - (health - Math.Max(damage, 0)) / maxHealth * 100);
-                    var readyDamagePercent = Math.Ceiling(100 - (health - Math.Max(readyDamage, 0)) / maxHealth * 100);
-                    var totalDamagePercent = Math.Ceiling(100 - (health - Math.Max(totalDamage, 0)) / maxHealth * 100);
 
                     if (damagePercent >= 100)
                     {
                         Texture(posTexture - 10, new Vector2(85), $"other/round_percentage/alert/{ Alert() }");
                     }
-
-                    Texture(posTexture, new Vector2(65), $"other/round_percentage/no_percent_gray/{ Math.Min(totalDamagePercent, 100) }");
-                    Texture(posTexture, new Vector2(65), $"other/round_percentage/no_percent_yellow/{ Math.Min(readyDamagePercent, 100) }");
 
                     var color = damagePercent >= 100 ? "green" : "red";
                     Texture(posTexture, new Vector2(65), $"other/round_percentage/{ color }/{ Math.Min(damagePercent, 100) }");

@@ -45,8 +45,6 @@ namespace LegionCommanderPlus.Features
                 List<BaseAbility> abilities = new List<BaseAbility>();
 
                 var damageOdds = 0.0f;
-                var readyDamageOdds = 0.0f;
-                var totalDamageOdds = 0.0f;
 
                 if (target.IsVisible)
                 {
@@ -79,7 +77,7 @@ namespace LegionCommanderPlus.Features
                     }
 
                     // Overwhelming Odds
-                   /* var overwhelmingOdds = Main.OverwhelmingOdds;
+                    var overwhelmingOdds = Main.OverwhelmingOdds;
                     if (overwhelmingOdds.Ability.Level > 0 && Menu.AutoKillStealToggler.Value.IsEnabled(overwhelmingOdds.ToString()))
                     {
                         var input = new PredictionInput
@@ -104,30 +102,22 @@ namespace LegionCommanderPlus.Features
                             {
                                 damageOdds += damageUnits;
                             }
-
-                            readyDamageOdds += damageUnits;
                         }
-
-                        totalDamageOdds += damageUnits;
-                    }*/
+                    }
                 }
 
                 var damageCalculation = new Combo(abilities.ToArray());
                 var damageReduction = -DamageReduction(target, heroes);
                 var damageBlock = MagicalDamageBlock(target, heroes);
 
-                var livingArmor = LivingArmor(target, heroes, damageCalculation.Abilities);
-                var damage = DamageHelpers.GetSpellDamage((damageCalculation.GetDamage(target) + damageOdds) + damageBlock, 0, damageReduction) - livingArmor;
-                var readyDamage = DamageHelpers.GetSpellDamage((damageCalculation.GetDamage(target, true, false) + readyDamageOdds) + damageBlock, 0, damageReduction) - livingArmor;
-                var totalDamage = DamageHelpers.GetSpellDamage((damageCalculation.GetDamage(target, false, false) + totalDamageOdds) + damageBlock, 0, damageReduction) - livingArmor;
+                var damage = DamageHelpers.GetSpellDamage((damageCalculation.GetDamage(target) + damageOdds) + damageBlock, 0, damageReduction);
 
                 if (target.IsInvulnerable() || target.HasAnyModifiers(BlockModifiers))
                 {
                     damage = 0.0f;
-                    readyDamage = 0.0f;
                 }
 
-                DamageList.Add(new Damage(target, damage, readyDamage, totalDamage, target.Health));
+                DamageList.Add(new Damage(target, damage, target.Health));
             }
         }
 
@@ -141,22 +131,6 @@ namespace LegionCommanderPlus.Features
             "modifier_oracle_fates_edict",
             "modifier_dark_willow_shadow_realm_buff"
         };
-
-        private float LivingArmor(Hero target, List<Hero> heroes, IReadOnlyCollection<BaseAbility> abilities)
-        {
-            if (!target.HasModifier("modifier_treant_living_armor"))
-            {
-                return 0;
-            }
-
-            var treant = heroes.FirstOrDefault(x => x.IsEnemy(Owner) && x.HeroId == HeroId.npc_dota_hero_treant);
-            var ability = treant.GetAbilityById(AbilityId.treant_living_armor);
-            var block = ability.GetAbilitySpecialData("damage_block");
-
-            var count = abilities.Where(x => x.GetDamage(target) > block).Count();
-
-            return count * block;
-        }
 
         private float DamageReduction(Hero target, List<Hero> heroes)
         {
@@ -348,18 +322,12 @@ namespace LegionCommanderPlus.Features
 
             public float GetDamage { get; }
 
-            public float GetReadyDamage { get; }
-
-            public float GetTotalDamage { get; }
-
             public uint GetHealth { get; }
 
-            public Damage(Hero target, float damage, float readyDamage, float totalDamage, uint health)
+            public Damage(Hero target, float damage, uint health)
             {
                 GetTarget = target;
                 GetDamage = damage;
-                GetReadyDamage = readyDamage;
-                GetTotalDamage = totalDamage;
                 GetHealth = health;
             }
         }

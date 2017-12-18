@@ -243,7 +243,7 @@ namespace LegionCommanderPlus
                                 && overwhelmingOdds.CanBeCasted
                                 && !comboBreaker)
                             {
-                                /*var input = new PredictionInput
+                                var input = new PredictionInput
                                 {
                                     Owner = Owner,
                                     AreaOfEffect = overwhelmingOdds.HasAreaOfEffect,
@@ -256,11 +256,11 @@ namespace LegionCommanderPlus
                                     PredictionSkillshotType = overwhelmingOdds.PredictionSkillshotType
                                 };
 
-                                var castPosition = overwhelmingOdds.GetPredictionOutput(input.WithTarget(target)).CastPosition;*/
-                                if (Owner.Distance2D(target) <= overwhelmingOdds.CastRange)
+                                var castPosition = overwhelmingOdds.GetPredictionOutput(input.WithTarget(target)).CastPosition;
+                                if (Owner.Distance2D(castPosition) <= overwhelmingOdds.CastRange)
                                 {
-                                    overwhelmingOdds.UseAbility(target.Position);
-                                    await Task.Delay(overwhelmingOdds.GetCastDelay(target.Position), token);
+                                    overwhelmingOdds.UseAbility(castPosition);
+                                    await Task.Delay(overwhelmingOdds.GetCastDelay(castPosition), token);
                                 }
                             }
                         }
