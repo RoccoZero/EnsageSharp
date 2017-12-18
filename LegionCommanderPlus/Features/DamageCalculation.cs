@@ -79,7 +79,7 @@ namespace LegionCommanderPlus.Features
                     }
 
                     // Overwhelming Odds
-                    var overwhelmingOdds = Main.OverwhelmingOdds;
+                   /* var overwhelmingOdds = Main.OverwhelmingOdds;
                     if (overwhelmingOdds.Ability.Level > 0 && Menu.AutoKillStealToggler.Value.IsEnabled(overwhelmingOdds.ToString()))
                     {
                         var input = new PredictionInput
@@ -109,7 +109,7 @@ namespace LegionCommanderPlus.Features
                         }
 
                         totalDamageOdds += damageUnits;
-                    }
+                    }*/
                 }
 
                 var damageCalculation = new Combo(abilities.ToArray());

@@ -173,7 +173,7 @@ namespace LegionCommanderPlus.Features
                     LinkenBreaker.Handler.RunAsync();
                 }
 
-                if (!MultiSleeper.Sleeping("ethereal") || target.IsEthereal())
+                /*if (!MultiSleeper.Sleeping("ethereal") || target.IsEthereal())
                 {
                     // Overwhelming Odds
                     var overwhelmingOdds = Main.OverwhelmingOdds;
@@ -199,7 +199,7 @@ namespace LegionCommanderPlus.Features
                             await Task.Delay(overwhelmingOdds.GetCastDelay(castPosition), token);
                         }
                     }
-                }
+                }*/
             }
             catch (TaskCanceledException)
             {
