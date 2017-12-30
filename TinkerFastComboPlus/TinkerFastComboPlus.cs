@@ -22,9 +22,9 @@ namespace TinkerFastComboPlus
     internal class TinkerFastComboPlus : Plugin
     {
         [ImportingConstructor]
-        public TinkerFastComboPlus([Import] IEntityContext<Hero> entityContext)
+        public TinkerFastComboPlus([Import] IEntityContext<Unit> entityContext)
         {
-            Owner = entityContext.Owner;
+            Owner = entityContext.Owner as Hero;
         }
 
         private Task RearmBlink { get; set; }
