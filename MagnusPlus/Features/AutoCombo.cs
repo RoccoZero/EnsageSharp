@@ -15,8 +15,6 @@ using Ensage.SDK.Prediction;
 using Ensage.SDK.Prediction.Collision;
 using Ensage.SDK.Service;
 
-using MouseButtons = System.Windows.Forms.MouseButtons;
-
 namespace MagnusPlus.Features
 {
     internal class AutoCombo
