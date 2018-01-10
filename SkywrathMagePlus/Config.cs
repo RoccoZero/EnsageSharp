@@ -21,6 +21,8 @@ namespace SkywrathMagePlus
 
         public MenuManager Menu { get; }
 
+        public Abilities Abilities { get; }
+
         public Extensions Extensions { get; }
 
         public UpdateMode UpdateMode { get; }
@@ -56,6 +58,8 @@ namespace SkywrathMagePlus
             MultiSleeper = new MultiSleeper();
 
             Menu = new MenuManager(this);
+
+            Abilities = new Abilities(this);
             Extensions = new Extensions(this);
 
             UpdateMode = new UpdateMode(this);
@@ -139,6 +143,8 @@ namespace SkywrathMagePlus
                 UpdateMode.Dispose();
 
                 Main.Context.Particle.Dispose();
+
+                Abilities.Dispose();
 
                 Menu.Dispose();
             }

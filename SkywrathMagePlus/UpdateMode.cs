@@ -14,7 +14,7 @@ namespace SkywrathMagePlus
     {
         private MenuManager Menu { get; }
 
-        private SkywrathMagePlus Main { get; }
+        private Abilities Abilities { get; }
 
         private ITargetSelectorManager TargetSelector { get; }
 
@@ -27,7 +27,7 @@ namespace SkywrathMagePlus
         public UpdateMode(Config config)
         {
             Menu = config.Menu;
-            Main = config.Main;
+            Abilities = config.Abilities;
             TargetSelector = config.Main.Context.TargetSelector;
             Particle = config.Main.Context.Particle;
             Owner = config.Main.Context.Owner;
@@ -42,7 +42,7 @@ namespace SkywrathMagePlus
 
         private void OnUpdate()
         {
-            var arcaneBolt = Main.ArcaneBolt;
+            var arcaneBolt = Abilities.ArcaneBolt;
             if (Menu.ArcaneBoltRadiusItem && arcaneBolt.Ability.Level > 0)
             {
                 Particle.DrawRange(
@@ -56,7 +56,7 @@ namespace SkywrathMagePlus
                 Particle.Remove("ArcaneBolt");
             }
 
-            var concussiveShot = Main.ConcussiveShot;
+            var concussiveShot = Abilities.ConcussiveShot;
             if (Menu.ConcussiveShotRadiusItem && concussiveShot.Ability.Level > 0)
             {
                 Particle.DrawRange(
@@ -70,7 +70,7 @@ namespace SkywrathMagePlus
                 Particle.Remove("ConcussiveShot");
             }
 
-            var ancientSeal = Main.AncientSeal;
+            var ancientSeal = Abilities.AncientSeal;
             if (Menu.AncientSealRadiusItem && ancientSeal.Ability.Level > 0)
             {
                 Particle.DrawRange(
@@ -84,7 +84,7 @@ namespace SkywrathMagePlus
                 Particle.Remove("AncientSeal");
             }
 
-            var mysticFlare = Main.MysticFlare;
+            var mysticFlare = Abilities.MysticFlare;
             if (Menu.MysticFlareRadiusItem && mysticFlare.Ability.Level > 0)
             {
                 Particle.DrawRange(
@@ -98,7 +98,7 @@ namespace SkywrathMagePlus
                 Particle.Remove("MysticFlare");
             }
 
-            var blink = Main.Blink;
+            var blink = Abilities.Blink;
             if (Menu.BlinkRadiusItem && blink != null)
             {
                 var color = Color.Red;

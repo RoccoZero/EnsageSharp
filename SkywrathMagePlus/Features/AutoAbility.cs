@@ -17,7 +17,7 @@ namespace SkywrathMagePlus.Features
 
         private MenuManager Menu { get; }
 
-        private SkywrathMagePlus Main { get; }
+        private Abilities Abilities { get; }
 
         private Unit Owner { get; }
 
@@ -27,7 +27,7 @@ namespace SkywrathMagePlus.Features
         {
             Config = config;
             Menu = config.Menu;
-            Main = config.Main;
+            Abilities = config.Abilities;
             Owner = config.Main.Context.Owner;
 
             Handler = UpdateManager.Run(ExecuteAsync, true, true);
@@ -60,7 +60,7 @@ namespace SkywrathMagePlus.Features
                                                          x.HasModifier("modifier_skywrath_mystic_flare_aura_effect") &&
                                                          x.HasModifier("modifier_item_blade_mail_reflect"));
 
-                    var eul = Main.Eul;
+                    var eul = Abilities.Eul;
                     if (target && eul != null && eul.CanBeCasted)
                     {
                         eul.UseAbility(Owner);
@@ -73,7 +73,7 @@ namespace SkywrathMagePlus.Features
                 {
                     if (Menu.AutoArcaneBoltOwnerMinHealthItem <= ((float)Owner.Health / Owner.MaximumHealth) * 100)
                     {
-                        var arcaneBolt = Main.ArcaneBolt;
+                        var arcaneBolt = Abilities.ArcaneBolt;
 
                         var target =
                             EntityManager<Hero>.Entities.Where(x =>
@@ -108,7 +108,7 @@ namespace SkywrathMagePlus.Features
             }
             catch (Exception e)
             {
-                Main.Log.Error(e);
+                Config.Main.Log.Error(e);
             }
         }
     }

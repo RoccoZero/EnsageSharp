@@ -19,7 +19,7 @@ namespace SkywrathMagePlus.Features
 
         private MenuManager Menu { get; }
 
-        private SkywrathMagePlus Main { get; }
+        private Abilities Abilities { get; }
 
         private Extensions Extensions { get; }
 
@@ -39,7 +39,7 @@ namespace SkywrathMagePlus.Features
         {
             Config = config;
             Menu = config.Menu;
-            Main = config.Main;
+            Abilities = config.Abilities;
             Extensions = config.Extensions;
             DamageCalculation = config.DamageCalculation;
             MultiSleeper = config.MultiSleeper;
@@ -118,7 +118,7 @@ namespace SkywrathMagePlus.Features
                 if (!target.IsBlockingAbilities())
                 {
                     // AncientSeal
-                    var ancientSeal = Main.AncientSeal;
+                    var ancientSeal = Abilities.AncientSeal;
                     if (Menu.AutoKillStealToggler.Value.IsEnabled(ancientSeal.ToString())
                         && ancientSeal.CanBeCasted
                         && ancientSeal.CanHit(target))
@@ -129,7 +129,7 @@ namespace SkywrathMagePlus.Features
                     }
 
                     // Veil
-                    var veil = Main.Veil;
+                    var veil = Abilities.Veil;
                     if (veil != null
                         && Menu.AutoKillStealToggler.Value.IsEnabled(veil.ToString())
                         && veil.CanBeCasted
@@ -140,7 +140,7 @@ namespace SkywrathMagePlus.Features
                     }
 
                     // Ethereal
-                    var ethereal = Main.Ethereal;
+                    var ethereal = Abilities.Ethereal;
                     if (ethereal != null
                         && Menu.AutoKillStealToggler.Value.IsEnabled(ethereal.ToString())
                         && ethereal.CanBeCasted
@@ -152,7 +152,7 @@ namespace SkywrathMagePlus.Features
                     }
 
                     // Shivas
-                    var shivas = Main.Shivas;
+                    var shivas = Abilities.Shivas;
                     if (shivas != null
                         && Menu.AutoKillStealToggler.Value.IsEnabled(shivas.ToString())
                         && shivas.CanBeCasted
@@ -165,7 +165,7 @@ namespace SkywrathMagePlus.Features
                     if (!MultiSleeper.Sleeping("ethereal") || target.IsEthereal())
                     {
                         // ConcussiveShot
-                        var concussiveShot = Main.ConcussiveShot;
+                        var concussiveShot = Abilities.ConcussiveShot;
                         if (Menu.AutoKillStealToggler.Value.IsEnabled(concussiveShot.ToString())
                             && target == concussiveShot.TargetHit
                             && concussiveShot.CanBeCasted
@@ -176,7 +176,7 @@ namespace SkywrathMagePlus.Features
                         }
 
                         // ArcaneBolt
-                        var arcaneBolt = Main.ArcaneBolt;
+                        var arcaneBolt = Abilities.ArcaneBolt;
                         if (Menu.AutoKillStealToggler.Value.IsEnabled(arcaneBolt.ToString())
                             && arcaneBolt.CanBeCasted
                             && arcaneBolt.CanHit(target))
@@ -194,7 +194,7 @@ namespace SkywrathMagePlus.Features
                         }
 
                         // Dagon
-                        var dagon = Main.Dagon;
+                        var dagon = Abilities.Dagon;
                         if (dagon != null
                             && Menu.AutoKillStealToggler.Value.IsEnabled("item_dagon_5")
                             && dagon.CanBeCasted
@@ -217,7 +217,7 @@ namespace SkywrathMagePlus.Features
             }
             catch (Exception e)
             {
-                Main.Log.Error(e);
+                Config.Main.Log.Error(e);
             }
         }
 

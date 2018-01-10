@@ -22,7 +22,7 @@ namespace SkywrathMagePlus
 
         private MenuManager Menu { get; }
 
-        private SkywrathMagePlus Main { get; }
+        private Abilities Abilities { get; }
 
         private IParticleManager Particle { get; }
 
@@ -38,7 +38,7 @@ namespace SkywrathMagePlus
         {
             Config = config;
             Menu = config.Menu;
-            Main = config.Main;
+            Abilities = config.Abilities;
             Particle = config.Main.Context.Particle;
             Orbwalker = config.Main.Context.Orbwalker;
             Owner = config.Main.Context.Owner;
@@ -113,7 +113,7 @@ namespace SkywrathMagePlus
                     if (!Target.IsMagicImmune())
                     {
                         // ArcaneBolt
-                        var arcaneBolt = Main.ArcaneBolt;
+                        var arcaneBolt = Abilities.ArcaneBolt;
                         if (arcaneBolt.CanBeCasted && arcaneBolt.CanHit(Target))
                         {
                             arcaneBolt.UseAbility(Target);
@@ -187,7 +187,7 @@ namespace SkywrathMagePlus
             }
             catch (Exception e)
             {
-                Main.Log.Error(e);
+                Config.Main.Log.Error(e);
             }
         }
     }

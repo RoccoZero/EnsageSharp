@@ -59,6 +59,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mode.cs" />
     <Compile Include="Renderer.cs" />
+    <Compile Include="Abilities.cs" />
     <Compile Include="SkywrathMagePlus.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="UpdateMode.cs" />

@@ -13,7 +13,7 @@ namespace SkywrathMagePlus.Features
     {
         private MenuManager Menu { get; }
 
-        private SkywrathMagePlus Main { get; }
+        private Abilities Abilities { get; }
 
         private MultiSleeper MultiSleeper { get; }
 
@@ -22,7 +22,7 @@ namespace SkywrathMagePlus.Features
         public DamageCalculation(Config config)
         {
             Menu = config.Menu;
-            Main = config.Main;
+            Abilities = config.Abilities;
             MultiSleeper = config.MultiSleeper;
             Owner = config.Main.Context.Owner;
 
@@ -49,42 +49,42 @@ namespace SkywrathMagePlus.Features
                 if (target.IsVisible)
                 {
                     // AncientSeal
-                    var ancientSeal = Main.AncientSeal;
+                    var ancientSeal = Abilities.AncientSeal;
                     if (ancientSeal.Ability.Level > 0 && Menu.AutoKillStealToggler.Value.IsEnabled(ancientSeal.ToString()))
                     {
                         abilities.Add(ancientSeal);
                     }
 
                     // Veil
-                    var veil = Main.Veil;
+                    var veil = Abilities.Veil;
                     if (veil != null && veil.Ability.IsValid && Menu.AutoKillStealToggler.Value.IsEnabled(veil.ToString()))
                     {
                         abilities.Add(veil);
                     }
 
                     // Ethereal
-                    var ethereal = Main.Ethereal;
+                    var ethereal = Abilities.Ethereal;
                     if (ethereal != null && ethereal.Ability.IsValid && Menu.AutoKillStealToggler.Value.IsEnabled(ethereal.ToString()))
                     {
                         abilities.Add(ethereal);
                     }
 
                     // Shivas
-                    var shivas = Main.Shivas;
+                    var shivas = Abilities.Shivas;
                     if (shivas != null && shivas.Ability.IsValid && Menu.AutoKillStealToggler.Value.IsEnabled(shivas.ToString()))
                     {
                         abilities.Add(shivas);
                     }
 
                     // ConcussiveShot
-                    var concussiveShot = Main.ConcussiveShot;
+                    var concussiveShot = Abilities.ConcussiveShot;
                     if (concussiveShot.Ability.Level > 0 && Menu.AutoKillStealToggler.Value.IsEnabled(concussiveShot.ToString()) && target == concussiveShot.TargetHit)
                     {
                         abilities.Add(concussiveShot);
                     }
 
                     // ArcaneBolt
-                    var arcaneBolt = Main.ArcaneBolt;
+                    var arcaneBolt = Abilities.ArcaneBolt;
                     if (arcaneBolt.Ability.Level > 0 && Menu.AutoKillStealToggler.Value.IsEnabled(arcaneBolt.ToString()))
                     {
                         abilities.Add(arcaneBolt);
@@ -96,7 +96,7 @@ namespace SkywrathMagePlus.Features
                     }
 
                     // Dagon
-                    var dagon = Main.Dagon;
+                    var dagon = Abilities.Dagon;
                     if (dagon != null && dagon.Ability.IsValid && Menu.AutoKillStealToggler.Value.IsEnabled("item_dagon_5"))
                     {
                         abilities.Add(dagon);

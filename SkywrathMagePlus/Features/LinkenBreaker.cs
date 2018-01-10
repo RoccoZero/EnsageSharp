@@ -18,7 +18,7 @@ namespace SkywrathMagePlus.Features
 
         private MenuManager Menu { get; }
 
-        private SkywrathMagePlus Main { get; set; }
+        private Abilities Abilities { get; set; }
 
         private Unit Owner { get; }
 
@@ -28,7 +28,7 @@ namespace SkywrathMagePlus.Features
         {
             Config = config;
             Menu = config.Menu;
-            Main = config.Main;
+            Abilities = config.Abilities;
             Owner = config.Main.Context.Owner;
 
             Handler = UpdateManager.Run(ExecuteAsync, false, false);
@@ -60,7 +60,7 @@ namespace SkywrathMagePlus.Features
                 foreach (var order in breakerChanger)
                 {
                     // Eul
-                    var eul = Main.Eul;
+                    var eul = Abilities.Eul;
                     if (eul != null
                         && eul.ToString() == order.Key
                         && eul.CanBeCasted)
@@ -78,7 +78,7 @@ namespace SkywrathMagePlus.Features
                     }
 
                     // ForceStaff
-                    var forceStaff = Main.ForceStaff;
+                    var forceStaff = Abilities.ForceStaff;
                     if (forceStaff != null
                         && forceStaff.ToString() == order.Key
                         && forceStaff.CanBeCasted)
@@ -96,7 +96,7 @@ namespace SkywrathMagePlus.Features
                     }
 
                     // Orchid
-                    var orchid = Main.Orchid;
+                    var orchid = Abilities.Orchid;
                     if (orchid != null
                         && orchid.ToString() == order.Key
                         && orchid.CanBeCasted)
@@ -114,7 +114,7 @@ namespace SkywrathMagePlus.Features
                     }
 
                     // Bloodthorn
-                    var bloodthorn = Main.Bloodthorn;
+                    var bloodthorn = Abilities.Bloodthorn;
                     if (bloodthorn != null
                         && bloodthorn.ToString() == order.Key
                         && bloodthorn.CanBeCasted)
@@ -132,7 +132,7 @@ namespace SkywrathMagePlus.Features
                     }
 
                     // Nullifier
-                    var nullifier = Main.Nullifier;
+                    var nullifier = Abilities.Nullifier;
                     if (nullifier != null
                         && nullifier.ToString() == order.Key
                         && nullifier.CanBeCasted)
@@ -150,7 +150,7 @@ namespace SkywrathMagePlus.Features
                     }
 
                     // RodofAtos
-                    var rodofAtos = Main.RodofAtos;
+                    var rodofAtos = Abilities.RodofAtos;
                     if (rodofAtos != null
                         && rodofAtos.ToString() == order.Key
                         && rodofAtos.CanBeCasted)
@@ -168,7 +168,7 @@ namespace SkywrathMagePlus.Features
                     }
 
                     // Hex
-                    var hex = Main.Hex;
+                    var hex = Abilities.Hex;
                     if (hex != null
                         && hex.ToString() == order.Key
                         && hex.CanBeCasted)
@@ -186,7 +186,7 @@ namespace SkywrathMagePlus.Features
                     }
 
                     // ArcaneBolt
-                    var arcaneBolt = Main.ArcaneBolt;
+                    var arcaneBolt = Abilities.ArcaneBolt;
                     if (arcaneBolt.ToString() == order.Key
                         && arcaneBolt.CanBeCasted)
                     {
@@ -203,7 +203,7 @@ namespace SkywrathMagePlus.Features
                     }
 
                     // AncientSeal
-                    var ancientSeal = Main.AncientSeal;
+                    var ancientSeal = Abilities.AncientSeal;
                     if (ancientSeal.ToString() == order.Key
                         && ancientSeal.CanBeCasted)
                     {
@@ -226,7 +226,7 @@ namespace SkywrathMagePlus.Features
             }
             catch (Exception e)
             {
-                Main.Log.Error(e);
+                Config.Main.Log.Error(e);
             }
         }
     }

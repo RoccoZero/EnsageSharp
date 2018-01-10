@@ -20,7 +20,7 @@ namespace SkywrathMagePlus.Features
 
         private MenuManager Menu { get; }
 
-        private SkywrathMagePlus Main { get; }
+        private Abilities Abilities { get; }
 
         private Extensions Extensions { get; }
 
@@ -36,7 +36,7 @@ namespace SkywrathMagePlus.Features
         {
             Config = config;
             Menu = config.Menu;
-            Main = config.Main;
+            Abilities = config.Abilities;
             Extensions = config.Extensions;
             MultiSleeper = config.MultiSleeper;
             Owner = config.Main.Context.Owner;
@@ -126,7 +126,7 @@ namespace SkywrathMagePlus.Features
                 var hexDebuff = target.Modifiers.FirstOrDefault(x => x.Name == "modifier_sheepstick_debuff");
 
                 // Hex
-                var hex = Main.Hex;
+                var hex = Abilities.Hex;
                 if (hex != null
                     && Menu.AutoItemToggler.Value.IsEnabled(hex.ToString())
                     && hex.CanBeCasted
@@ -139,7 +139,7 @@ namespace SkywrathMagePlus.Features
                 }
 
                 // Orchid
-                var orchid = Main.Orchid;
+                var orchid = Abilities.Orchid;
                 if (orchid != null
                     && Menu.AutoItemToggler.Value.IsEnabled(orchid.ToString())
                     && orchid.CanBeCasted
@@ -150,7 +150,7 @@ namespace SkywrathMagePlus.Features
                 }
 
                 // Bloodthorn
-                var bloodthorn = Main.Bloodthorn;
+                var bloodthorn = Abilities.Bloodthorn;
                 if (bloodthorn != null
                     && Menu.AutoItemToggler.Value.IsEnabled(bloodthorn.ToString())
                     && bloodthorn.CanBeCasted
@@ -161,7 +161,7 @@ namespace SkywrathMagePlus.Features
                 }
 
                 // Mystic Flare
-                var mysticFlare = Main.MysticFlare;
+                var mysticFlare = Abilities.MysticFlare;
                 if (Menu.AutoAbilityToggler.Value.IsEnabled(mysticFlare.ToString())
                     && Menu.AutoMinHealthToUltItem <= ((float)target.Health / target.MaximumHealth) * 100
                     && mysticFlare.CanBeCasted
@@ -190,7 +190,7 @@ namespace SkywrathMagePlus.Features
                 }
 
                 // Nullifier
-                var nullifier = Main.Nullifier;
+                var nullifier = Abilities.Nullifier;
                 if (nullifier != null
                     && Menu.ItemToggler.Value.IsEnabled(nullifier.ToString())
                     && nullifier.CanBeCasted
@@ -203,7 +203,7 @@ namespace SkywrathMagePlus.Features
                 }
 
                 // RodofAtos
-                var rodofAtos = Main.RodofAtos;
+                var rodofAtos = Abilities.RodofAtos;
                 if (rodofAtos != null
                     && Menu.AutoItemToggler.Value.IsEnabled(rodofAtos.ToString())
                     && rodofAtos.CanBeCasted
@@ -216,7 +216,7 @@ namespace SkywrathMagePlus.Features
                 }
 
                 // AncientSeal
-                var ancientSeal = Main.AncientSeal;
+                var ancientSeal = Abilities.AncientSeal;
                 if (Menu.AutoAbilityToggler.Value.IsEnabled(ancientSeal.ToString())
                     && ancientSeal.CanBeCasted
                     && ancientSeal.CanHit(target))
@@ -227,7 +227,7 @@ namespace SkywrathMagePlus.Features
                 }
 
                 // Veil
-                var veil = Main.Veil;
+                var veil = Abilities.Veil;
                 if (veil != null
                     && Menu.AutoItemToggler.Value.IsEnabled(veil.ToString())
                     && veil.CanBeCasted
@@ -238,7 +238,7 @@ namespace SkywrathMagePlus.Features
                 }
 
                 // Ethereal
-                var ethereal = Main.Ethereal;
+                var ethereal = Abilities.Ethereal;
                 if (ethereal != null
                     && Menu.AutoItemToggler.Value.IsEnabled(ethereal.ToString())
                     && ethereal.CanBeCasted
@@ -250,7 +250,7 @@ namespace SkywrathMagePlus.Features
                 }
 
                 // Shivas
-                var shivas = Main.Shivas;
+                var shivas = Abilities.Shivas;
                 if (shivas != null
                     && Menu.AutoItemToggler.Value.IsEnabled(shivas.ToString())
                     && shivas.CanBeCasted
@@ -263,7 +263,7 @@ namespace SkywrathMagePlus.Features
                 if (!MultiSleeper.Sleeping("ethereal") || target.IsEthereal())
                 {
                     // ConcussiveShot
-                    var concussiveShot = Main.ConcussiveShot;
+                    var concussiveShot = Abilities.ConcussiveShot;
                     if (Menu.AutoAbilityToggler.Value.IsEnabled(concussiveShot.ToString())
                         && Extensions.ConcussiveShotTarget(target, concussiveShot.TargetHit)
                         && concussiveShot.CanBeCasted
@@ -274,7 +274,7 @@ namespace SkywrathMagePlus.Features
                     }
 
                     // ArcaneBolt
-                    var arcaneBolt = Main.ArcaneBolt;
+                    var arcaneBolt = Abilities.ArcaneBolt;
                     if (Menu.AutoAbilityToggler.Value.IsEnabled(arcaneBolt.ToString())
                         && arcaneBolt.CanBeCasted
                         && arcaneBolt.CanHit(target))
@@ -292,7 +292,7 @@ namespace SkywrathMagePlus.Features
                     }
 
                     // Dagon
-                    var dagon = Main.Dagon;
+                    var dagon = Abilities.Dagon;
                     if (dagon != null
                         && Menu.AutoItemToggler.Value.IsEnabled("item_dagon_5")
                         && dagon.CanBeCasted
@@ -310,7 +310,7 @@ namespace SkywrathMagePlus.Features
             }
             catch (Exception e)
             {
-                Main.Log.Error(e);
+                Config.Main.Log.Error(e);
             }
         }
     }

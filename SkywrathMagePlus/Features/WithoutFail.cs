@@ -8,12 +8,12 @@ namespace SkywrathMagePlus.Features
     {
         private MenuManager Menu { get; }
 
-        private SkywrathMagePlus Main { get; }
+        private Abilities Abilities { get; }
 
         public WithoutFail(Config config)
         {
             Menu = config.Menu;
-            Main = config.Main;
+            Abilities = config.Abilities;
 
             if (config.Menu.ConcussiveShotWithoutFailItem)
             {
@@ -47,7 +47,7 @@ namespace SkywrathMagePlus.Features
 
         private void OnExecuteOrder(Player sender, ExecuteOrderEventArgs args)
         {
-            var concussiveShot = Main.ConcussiveShot;
+            var concussiveShot = Abilities.ConcussiveShot;
             if (args.OrderId == OrderId.Ability && args.Ability.Name == concussiveShot.ToString() && concussiveShot.TargetHit == null)
             {
                 args.Process = false;
