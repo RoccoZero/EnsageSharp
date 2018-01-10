@@ -20,7 +20,8 @@ namespace PudgePlus
         name: "PudgePlus",
         mode: StartupMode.Auto,
         author: "YEEEEEEE", 
-        version: "1.0.1.0",
+        version: "1.0.1.1",
+        priority: 10000,
         units: HeroId.npc_dota_hero_pudge)]
     internal class PudgePlus : Plugin
     {
