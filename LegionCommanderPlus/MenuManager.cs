@@ -27,12 +27,6 @@ namespace LegionCommanderPlus
 
         public MenuItem<StringList> TargetItem { get; }
 
-        public MenuItem<bool> AutoKillStealItem { get; }
-
-        public MenuItem<bool> AutoKillWhenComboItem { get; }
-
-        public MenuItem<AbilityToggler> AutoKillStealToggler { get; }
-
         public MenuItem<AbilityToggler> LinkenBreakerToggler { get; }
 
         public MenuItem<PriorityChanger> LinkenBreakerChanger { get; }
@@ -126,18 +120,6 @@ namespace LegionCommanderPlus
             OrbwalkerItem = comboMenu.Item("Orbwalker", new StringList("Default", "Free", "Only Attack", "No Move"));
             FullFreeModeItem = comboMenu.Item("Full Free Mode", false);
             TargetItem = comboMenu.Item("Target", new StringList("Lock", "Default"));
-
-            var autoKillStealMenu = Factory.Menu("Auto Kill Steal");
-            AutoKillStealItem = autoKillStealMenu.Item("Enable", true);
-            AutoKillWhenComboItem = autoKillStealMenu.Item("Disable When Combo", true);
-            AutoKillStealToggler = autoKillStealMenu.Item("Use: ", "autokillstealtoggler", new AbilityToggler(new Dictionary<string, bool>
-            {
-                { AbilityId.legion_commander_overwhelming_odds.ToString(), true },
-                { AbilityId.item_shivas_guard.ToString(), true },
-                { AbilityId.item_dagon_5.ToString(), true },
-                { AbilityId.item_ethereal_blade.ToString(), true },
-                { AbilityId.item_veil_of_discord.ToString(), true }
-            }));
 
             var linkenBreakerMenu = Factory.MenuWithTexture("Linken Breaker", "item_sphere");
             linkenBreakerMenu.Target.AddItem(new MenuItem("linkensphere", "Linkens Sphere:"));

@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 
 using Ensage;
-using Ensage.SDK.Extensions;
 using Ensage.SDK.Helpers;
 using Ensage.SDK.Renderer.Particle;
 using Ensage.SDK.TargetSelector;
@@ -23,8 +22,6 @@ namespace LegionCommanderPlus
         private Unit Owner { get; }
 
         public Hero Target { get; private set; }
-
-        public Unit[] OverwhelmingOddsUnits { get; private set; }
 
         public UpdateMode(Config config)
         {
@@ -110,8 +107,6 @@ namespace LegionCommanderPlus
                 Target = TargetSelector.Active.GetTargets().FirstOrDefault() as Hero;
             }
 
-            OverwhelmingOddsUnits = Units();
-
             if (Target != null && (Menu.DrawOffTargetItem && !Menu.ComboKeyItem || Menu.DrawTargetItem && Menu.ComboKeyItem))
             {
                 switch (Menu.TargetEffectTypeItem.Value.SelectedIndex)
@@ -156,18 +151,6 @@ namespace LegionCommanderPlus
             {
                 Particle.Remove("LegionCommanderPlusTarget");
             }
-        }
-
-        private Unit[] Units()
-        {
-            return EntityManager<Unit>.Entities.Where(x =>
-                                                      x.IsValid &&
-                                                      x.IsVisible &&
-                                                      x.IsAlive &&
-                                                      x.IsSpawned &&
-                                                      !(x is Building) &&
-                                                      x.IsEnemy(Owner) &&
-                                                      !x.IsInvulnerable()).ToArray();
         }
     }
 }

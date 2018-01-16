@@ -25,15 +25,9 @@ namespace LegionCommanderPlus
 
         public UpdateMode UpdateMode { get; }
 
-        public DamageCalculation DamageCalculation { get; }
-
         public LinkenBreaker LinkenBreaker { get; }
 
-        private AutoKillSteal AutoKillSteal { get; }
-
         private Mode Mode { get; }
-
-        private Renderer Renderer { get; }
 
         private bool Disposed { get; set; }
 
@@ -49,16 +43,12 @@ namespace LegionCommanderPlus
             Extensions = new Extensions(this);
 
             UpdateMode = new UpdateMode(this);
-            DamageCalculation = new DamageCalculation(this);
             LinkenBreaker = new LinkenBreaker(this);
-            AutoKillSteal = new AutoKillSteal(this);
 
             Menu.ComboKeyItem.Item.ValueChanged += ComboKeyChanged;
             var key = KeyInterop.KeyFromVirtualKey((int)Menu.ComboKeyItem.Value.Key);
             Mode = new Mode(key, this);
             main.Context.Orbwalker.RegisterMode(Mode);
-
-            Renderer = new Renderer(this);
         }
 
         private void ActivatePlugins()
@@ -109,13 +99,9 @@ namespace LegionCommanderPlus
 
             if (disposing)
             {
-                Renderer.Dispose();
-
                 Main.Context.Orbwalker.UnregisterMode(Mode);
                 Menu.ComboKeyItem.Item.ValueChanged -= ComboKeyChanged;
 
-                AutoKillSteal.Dispose();
-                DamageCalculation.Dispose();
                 UpdateMode.Dispose();
 
                 Main.Context.Particle.Dispose();

@@ -8,16 +8,14 @@ using Ensage;
 using Ensage.Common.Objects.UtilityObjects;
 using Ensage.SDK.Extensions;
 using Ensage.SDK.Geometry;
+using Ensage.SDK.Helpers;
 using Ensage.SDK.Orbwalker.Modes;
 using Ensage.SDK.Prediction;
-
-using PlaySharp.Toolkit.Helper.Annotations;
 
 using LegionCommanderPlus.Features;
 
 namespace LegionCommanderPlus
 {
-    [PublicAPI]
     internal class Mode : KeyPressOrbwalkingModeAsync
     {
         private MenuManager Menu { get; }
@@ -243,24 +241,28 @@ namespace LegionCommanderPlus
                                 && overwhelmingOdds.CanBeCasted
                                 && !comboBreaker)
                             {
-                                var input = new PredictionInput
+                                var heroes = EntityManager<Hero>.Entities.Where(x => x.IsValid && x.IsVisible && x.IsAlive && x.IsEnemy(Owner) && !x.IsInvulnerable()).ToArray();
+                                if (heroes.All(x => x.Distance2D(Owner) < overwhelmingOdds.CastRange + 300))
                                 {
-                                    Owner = Owner,
-                                    AreaOfEffect = overwhelmingOdds.HasAreaOfEffect,
-                                    AreaOfEffectTargets = UpdateMode.OverwhelmingOddsUnits,
-                                    CollisionTypes = overwhelmingOdds.CollisionTypes,
-                                    Delay = overwhelmingOdds.CastPoint + overwhelmingOdds.ActivationDelay,
-                                    Speed = overwhelmingOdds.Speed,
-                                    Range = overwhelmingOdds.CastRange,
-                                    Radius = overwhelmingOdds.Radius,
-                                    PredictionSkillshotType = overwhelmingOdds.PredictionSkillshotType
-                                };
+                                    var input = new PredictionInput
+                                    {
+                                        Owner = Owner,
+                                        AreaOfEffect = overwhelmingOdds.HasAreaOfEffect,
+                                        AreaOfEffectTargets = heroes,
+                                        CollisionTypes = overwhelmingOdds.CollisionTypes,
+                                        Delay = overwhelmingOdds.CastPoint + overwhelmingOdds.ActivationDelay,
+                                        Speed = overwhelmingOdds.Speed,
+                                        Range = overwhelmingOdds.CastRange,
+                                        Radius = overwhelmingOdds.Radius,
+                                        PredictionSkillshotType = overwhelmingOdds.PredictionSkillshotType
+                                    };
 
-                                var castPosition = overwhelmingOdds.GetPredictionOutput(input.WithTarget(target)).CastPosition;
-                                if (Owner.Distance2D(castPosition) <= overwhelmingOdds.CastRange)
-                                {
-                                    overwhelmingOdds.UseAbility(castPosition);
-                                    await Task.Delay(overwhelmingOdds.GetCastDelay(castPosition), token);
+                                    var castPosition = overwhelmingOdds.GetPredictionOutput(input.WithTarget(target)).CastPosition;
+                                    if (Owner.Distance2D(castPosition) <= overwhelmingOdds.CastRange)
+                                    {
+                                        overwhelmingOdds.UseAbility(castPosition);
+                                        await Task.Delay(overwhelmingOdds.GetCastDelay(castPosition), token);
+                                    }
                                 }
                             }
                         }
