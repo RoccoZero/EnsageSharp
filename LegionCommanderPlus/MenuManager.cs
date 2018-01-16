@@ -122,6 +122,7 @@ namespace LegionCommanderPlus
                 { AbilityId.item_bloodthorn.ToString(), true },
                 { AbilityId.item_orchid.ToString(), true },
                 { AbilityId.item_cyclone.ToString(), true },
+                { AbilityId.item_heavens_halberd.ToString(), true },
                 { AbilityId.item_force_staff.ToString(), true }
             }));
 
@@ -134,6 +135,7 @@ namespace LegionCommanderPlus
                 { AbilityId.item_bloodthorn.ToString() },
                 { AbilityId.item_orchid.ToString() },
                 { AbilityId.item_cyclone.ToString() },
+                { AbilityId.item_heavens_halberd.ToString() },
                 { AbilityId.item_force_staff.ToString() }
             }));
 

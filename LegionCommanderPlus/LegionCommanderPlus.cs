@@ -16,7 +16,7 @@ using PlaySharp.Toolkit.Logging;
 
 namespace LegionCommanderPlus
 {
-    [ExportPlugin(name: "LegionCommanderPlus", author: "YEEEEEEE", version: "1.0.0.1", priority: 10000, units: HeroId.npc_dota_hero_legion_commander)]
+    [ExportPlugin(name: "LegionCommanderPlus", author: "YEEEEEEE", version: "1.0.0.2", priority: 10000, units: HeroId.npc_dota_hero_legion_commander)]
     internal class LegionCommanderPlus : Plugin
     {
         public IServiceContext Context { get; }
@@ -119,6 +119,9 @@ namespace LegionCommanderPlus
 
         [ItemBinding]
         public item_satanic Satanic { get; private set; }
+
+        [ItemBinding]
+        public item_heavens_halberd HeavensHalberd { get; private set; }
 
         protected override void OnActivate()
         {

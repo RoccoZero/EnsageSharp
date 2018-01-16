@@ -201,6 +201,24 @@ namespace LegionCommanderPlus.Features
                             return;
                         }
                     }
+
+                    // Heavens Halberd
+                    var heavensHalberd = Main.HeavensHalberd;
+                    if (heavensHalberd != null
+                        && heavensHalberd.ToString() == order.Key
+                        && heavensHalberd.CanBeCasted)
+                    {
+                        if (heavensHalberd.CanHit(target))
+                        {
+                            heavensHalberd.UseAbility(target);
+                            await Task.Delay(heavensHalberd.GetCastDelay(target), token);
+                            return;
+                        }
+                        else if (Menu.UseOnlyFromRangeItem)
+                        {
+                            return;
+                        }
+                    }
                 }
             }
             catch (TaskCanceledException)
