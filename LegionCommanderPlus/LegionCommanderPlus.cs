@@ -123,6 +123,9 @@ namespace LegionCommanderPlus
         [ItemBinding]
         public item_heavens_halberd HeavensHalberd { get; private set; }
 
+        [ItemBinding]
+        public item_solar_crest SolarCrest { get; private set; }
+
         protected override void OnActivate()
         {
             OverwhelmingOdds = AbilityFactory.GetAbility<legion_commander_overwhelming_odds>();

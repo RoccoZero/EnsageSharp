@@ -231,6 +231,17 @@ namespace LegionCommanderPlus
                             {
                                 LinkenBreaker.Handler.RunAsync();
                             }
+
+                            // Solar Crest
+                            var solarCrest = Main.SolarCrest;
+                            if (solarCrest != null
+                                && Menu.ItemToggler.Value.IsEnabled(solarCrest.ToString())
+                                && solarCrest.CanBeCasted
+                                && solarCrest.CanHit(target))
+                            {
+                                solarCrest.UseAbility(target);
+                                await Task.Delay(solarCrest.GetCastDelay(target), token);
+                            }
                         }
 
                         if (!MultiSleeper.Sleeping("ethereal") || target.IsEthereal())

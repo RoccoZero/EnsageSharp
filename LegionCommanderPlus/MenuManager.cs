@@ -85,6 +85,7 @@ namespace LegionCommanderPlus
                 { AbilityId.item_blink.ToString(), true },
                 { AbilityId.item_blade_mail.ToString(), true },
                 { AbilityId.item_spirit_vessel.ToString(), true },
+                { AbilityId.item_solar_crest.ToString(), true },
                 { AbilityId.item_urn_of_shadows.ToString(), true },
                 { AbilityId.item_satanic.ToString(), true },
                 { AbilityId.item_armlet.ToString(), true },
