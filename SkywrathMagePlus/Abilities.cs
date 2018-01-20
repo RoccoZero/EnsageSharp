@@ -1,7 +1,10 @@
-﻿using Ensage.SDK.Abilities;
+﻿using System;
+using System.Collections.Specialized;
+using Ensage.SDK.Abilities;
 using Ensage.SDK.Abilities.Aggregation;
 using Ensage.SDK.Abilities.Items;
 using Ensage.SDK.Abilities.npc_dota_hero_skywrath_mage;
+using Ensage.SDK.Helpers;
 using Ensage.SDK.Inventory;
 using Ensage.SDK.Inventory.Metadata;
 
@@ -23,7 +26,11 @@ namespace SkywrathMagePlus
             AncientSeal = AbilityFactory.GetAbility<skywrath_mage_ancient_seal>();
             MysticFlare = AbilityFactory.GetAbility<skywrath_mage_mystic_flare>();
 
-            Inventory.Attach(this);
+            UpdateManager.BeginInvoke(() =>
+            {
+                Inventory.Attach(this);
+            },
+            3000);
         }
 
         public skywrath_mage_arcane_bolt ArcaneBolt { get; set; }

@@ -19,8 +19,8 @@ namespace SkywrathMagePlus
     [ExportPlugin(
         name: "SkywrathMagePlus",
         author: "YEEEEEEE", 
-        version: "2.2.0.3",
-        priority: 10000,
+        version: "2.2.0.4",
+        priority: 7000,
         units: HeroId.npc_dota_hero_skywrath_mage)]
     internal class SkywrathMagePlus : Plugin
     {
