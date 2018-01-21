@@ -6,6 +6,7 @@ using Ensage.SDK.Abilities;
 using Ensage.SDK.Abilities.Aggregation;
 using Ensage.SDK.Abilities.Items;
 using Ensage.SDK.Abilities.npc_dota_hero_zuus;
+using Ensage.SDK.Helpers;
 using Ensage.SDK.Inventory.Metadata;
 using Ensage.SDK.Service;
 using Ensage.SDK.Service.Metadata;
@@ -20,7 +21,8 @@ namespace ZeusPlus
         name: "ZeusPlus",
         mode: StartupMode.Auto,
         author: "YEEEEEEE", 
-        version: "1.1.0.0",
+        version: "1.1.1.0",
+        priority: 7000,
         units: HeroId.npc_dota_hero_zuus)]
     internal class ZeusPlus : Plugin
     {
@@ -110,7 +112,11 @@ namespace ZeusPlus
             Nimbus = AbilityFactory.GetAbility<zuus_cloud>();
             ThundergodsWrath = AbilityFactory.GetAbility<zuus_thundergods_wrath>();
 
-            Context.Inventory.Attach(this);
+            UpdateManager.BeginInvoke(() =>
+            {
+                Context.Inventory.Attach(this);
+            },
+            3000);
 
             Config = new Config(this);
         }

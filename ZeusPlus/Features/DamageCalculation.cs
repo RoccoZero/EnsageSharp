@@ -125,10 +125,7 @@ namespace ZeusPlus.Features
                 readyDamage -= LivingArmor(hero, heroes, damageCalculation.Abilities);
                 totalDamage -= LivingArmor(hero, heroes, damageCalculation.Abilities);
 
-                if (hero.HasModifier("modifier_abaddon_borrowed_time") 
-                    || hero.HasModifier("modifier_templar_assassin_refraction_absorb")
-                    || hero.HasAnyModifiers("modifier_winter_wyvern_winters_curse_aura", "modifier_winter_wyvern_winters_curse")
-                    || hero.IsInvulnerable())
+                if (hero.HasModifiers(BlockModifiers) || hero.IsInvulnerable())
                 {
                     damage = 0.0f;
                     readyDamage = 0.0f;
@@ -137,6 +134,16 @@ namespace ZeusPlus.Features
                 DamageList.Add(new Damage(hero, damage, readyDamage, totalDamage, hero.Health));
             }
         }
+
+        public static string[] BlockModifiers { get; } =
+        {
+            "modifier_abaddon_borrowed_time",
+            "modifier_item_combo_breaker_buff",
+            "modifier_winter_wyvern_winters_curse_aura",
+            "modifier_winter_wyvern_winters_curse",
+            "modifier_templar_assassin_refraction_absorb",
+            "modifier_oracle_fates_edict"
+        };
 
         private float LivingArmor(Hero hero, List<Hero> heroes, IReadOnlyCollection<BaseAbility> abilities)
         {

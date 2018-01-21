@@ -56,25 +56,18 @@ namespace ZeusPlus.Features
             {
                 return;
             }
-
+            
             UpdateManager.BeginInvoke(
                 () =>
                 {
                     Position = args.ParticleEffect.GetControlPoint(0);
 
-                    var ignore = EntityManager<Hero>.Entities.Any(x =>
-                                                                  x.IsValid &&
-                                                                  x.IsVisible &&
-                                                                  x.IsMagicImmune() &&
-                                                                  (x.IsAlly(Owner) &&
-                                                                  x.Distance2D(Position) < 50) ||
-                                                                  (x.IsEnemy(Owner)));
+                    var ignore = EntityManager<Hero>.Entities.Any(x => x.IsValid && x.IsAlly(Owner) && x.Distance2D(Position) < 100);
 
                     if (!ignore)
                     {
                         Particle = true;
                         ParticleName = args.Name;
-
                         UpdateManager.BeginInvoke(
                             () =>
                             {
