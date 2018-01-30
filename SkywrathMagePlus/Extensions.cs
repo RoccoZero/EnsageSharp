@@ -131,7 +131,7 @@ namespace SkywrathMagePlus
                 return false;
             }
 
-            var comboBreaker = target.GetItemById(AbilityId.item_combo_breaker);
+            var comboBreaker = target.GetItemById(AbilityId.item_aeon_disk);
             if (comboBreaker != null && comboBreaker.Cooldown <= 0)
             {
                 return true;
