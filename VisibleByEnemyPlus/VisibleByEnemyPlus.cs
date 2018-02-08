@@ -59,7 +59,6 @@ namespace VisibleByEnemyPlus
         {
             Config = new Config();
 
-            Config.ShrinesDrawItem.PropertyChanged += ShrinesDrawItemChanged;
             Config.EffectTypeItem.PropertyChanged += ItemChanged;
 
             Config.RedItem.PropertyChanged += ItemChanged;
@@ -79,23 +78,12 @@ namespace VisibleByEnemyPlus
             }
 
             UpdateManager.Subscribe(LoopEntities, 250);
-
-            if (Config.ShrinesDrawItem)
-            {
-                RendererManager.Value.Draw += OnDraw;
-            }
         }
 
         protected override void OnDeactivate()
         {
-            if (Config.ShrinesDrawItem)
-            {
-                RendererManager.Value.Draw -= OnDraw;
-            }
-
             UpdateManager.Unsubscribe(LoopEntities);
 
-            Config.ShrinesDrawItem.PropertyChanged -= ShrinesDrawItemChanged;
             Config.EffectTypeItem.PropertyChanged -= ItemChanged;
 
             Config.RedItem.PropertyChanged -= ItemChanged;
@@ -105,18 +93,6 @@ namespace VisibleByEnemyPlus
 
             Config?.Dispose();
             ParticleManager.Value.Dispose();
-        }
-
-        private void ShrinesDrawItemChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (Config.ShrinesDrawItem)
-            {
-                RendererManager.Value.Draw += OnDraw;
-            }
-            else
-            {
-                RendererManager.Value.Draw -= OnDraw;
-            }
         }
 
         private void ItemChanged(object sender, PropertyChangedEventArgs e)
@@ -264,34 +240,6 @@ namespace VisibleByEnemyPlus
             else if (AddEffectType)
             {
                 ParticleManager.Value.Remove($"unit_{ unit.Handle }");
-            }
-
-            if (visible && unit.IsAlive)
-            {
-                if (!PosShrines.Any(x => x == unit.Position))
-                {
-                    if (IsShrine(unit))
-                    {
-                        PosShrines.Add(unit.Position);
-                    }
-                }
-            }
-            else
-            {
-                PosShrines.Remove(unit.Position);
-            }
-        }
-
-        private void OnDraw(object sender, EventArgs e)
-        {
-            foreach (var pos in PosShrines.ToList())
-            {
-                RendererManager.Value.DrawText(
-                    pos.WorldToMinimap() - ExtraPos,
-                    "V",
-                    System.Drawing.Color.Aqua,
-                    ExtraSize,
-                    "Arial Black");
             }
         }
     }

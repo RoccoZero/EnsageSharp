@@ -19,8 +19,6 @@ namespace VisibleByEnemyPlus
 
         public MenuItem<bool> ShrinesItem { get; }
 
-        public MenuItem<bool> ShrinesDrawItem { get; }
-
         public MenuItem<bool> NeutralsItem { get; }
 
         public MenuItem<bool> UnitsItem { get; }
@@ -70,7 +68,6 @@ namespace VisibleByEnemyPlus
             WardsItem = Factory.Item("Wards", true);
             MinesItem = Factory.Item("Mines", true);
             ShrinesItem = Factory.Item("Shrines", true);
-            ShrinesDrawItem = Factory.Item("Shrines Draw On Minimap", true);
             NeutralsItem = Factory.Item("Neutrals", true);
             UnitsItem = Factory.Item("Units", true);
             BuildingsItem = Factory.Item("Buildings", true);
