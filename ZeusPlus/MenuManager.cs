@@ -46,6 +46,8 @@ namespace ZeusPlus
 
         public MenuItem<bool> NimbusVisibleTeleportItem { get; }
 
+        public MenuItem<bool> NimbusFullRangeTeleportItem { get; }
+
         public MenuItem<Slider> TeleportNimbusRangeItem { get; }
 
         public MenuItem<bool> AbilityBreakerItem { get; }
@@ -53,6 +55,8 @@ namespace ZeusPlus
         public MenuItem<AbilityToggler> AbilityBreakerToggler { get; }
 
         public MenuItem<AbilityToggler> AbilityWeakBreakerToggler { get; }
+
+        public MenuItem<bool> AbilityNimbusFullRangeItem { get; }
 
         public MenuItem<Slider> AbilityNimbusRangeItem { get; }
 
@@ -209,7 +213,8 @@ namespace ZeusPlus
             }));
 
             NimbusVisibleTeleportItem = TeleportBreakerMenu.Item("Nimbus Only Visible Teleport", false);
-            TeleportNimbusRangeItem = TeleportBreakerMenu.Item("Nimbus Range", new Slider(3000, 1000, 6000));
+            NimbusFullRangeTeleportItem = TeleportBreakerMenu.Item("Nimbus Full Range", false);
+            TeleportNimbusRangeItem = TeleportBreakerMenu.Item("Nimbus Range", new Slider(5000, 1000, 8000));
 
             AbilityBreakerItem = AbilityBreakerMenu.Item("Enable", true);
             AbilityBreakerToggler = AbilityBreakerMenu.Item("Use: ", "abilitybreakertoggler", new AbilityToggler(new Dictionary<string, bool>
@@ -225,7 +230,8 @@ namespace ZeusPlus
             }));
             AbilityWeakBreakerToggler.Item.SetTooltip("Breaks the Abilities Shadow Shaman Shackles and Spirit Breaker Charge of Darkness");
 
-            AbilityNimbusRangeItem = AbilityBreakerMenu.Item("Nimbus Range", new Slider(3500, 1000, 6000));
+            AbilityNimbusFullRangeItem = TeleportBreakerMenu.Item("Nimbus Full Range", true);
+            AbilityNimbusRangeItem = AbilityBreakerMenu.Item("Nimbus Range", new Slider(5000, 1000, 8000));
 
             var DrawingMenu = Factory.Menu("Drawing");
             var TargetMenu = DrawingMenu.Menu("Target");
@@ -269,6 +275,8 @@ namespace ZeusPlus
             ItemsToggler.PropertyChanged += Changed;
             TeleportBreakerToggler.PropertyChanged += Changed;
             AbilityBreakerToggler.PropertyChanged += Changed;
+            NimbusFullRangeTeleportItem.PropertyChanged += Changed;
+            AbilityNimbusFullRangeItem.PropertyChanged += Changed;
             DrawTargetItem.PropertyChanged += Changed;
             DrawOffTargetItem.PropertyChanged += Changed;
             OrbwalkerItem.PropertyChanged += Changed;
@@ -314,6 +322,26 @@ namespace ZeusPlus
 
             // Ability Breaker
             if (AbilityBreakerToggler.Value.IsEnabled("zuus_cloud"))
+            {
+                AbilityNimbusRangeItem.Item.ShowItem = true;
+            }
+            else
+            {
+                AbilityNimbusRangeItem.Item.ShowItem = false;
+            }
+
+            // Nimbus Teleport Range
+            if (!NimbusFullRangeTeleportItem)
+            {
+                TeleportNimbusRangeItem.Item.ShowItem = true;
+            }
+            else
+            {
+                TeleportNimbusRangeItem.Item.ShowItem = false;
+            }
+
+            // Nimbus Ability Range
+            if (!AbilityNimbusFullRangeItem)
             {
                 AbilityNimbusRangeItem.Item.ShowItem = true;
             }
@@ -402,6 +430,8 @@ namespace ZeusPlus
             OrbwalkerItem.PropertyChanged -= Changed;
             DrawOffTargetItem.PropertyChanged -= Changed;
             DrawTargetItem.PropertyChanged -= Changed;
+            AbilityNimbusFullRangeItem.PropertyChanged += Changed;
+            NimbusFullRangeTeleportItem.PropertyChanged += Changed;
             AbilityBreakerToggler.PropertyChanged -= Changed;
             TeleportBreakerToggler.PropertyChanged -= Changed;
             ItemsToggler.PropertyChanged -= Changed;

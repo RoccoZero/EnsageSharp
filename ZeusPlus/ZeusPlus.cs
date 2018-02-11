@@ -17,13 +17,7 @@ using PlaySharp.Toolkit.Logging;
 
 namespace ZeusPlus
 {
-    [ExportPlugin(
-        name: "ZeusPlus",
-        mode: StartupMode.Auto,
-        author: "YEEEEEEE", 
-        version: "1.1.1.0",
-        priority: 7000,
-        units: HeroId.npc_dota_hero_zuus)]
+    [ExportPlugin(name: "ZeusPlus", author: "YEEEEEEE", version: "1.1.2.0", priority: 7000, units: HeroId.npc_dota_hero_zuus)]
     internal class ZeusPlus : Plugin
     {
         private Config Config { get; set; }

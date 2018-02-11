@@ -68,12 +68,11 @@ namespace ZeusPlus.Features
                     {
                         Particle = true;
                         ParticleName = args.Name;
-                        UpdateManager.BeginInvoke(
-                            () =>
-                            {
-                                Particle = false;
-                            },
-                            3000);
+                        UpdateManager.BeginInvoke(() =>
+                        {
+                            Particle = false;
+                        },
+                        3000);
                     }
                 },
                 20);
@@ -113,7 +112,8 @@ namespace ZeusPlus.Features
                         // Nimbus
                         var Nimbus = Main.Nimbus;
                         if (AbilityTogglers(target, Nimbus.Ability)
-                            && Owner.Distance2D(target) > LightningBolt.CastRange + 100 && Owner.Distance2D(target) < Menu.TeleportNimbusRangeItem
+                            && Owner.Distance2D(target) > LightningBolt.CastRange + 100 
+                            && Owner.Distance2D(target) < Menu.AbilityNimbusRangeItem || Menu.AbilityNimbusFullRangeItem
                             && Nimbus.CanBeCasted)
                         {
                             Nimbus.UseAbility(target.Position);
@@ -141,7 +141,8 @@ namespace ZeusPlus.Features
                     // Nimbus
                     var Nimbus = Main.Nimbus;
                     if (ParticleTogglers(Nimbus.Ability)
-                        && Owner.Distance2D(Position) > LightningBolt.CastRange + 100 && Owner.Distance2D(Position) < Menu.TeleportNimbusRangeItem
+                        && Owner.Distance2D(Position) > LightningBolt.CastRange + 100 
+                        && (Owner.Distance2D(Position) < Menu.TeleportNimbusRangeItem || Menu.NimbusFullRangeTeleportItem)
                         && Nimbus.CanBeCasted)
                     {
                         Nimbus.UseAbility(Position);
@@ -168,7 +169,8 @@ namespace ZeusPlus.Features
                         var LightningBolt = Main.LightningBolt;
                         var Nimbus = Main.Nimbus;
                         if (AbilityTogglers(visibleTarget, Nimbus.Ability)
-                           && Owner.Distance2D(visibleTarget) > LightningBolt.CastRange + 100 && Owner.Distance2D(visibleTarget) < Menu.TeleportNimbusRangeItem
+                           && Owner.Distance2D(visibleTarget) > LightningBolt.CastRange + 100 
+                           && (Owner.Distance2D(visibleTarget) < Menu.TeleportNimbusRangeItem || Menu.NimbusFullRangeTeleportItem)
                            && Nimbus.CanBeCasted)
                         {
                             Nimbus.UseAbility(visibleTarget.Position);
