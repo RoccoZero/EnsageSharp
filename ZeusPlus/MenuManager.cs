@@ -230,7 +230,7 @@ namespace ZeusPlus
             }));
             AbilityWeakBreakerToggler.Item.SetTooltip("Breaks the Abilities Shadow Shaman Shackles and Spirit Breaker Charge of Darkness");
 
-            AbilityNimbusFullRangeItem = TeleportBreakerMenu.Item("Nimbus Full Range", true);
+            AbilityNimbusFullRangeItem = AbilityBreakerMenu.Item("Nimbus Full Range", true);
             AbilityNimbusRangeItem = AbilityBreakerMenu.Item("Nimbus Range", new Slider(5000, 1000, 8000));
 
             var DrawingMenu = Factory.Menu("Drawing");
