@@ -112,7 +112,7 @@ namespace ZeusPlus.Features
                 {
                     if (target.Distance2D(Owner) > 2000 && !MultiSleeper.Sleeping("camera"))
                     {
-                        var consolePosition = $"{ target.Position.X } { target.Position.Z }";
+                        var consolePosition = $"{ target.Position.X } { target.Position.Y }";
                         Game.ExecuteCommand($"dota_camera_set_lookatpos { consolePosition }");
 
                         UpdateManager.BeginInvoke(
