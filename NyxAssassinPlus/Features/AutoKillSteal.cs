@@ -75,7 +75,7 @@ namespace NyxAssassinPlus.Features
                     return;
                 }
 
-                var damageCalculation = DamageCalculation.DamageList.OrderByDescending(x => x.GetHealth).OrderByDescending(x => x.GetHero.Player.Kills).ToList();
+                var damageCalculation = DamageCalculation.DamageList.OrderByDescending(x => x.GetHealth).ToList();
                 var damage = damageCalculation.FirstOrDefault(x => (x.GetHealth - x.GetDamage) / x.GetHero.MaximumHealth <= 0.0f);
 
                 if (damage == null)
