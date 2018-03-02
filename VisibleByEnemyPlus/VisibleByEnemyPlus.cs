@@ -5,7 +5,6 @@ using System.ComponentModel.Composition;
 using System.Linq;
 
 using Ensage;
-using Ensage.Common;
 using Ensage.SDK.Extensions;
 using Ensage.SDK.Helpers;
 using Ensage.SDK.Renderer;
@@ -120,35 +119,35 @@ namespace VisibleByEnemyPlus
 
         private bool IsMine(Entity sender)
         {
-            return sender.ClassId == ClassId.CDOTA_NPC_TechiesMines;
+            return sender.NetworkName == "CDOTA_NPC_TechiesMines";
         }
 
         private bool IsShrine(Entity sender)
         {
-            return sender.ClassId == ClassId.CDOTA_BaseNPC_Healer;
+            return sender.NetworkName == "CDOTA_BaseNPC_Healer";
         }
 
         private bool IsNeutral(Unit sender)
         {
-            return sender.ClassId == ClassId.CDOTA_BaseNPC_Creep_Neutral;
+            return sender.NetworkName == "CDOTA_BaseNPC_Creep_Neutral";
         }
 
         private bool IsUnit(Unit sender)
         {
             return !(sender is Hero) && !(sender is Building)
-                   && (sender.ClassId != ClassId.CDOTA_BaseNPC_Creep_Lane 
-                   && sender.ClassId != ClassId.CDOTA_BaseNPC_Creep_Siege 
+                   && (sender.NetworkName != "CDOTA_BaseNPC_Creep_Lane"
+                   && sender.NetworkName != "CDOTA_BaseNPC_Creep_Siege"
                    || sender.IsControllable)
-                   && sender.ClassId != ClassId.CDOTA_NPC_TechiesMines 
-                   && sender.ClassId != ClassId.CDOTA_NPC_Observer_Ward
-                   && sender.ClassId != ClassId.CDOTA_NPC_Observer_Ward_TrueSight
-                   && sender.ClassId != ClassId.CDOTA_BaseNPC_Healer;
+                   && sender.NetworkName != "CDOTA_NPC_TechiesMines" 
+                   && sender.NetworkName != "CDOTA_NPC_Observer_Ward"
+                   && sender.NetworkName != "CDOTA_NPC_Observer_Ward_TrueSight"
+                   && sender.NetworkName != "CDOTA_BaseNPC_Healer";
         }
 
         private bool IsWard(Entity sender)
         {
-            return sender.ClassId == ClassId.CDOTA_NPC_Observer_Ward 
-                || sender.ClassId == ClassId.CDOTA_NPC_Observer_Ward_TrueSight;
+            return sender.NetworkName == "CDOTA_NPC_Observer_Ward" 
+                || sender.NetworkName == "CDOTA_NPC_Observer_Ward_TrueSight";
         }
 
         private void LoopEntities()
