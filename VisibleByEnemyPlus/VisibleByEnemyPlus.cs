@@ -119,35 +119,35 @@ namespace VisibleByEnemyPlus
 
         private bool IsMine(Entity sender)
         {
-            return sender.NetworkName == "CDOTA_NPC_TechiesMines";
+            return sender.ClassId == ClassId.CDOTA_NPC_TechiesMines;
         }
 
         private bool IsShrine(Entity sender)
         {
-            return sender.NetworkName == "CDOTA_BaseNPC_Healer";
+            return sender.ClassId == ClassId.CDOTA_BaseNPC_Healer;
         }
 
         private bool IsNeutral(Unit sender)
         {
-            return sender.NetworkName == "CDOTA_BaseNPC_Creep_Neutral";
+            return sender.ClassId == ClassId.CDOTA_BaseNPC_Creep_Neutral;
         }
 
         private bool IsUnit(Unit sender)
         {
             return !(sender is Hero) && !(sender is Building)
-                   && (sender.NetworkName != "CDOTA_BaseNPC_Creep_Lane"
-                   && sender.NetworkName != "CDOTA_BaseNPC_Creep_Siege"
+                   && (sender.ClassId != ClassId.CDOTA_BaseNPC_Creep_Lane
+                   && sender.ClassId != ClassId.CDOTA_BaseNPC_Creep_Siege
                    || sender.IsControllable)
-                   && sender.NetworkName != "CDOTA_NPC_TechiesMines" 
-                   && sender.NetworkName != "CDOTA_NPC_Observer_Ward"
-                   && sender.NetworkName != "CDOTA_NPC_Observer_Ward_TrueSight"
-                   && sender.NetworkName != "CDOTA_BaseNPC_Healer";
+                   && sender.ClassId != ClassId.CDOTA_NPC_TechiesMines
+                   && sender.ClassId != ClassId.CDOTA_NPC_Observer_Ward
+                   && sender.ClassId != ClassId.CDOTA_NPC_Observer_Ward_TrueSight
+                   && sender.ClassId != ClassId.CDOTA_BaseNPC_Healer;
         }
 
         private bool IsWard(Entity sender)
         {
-            return sender.NetworkName == "CDOTA_NPC_Observer_Ward" 
-                || sender.NetworkName == "CDOTA_NPC_Observer_Ward_TrueSight";
+            return sender.ClassId == ClassId.CDOTA_NPC_Observer_Ward
+                || sender.ClassId == ClassId.CDOTA_NPC_Observer_Ward_TrueSight;
         }
 
         private void LoopEntities()
