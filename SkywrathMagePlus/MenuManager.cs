@@ -122,12 +122,6 @@ namespace SkywrathMagePlus
 
         public MenuItem<bool> BlinkRadiusItem { get; }
 
-        public MenuItem<bool> CalculationItem { get; }
-
-        public MenuItem<Slider> CalculationXItem { get; }
-
-        public MenuItem<Slider> CalculationYItem { get; }
-
         public MenuItem<bool> HPBarCalculationItem { get; }
 
         public MenuItem<Slider> HPBarCalculationPosItem { get; }
@@ -336,11 +330,6 @@ namespace SkywrathMagePlus
             OffTargetGreenItem.Item.SetFontColor(Color.Green);
             OffTargetBlueItem = targetMenu.Item("Blue", "offblue", new Slider(255, 0, 255));
             OffTargetBlueItem.Item.SetFontColor(Color.Blue);
-
-            var calculationMenu = drawingMenu.Menu("Damage Calculation");
-            CalculationItem = calculationMenu.Item("Enable", true);
-            CalculationXItem = calculationMenu.Item("X", new Slider(0, 0, (int)config.Screen.X + 65));
-            CalculationYItem = calculationMenu.Item("Y", new Slider((int)config.Screen.Y - 260, 0, (int)config.Screen.Y - 200));
 
             var hpBarCalculationMenu = drawingMenu.Menu("HP Bar Damage Calculation");
             HPBarCalculationItem = hpBarCalculationMenu.Item("Enable", true);
