@@ -55,7 +55,8 @@ namespace BeAwarePlus.Checker
         private void OnTimedEvent()
         {
             //Check Rune
-            if (((Math.Round(Game.GameTime) + 10) % 120) == 0
+            var time = Math.Round(Game.GameTime) + 10;
+            if (((time % 120) == 0 || (time % 300) == 0)
                 && MenuManager.OtherItem.Value.IsEnabled("rune_bounty") 
                 && Utils.SleepCheck("check_rune"))
             {
