@@ -283,6 +283,7 @@ namespace EnchantressPlus
                         }
 
                         Orbwalker.OrbwalkingPoint = pos;
+						Orbwalker.OrbwalkingPoint = Vector3.Zero;
                     }
                     else if (Menu.OrbwalkerItem.Value.SelectedValue.Contains("Free"))
                     {
