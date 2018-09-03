@@ -41,7 +41,6 @@ namespace PudgePlus
 
         private void OnDraw(EventArgs args)
         {
-            var i = 0;
             foreach (var data in Config.DamageCalculation.DamageList)
             {
                 var target = data.GetTarget;
@@ -82,60 +81,6 @@ namespace PudgePlus
                             Drawing.DrawRect(damagePosition, damageSize, Color.Black, true);
                         }
                     }
-                }
-
-                if (Menu.CalculationItem)
-                {
-                    var setPosTexture = new Vector2(Config.Screen.X - Menu.CalculationXItem - 20, Menu.CalculationYItem - 110);
-                    var posTexture = new Vector2(Config.Screen.X, Config.Screen.Y * 0.65f + i) - setPosTexture;
-                    var doNotKill = DoNotKill(target);
-
-                    Texture(posTexture + 5, new Vector2(55), $"heroes_round/{ target.Name.Substring("npc_dota_hero_".Length) }");
-                    Texture(posTexture, new Vector2(65), "other/round_percentage/frame/white");
-
-                    if (!target.IsVisible)
-                    {
-                        var hp = Math.Ceiling((float)health / target.MaximumHealth * 100);
-                        Texture(posTexture, new Vector2(65), $"other/round_percentage/hp/{ Math.Min(hp, 100) }");
-
-                        if (doNotKill != null)
-                        {
-                            Texture(posTexture + new Vector2(42, 45), new Vector2(20), $"modifier_textures/round/{ doNotKill }");
-                        }
-
-                        i += 80;
-                        continue;
-                    }
-
-                    var totalDamage = data.GetTotalDamage;
-
-                    var maxHealth = target.MaximumHealth + (health - target.MaximumHealth);
-                    var damagePercent = Math.Ceiling(100 - (health - Math.Max(damage, 0)) / maxHealth * 100);
-                    var readyDamagePercent = Math.Ceiling(100 - (health - Math.Max(readyDamage, 0)) / maxHealth * 100);
-                    var totalDamagePercent = Math.Ceiling(100 - (health - Math.Max(totalDamage, 0)) / maxHealth * 100);
-
-                    if (damagePercent >= 100)
-                    {
-                        Texture(posTexture - 10, new Vector2(85), $"other/round_percentage/alert/{ Alert() }");
-                    }
-
-                    Texture(posTexture, new Vector2(65), $"other/round_percentage/no_percent_gray/{ Math.Min(totalDamagePercent, 100) }");
-                    Texture(posTexture, new Vector2(65), $"other/round_percentage/no_percent_yellow/{ Math.Min(readyDamagePercent, 100) }");
-
-                    var color = damagePercent >= 100 ? "green" : "red";
-                    Texture(posTexture, new Vector2(65), $"other/round_percentage/{ color }/{ Math.Min(damagePercent, 100) }");
-
-                    if (damagePercent >= 100)
-                    {
-                        Texture(posTexture, new Vector2(65), $"other/round_percentage/no_percent_gray/{ Math.Min(damagePercent - 100, 100) }");
-                    }
-
-                    if (doNotKill != null)
-                    {
-                        Texture(posTexture + new Vector2(42, 45), new Vector2(20), $"modifier_textures/round/{ doNotKill }");
-                    }
-
-                    i += 80;
                 }
             }
         }
