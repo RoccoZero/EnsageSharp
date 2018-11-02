@@ -274,6 +274,7 @@ namespace InvokerNinja
                     if (spells.Name.Contains("quas")) continue;
                     if (spells.Name.Contains("wex")) continue;
                     if (spells.Name.Contains("exort")) continue;
+                    if (spells.Name.Contains("bonus")) continue;
                     if (spells.Name == "invoker_invoke") continue;
                     Drawing.DrawRect(new Vector2(boxX + i, boxY), new Vector2(boxsize, boxsize), Drawing.GetTexture("materials/ensage_ui/spellicons/" + spells.Name + ".vmat"));
                     Drawing.DrawRect(new Vector2(boxX + i, boxY), new Vector2(boxsize, boxsize), Color.Black, true);
