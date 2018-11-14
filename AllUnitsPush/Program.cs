@@ -111,10 +111,10 @@ namespace AllUnitsPush
             if (activated && !Game.IsPaused)
             {
                 var unit = ObjectManager.GetEntities<Unit>().Where(creep =>
-                    (creep.ClassId == ClassId.CDOTA_BaseNPC_Creep_Neutral
-                     || creep.ClassId == ClassId.CDOTA_BaseNPC_Additive                    
-                     || creep.ClassId == ClassId.CDOTA_BaseNPC_Creep
-                     || creep.ClassId == ClassId.CDOTA_Unit_Broodmother_Spiderling
+                    (creep.NetworkName == "CDOTA_BaseNPC_Creep_Neutral"
+                     || creep.NetworkName == "CDOTA_BaseNPC_Additive"                 
+                     || creep.NetworkName == "CDOTA_BaseNPC_Creep"
+                     || creep.NetworkName == "CDOTA_Unit_Broodmother_Spiderling"
                      || creep.IsIllusion)
                     && creep.IsAlive
                     && creep.NetworkActivity != NetworkActivity.Move
@@ -123,8 +123,8 @@ namespace AllUnitsPush
                     && creep.IsValid).ToList();
                 if (unit.Count == 0) return;
 
-                Unit fount = ObjectManager.GetEntities<Unit>().FirstOrDefault(x => x.Team == me.Team && x.ClassId == ClassId.CDOTA_Unit_Fountain);
-                List<Unit> tower = ObjectManager.GetEntities<Unit>().Where(x => x.Team != me.Team && x.ClassId == ClassId.CDOTA_BaseNPC_Tower).ToList();                
+                Unit fount = ObjectManager.GetEntities<Unit>().FirstOrDefault(x => x.Team == me.Team && x.NetworkName == "CDOTA_Unit_Fountain");
+                List<Unit> tower = ObjectManager.GetEntities<Unit>().Where(x => x.Team != me.Team && x.NetworkName == "CDOTA_BaseNPC_Tower").ToList();                
 
                 for (int i = 0; i < unit.Count(); ++i)
                 {

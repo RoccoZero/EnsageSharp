@@ -108,7 +108,7 @@ namespace InvokerNinja
             if (!Game.IsInGame || Game.IsWatchingGame || Game.IsPaused)
                 return;
             me = ObjectManager.LocalHero;
-            if (me == null || me.ClassId != ClassId.CDOTA_Unit_Hero_Invoker)
+            if (me == null || me.NetworkName != "CDOTA_Unit_Hero_Invoker")
                 return;
             if (Game.IsKeyDown(Menu.Item("Flee Mode").GetValue<KeyBind>().Key) || Game.IsKeyDown(Menu.Item("Combo Mode").GetValue<KeyBind>().Key))
                 return;
@@ -247,7 +247,7 @@ namespace InvokerNinja
             if (!Game.IsInGame || Game.IsWatchingGame)
                 return;
             me = ObjectManager.LocalHero;
-            if (me == null || me.ClassId != ClassId.CDOTA_Unit_Hero_Invoker)
+            if (me == null || me.NetworkName != "CDOTA_Unit_Hero_Invoker")
                 return;
             if (targetParticle == null && target != null)
             {
@@ -314,7 +314,7 @@ namespace InvokerNinja
             if (!Game.IsInGame || Game.IsWatchingGame || Game.IsPaused)
                 return;
             me = ObjectManager.LocalHero;
-            if (me == null || me.ClassId != ClassId.CDOTA_Unit_Hero_Invoker)
+            if (me == null || me.NetworkName != "CDOTA_Unit_Hero_Invoker")
                 return;
             for (uint i = 48; i <= 90; i++)
             {

@@ -144,7 +144,7 @@ namespace SkywrathMagePlus.Features
 
         private bool Disable(Hero target)
         {
-            var ability = target.Spellbook.Spells.Any(x => AbilityId.Contains(x.Id) && x.IsInAbilityPhase);
+            var ability = target.Spellbook.Spells.Any(x => AbilityIds.Contains(x.Id) && x.IsInAbilityPhase);
             if (ability)
             {
                 return true;
@@ -153,25 +153,25 @@ namespace SkywrathMagePlus.Features
             return false;
         }
 
-        private AbilityId[] AbilityId { get; } =
+        private AbilityId[] AbilityIds { get; } =
         {
-            Ensage.AbilityId.queenofpain_blink,
-            Ensage.AbilityId.antimage_blink,
-            Ensage.AbilityId.antimage_mana_void,
-            Ensage.AbilityId.legion_commander_duel,
-            Ensage.AbilityId.doom_bringer_doom,
-            Ensage.AbilityId.faceless_void_time_walk,
-            Ensage.AbilityId.faceless_void_chronosphere,
-            Ensage.AbilityId.witch_doctor_death_ward,
-            Ensage.AbilityId.rattletrap_power_cogs,
-            Ensage.AbilityId.tidehunter_ravage,
-            Ensage.AbilityId.axe_berserkers_call,
-            Ensage.AbilityId.brewmaster_primal_split,
-            Ensage.AbilityId.omniknight_guardian_angel,
-            Ensage.AbilityId.queenofpain_sonic_wave,
-            Ensage.AbilityId.slardar_slithereen_crush,
-            Ensage.AbilityId.lion_finger_of_death,
-            Ensage.AbilityId.lina_laguna_blade
+            AbilityId.queenofpain_blink,
+            AbilityId.antimage_blink,
+            AbilityId.antimage_mana_void,
+            AbilityId.legion_commander_duel,
+            AbilityId.doom_bringer_doom,
+            AbilityId.faceless_void_time_walk,
+            AbilityId.faceless_void_chronosphere,
+            AbilityId.witch_doctor_death_ward,
+            AbilityId.rattletrap_power_cogs,
+            AbilityId.tidehunter_ravage,
+            AbilityId.axe_berserkers_call,
+            AbilityId.brewmaster_primal_split,
+            AbilityId.omniknight_guardian_angel,
+            AbilityId.queenofpain_sonic_wave,
+            AbilityId.slardar_slithereen_crush,
+            AbilityId.lion_finger_of_death,
+            AbilityId.lina_laguna_blade
         };
     }
 }

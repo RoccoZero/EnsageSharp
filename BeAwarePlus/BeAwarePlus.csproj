@@ -46,9 +46,6 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="BeAwarePlus.cs" />
     <Compile Include="BeAwarePlusConfig.cs" />
     <Compile Include="Checker\Modifiers.cs" />
