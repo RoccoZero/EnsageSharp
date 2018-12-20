@@ -39,41 +39,43 @@ namespace TinkerFastComboPlus
 
         private bool Iscreated { get; set; }
 
-        private Ability Laser { get; set; }
+        private Abilities Abilities;
 
-        private Ability Rocket { get; set; }
+        private Ability Laser => Abilities.Laser;
 
-        private Ability March { get; set; }
+        private Ability Rocket => Abilities.Rocket;
 
-        private Ability Refresh { get; set; }
+        private Ability March => Abilities.March;
 
-        private Item Blink { get; set; }
+        private Ability Refresh => Abilities.Refresh;
 
-        private Item Dagon { get; set; }
+        private Item Blink => Abilities.Blink;
 
-        private Item Sheep { get; set; }
+        private Item Dagon => Abilities.Dagon;
 
-        private Item Soulring { get; set; }
+        private Item Sheep => Abilities.Sheep;
 
-        private Item Ethereal { get; set; }
+        private Item Soulring => Abilities.Soulring;
 
-        private Item Shiva { get; set; }
+        private Item Ethereal => Abilities.Ethereal;
 
-        private Item Ghost { get; set; }
+        private Item Shiva => Abilities.Shiva;
 
-        private Item Cyclone { get; set; }
+        private Item Ghost => Abilities.Ghost;
 
-        private Item Forcestaff { get; set; }
+        private Item Cyclone => Abilities.Cyclone;
 
-        private Item Glimmer { get; set; }
+        private Item Forcestaff => Abilities.Forcestaff;
 
-        private Item Bottle { get; set; }
+        private Item Glimmer => Abilities.Glimmer;
 
-        private Item Travel { get; set; }
+        private Item Bottle => Abilities.Bottle;
 
-        private Item Veil { get; set; }
+        private Item Travel => Abilities.Travel;
 
-        private Item Atos { get; set; }
+        private Item Veil => Abilities.Veil;
+
+        private Item Atos => Abilities.Atos;
 
         private Hero Owner { get; }
 
@@ -205,82 +207,90 @@ namespace TinkerFastComboPlus
 
         protected override void OnActivate()
         {
-            // Menu Options	                                                          
-            _Combo.AddItem(new MenuItem("ComboSkills: ", "Skills:").SetValue(new AbilityToggler(ComboSkills)));
-            _Combo.AddItem(new MenuItem("ComboItems: ", "Items:").SetValue(new AbilityToggler(ComboItems)));
-            _Combo.AddItem(new MenuItem("LinkenBreaker: ", "Linken Breaker:").SetValue(new AbilityToggler(LinkenBreaker)));
-            Menu.AddSubMenu(_Combo);
+            UpdateManager.BeginInvoke(() =>
+            {
+                // Menu Options	                                                          
+                _Combo.AddItem(new MenuItem("ComboSkills: ", "Skills:").SetValue(new AbilityToggler(ComboSkills)));
+                _Combo.AddItem(new MenuItem("ComboItems: ", "Items:").SetValue(new AbilityToggler(ComboItems)));
+                _Combo.AddItem(new MenuItem("LinkenBreaker: ", "Linken Breaker:").SetValue(new AbilityToggler(LinkenBreaker)));
+                Menu.AddSubMenu(_Combo);
 
-            _RocketSpam.AddItem(new MenuItem("RocketSpamSkills: ", "Skills:").SetValue(new AbilityToggler(RocketSpamSkills)));
-            _RocketSpam.AddItem(new MenuItem("RocketSpamItems: ", "Items:").SetValue(new AbilityToggler(RocketSpamItems)));
-            Menu.AddSubMenu(_RocketSpam);
+                _RocketSpam.AddItem(new MenuItem("RocketSpamSkills: ", "Skills:").SetValue(new AbilityToggler(RocketSpamSkills)));
+                _RocketSpam.AddItem(new MenuItem("RocketSpamItems: ", "Items:").SetValue(new AbilityToggler(RocketSpamItems)));
+                Menu.AddSubMenu(_RocketSpam);
 
-            _MarchSpam.AddItem(new MenuItem("MarchSpamItems: ", "Items:").SetValue(new AbilityToggler(MarchSpamItems)));
-            Menu.AddSubMenu(_MarchSpam);
+                _MarchSpam.AddItem(new MenuItem("MarchSpamItems: ", "Items:").SetValue(new AbilityToggler(MarchSpamItems)));
+                Menu.AddSubMenu(_MarchSpam);
 
-            var _autopush = new Menu("Auto Push", "Auto Push");
-            _autopush.AddItem(new MenuItem("autoPush", "Enable auto push helper").SetValue(false));
-            _autopush.AddItem(new MenuItem("autoRearm", "Enable auto rearm in fountain when travel boots on cooldown").SetValue(false));
-            _autopush.AddItem(new MenuItem("pushFount", "Use auto push if I have modif Fountain").SetValue(false));
-            _autopush.AddItem(new MenuItem("pushSafe", "Use march only after blinking to a safe spot").SetValue(false));
-            Menu.AddSubMenu(_autopush);
+                var _autopush = new Menu("Auto Push", "Auto Push");
+                _autopush.AddItem(new MenuItem("autoPush", "Enable auto push helper").SetValue(false));
+                _autopush.AddItem(new MenuItem("autoRearm", "Enable auto rearm in fountain when travel boots on cooldown").SetValue(false));
+                _autopush.AddItem(new MenuItem("pushFount", "Use auto push if I have modif Fountain").SetValue(false));
+                _autopush.AddItem(new MenuItem("pushSafe", "Use march only after blinking to a safe spot").SetValue(false));
+                Menu.AddSubMenu(_autopush);
 
-            var _ranges = new Menu("Drawing", "Drawing");
-            _ranges.AddItem(new MenuItem("Blink Range", "Show Blink Dagger Range").SetValue(true));
-            _ranges.AddItem(new MenuItem("Blink Range Incoming TP", "Show incoming TP Blink Range").SetValue(true));
-            _ranges.AddItem(new MenuItem("Rocket Range", "Show Rocket Range").SetValue(true));
-            _ranges.AddItem(new MenuItem("Laser Range", "Show Laser Range").SetValue(true));
-            _ranges.AddItem(new MenuItem("Show Direction", "Show Direction Vector on Rearming").SetValue(true));
-            _ranges.AddItem(new MenuItem("Show Target Effect", "Show Target Effect").SetValue(true));
-            _ranges.AddItem(new MenuItem("red", "Red").SetValue(new Slider(0, 0, 255)).SetFontColor(Color.Red));
-            _ranges.AddItem(new MenuItem("green", "Green").SetValue(new Slider(255, 0, 255)).SetFontColor(Color.Green));
-            _ranges.AddItem(new MenuItem("blue", "Blue").SetValue(new Slider(255, 0, 255)).SetFontColor(Color.Blue));
-            Menu.AddSubMenu(_ranges);
+                var _ranges = new Menu("Drawing", "Drawing");
+                _ranges.AddItem(new MenuItem("Blink Range", "Show Blink Dagger Range").SetValue(true));
+                _ranges.AddItem(new MenuItem("Blink Range Incoming TP", "Show incoming TP Blink Range").SetValue(true));
+                _ranges.AddItem(new MenuItem("Rocket Range", "Show Rocket Range").SetValue(true));
+                _ranges.AddItem(new MenuItem("Laser Range", "Show Laser Range").SetValue(true));
+                _ranges.AddItem(new MenuItem("Show Direction", "Show Direction Vector on Rearming").SetValue(true));
+                _ranges.AddItem(new MenuItem("Show Target Effect", "Show Target Effect").SetValue(true));
+                _ranges.AddItem(new MenuItem("red", "Red").SetValue(new Slider(0, 0, 255)).SetFontColor(Color.Red));
+                _ranges.AddItem(new MenuItem("green", "Green").SetValue(new Slider(255, 0, 255)).SetFontColor(Color.Green));
+                _ranges.AddItem(new MenuItem("blue", "Blue").SetValue(new Slider(255, 0, 255)).SetFontColor(Color.Blue));
+                Menu.AddSubMenu(_ranges);
 
-            var _blockrearm = new Menu("Blocker Rearm", "Blocker Rearm");
-            Menu.AddSubMenu(_blockrearm);
-            _blockrearm.AddItem(new MenuItem("BlockRearm", "Block Rearm").SetValue(true)).SetTooltip("It does not allow double-cast rearm");
-            _blockrearm.AddItem(new MenuItem("NoBlockRearmFountain", "No Block Rearm in Fountain").SetValue(true));
-            _blockrearm.AddItem(new MenuItem("NoBlockRearmTeleporting", "No Block Rearm with Teleporting").SetValue(true));
+                var _blockrearm = new Menu("Blocker Rearm", "Blocker Rearm");
+                Menu.AddSubMenu(_blockrearm);
+                _blockrearm.AddItem(new MenuItem("BlockRearm", "Block Rearm").SetValue(true)).SetTooltip("It does not allow double-cast rearm");
+                _blockrearm.AddItem(new MenuItem("NoBlockRearmFountain", "No Block Rearm in Fountain").SetValue(true));
+                _blockrearm.AddItem(new MenuItem("NoBlockRearmTeleporting", "No Block Rearm with Teleporting").SetValue(true));
 
-            var _settings = new Menu("Settings", "Settings UI");
-            _settings.AddItem(new MenuItem("HitCounter", "Enable target hit counter").SetValue(true));
-            _settings.AddItem(new MenuItem("RocketCounter", "Enable target rocket counter").SetValue(true));
-            _settings.AddItem(new MenuItem("TargetCalculator", "Enable target dmg calculator").SetValue(true));
-            _settings.AddItem(new MenuItem("Calculator", "Enable UI calculator").SetValue(true));
-            _settings.AddItem(new MenuItem("BarPosX", "UI Calculator Position X").SetValue(new Slider(600, -1500, 1500)));
-            _settings.AddItem(new MenuItem("BarPosY", "UI Calculator Position Y").SetValue(new Slider(0, -1500, 1500)));
-            _settings.AddItem(new MenuItem("CalculatorRkt", "Enable Rocket calculator").SetValue(true));
-            _settings.AddItem(new MenuItem("BarPosXr", "Rocket Calc Position X").SetValue(new Slider(950, -1500, 1500)));
-            _settings.AddItem(new MenuItem("BarPosYr", "Rocket Calc Position Y").SetValue(new Slider(-300, -1500, 1500)));
-            _settings.AddItem(new MenuItem("ComboModeDrawing", "Enable Combo Mode drawing").SetValue(true));
-            _settings.AddItem(new MenuItem("debug", "Enable debug").SetValue(false));
-            Menu.AddSubMenu(_settings);
+                var _settings = new Menu("Settings", "Settings UI");
+                _settings.AddItem(new MenuItem("HitCounter", "Enable target hit counter").SetValue(true));
+                _settings.AddItem(new MenuItem("RocketCounter", "Enable target rocket counter").SetValue(true));
+                _settings.AddItem(new MenuItem("TargetCalculator", "Enable target dmg calculator").SetValue(true));
+                _settings.AddItem(new MenuItem("Calculator", "Enable UI calculator").SetValue(true));
+                _settings.AddItem(new MenuItem("BarPosX", "UI Calculator Position X").SetValue(new Slider(600, -1500, 1500)));
+                _settings.AddItem(new MenuItem("BarPosY", "UI Calculator Position Y").SetValue(new Slider(0, -1500, 1500)));
+                _settings.AddItem(new MenuItem("CalculatorRkt", "Enable Rocket calculator").SetValue(true));
+                _settings.AddItem(new MenuItem("BarPosXr", "Rocket Calc Position X").SetValue(new Slider(950, -1500, 1500)));
+                _settings.AddItem(new MenuItem("BarPosYr", "Rocket Calc Position Y").SetValue(new Slider(-300, -1500, 1500)));
+                _settings.AddItem(new MenuItem("ComboModeDrawing", "Enable Combo Mode drawing").SetValue(true));
+                _settings.AddItem(new MenuItem("debug", "Enable debug").SetValue(false));
+                Menu.AddSubMenu(_settings);
 
-            Menu.AddItem(new MenuItem("Combo Key", "Combo Key").SetValue(new KeyBind('D', KeyBindType.Press)));
-            Menu.AddItem(new MenuItem("ComboMode", "Combo Mode")).SetValue(new StringList(new[] { "Fast", "MpSaving" }));
-            Menu.AddItem(new MenuItem("TargetLock", "Target Lock")).SetValue(new StringList(new[] { "Free", "Lock" }));
-            Menu.AddItem(new MenuItem("Chase", "Chase Toggle").SetValue(new KeyBind('F', KeyBindType.Toggle, false)).SetTooltip("Toggle for chasing"));
+                Menu.AddItem(new MenuItem("Combo Key", "Combo Key").SetValue(new KeyBind('D', KeyBindType.Press)));
+                Menu.AddItem(new MenuItem("ComboMode", "Combo Mode")).SetValue(new StringList(new[] { "Fast", "MpSaving" }));
+                Menu.AddItem(new MenuItem("TargetLock", "Target Lock")).SetValue(new StringList(new[] { "Free", "Lock" }));
+                Menu.AddItem(new MenuItem("Chase", "Chase Toggle").SetValue(new KeyBind('F', KeyBindType.Toggle, false)).SetTooltip("Toggle for chasing"));
 
-            Menu.AddItem(new MenuItem("Rocket Spam Key", "Rocket Spam Key").SetValue(new KeyBind('W', KeyBindType.Press)));
-            Menu.AddItem(new MenuItem("March Spam Key", "March Spam Key").SetValue(new KeyBind('E', KeyBindType.Press)));
-            Menu.AddItem(new MenuItem("FastRearmBlink", "Fast Rearm Blink").SetValue(new KeyBind(32, KeyBindType.Press)));
+                Menu.AddItem(new MenuItem("Rocket Spam Key", "Rocket Spam Key").SetValue(new KeyBind('W', KeyBindType.Press)));
+                Menu.AddItem(new MenuItem("March Spam Key", "March Spam Key").SetValue(new KeyBind('E', KeyBindType.Press)));
+                Menu.AddItem(new MenuItem("FastRearmBlink", "Fast Rearm Blink").SetValue(new KeyBind(32, KeyBindType.Press)));
 
-            Menu.AddItem(new MenuItem("autoDisable", "Auto disable/counter enemy").SetValue(true));
-            Menu.AddItem(new MenuItem("autoKillsteal", "Auto killsteal enemy").SetValue(true));
-            Menu.AddToMainMenu();
+                Menu.AddItem(new MenuItem("autoDisable", "Auto disable/counter enemy").SetValue(true));
+                Menu.AddItem(new MenuItem("autoKillsteal", "Auto killsteal enemy").SetValue(true));
+                Menu.AddToMainMenu();
 
-            Orbwalking.Load();
+                Orbwalking.Load();
 
-            Game.OnUpdate += ComboEngine;
-            Game.OnUpdate += AD;
+                OnUpdateAbility();
+                UpdateManager.Subscribe(OnUpdateAbility, 500);
 
-            GameDispatcher.OnUpdate += OnUpdate;
-            Player.OnExecuteOrder += OnExecuteOrder;
+                Game.OnUpdate += ComboEngine;
+                Game.OnUpdate += AD;
 
-            Drawing.OnDraw += Information;
-            Drawing.OnDraw += DrawRanges;
-            Drawing.OnDraw += ParticleDraw;
+                GameDispatcher.OnUpdate += OnUpdate;
+                Player.OnExecuteOrder += OnExecuteOrder;
+
+                Drawing.OnDraw += Information;
+
+                UpdateManager.Subscribe(DrawRanges, 50);
+                ParticleDraw();
+            }, 
+            5000);
         }
 
         protected override void OnDeactivate()
@@ -350,9 +360,6 @@ namespace TinkerFastComboPlus
                 Utils.Sleep(100, "FASTBLINK");
             }
 
-            
-            var blink = Owner.FindItem("item_blink");
-            
             var fastblink = Game.MousePosition;
             var rearm = Owner.Spellbook().SpellR;
             if (rearm.CanBeCasted())
@@ -378,19 +385,19 @@ namespace TinkerFastComboPlus
                 await Task.Delay(Time, cancellationToken);
             }
 
-            blink?.UseAbility(fastblink);
+            Blink?.UseAbility(fastblink);
             await Task.Delay(0, cancellationToken);
 
-            blink?.UseAbility(fastblink);
+            Blink?.UseAbility(fastblink);
             await Task.Delay(10, cancellationToken);
 
-            blink?.UseAbility(fastblink);
+            Blink?.UseAbility(fastblink);
             await Task.Delay(20, cancellationToken);
 
-            blink?.UseAbility(fastblink);
+            Blink?.UseAbility(fastblink);
             await Task.Delay(30, cancellationToken);
 
-            blink?.UseAbility(fastblink);
+            Blink?.UseAbility(fastblink);
             await Task.Delay(50, cancellationToken);
         }
         private void OnExecuteOrder(Player sender, ExecuteOrderEventArgs args)
@@ -449,8 +456,6 @@ namespace TinkerFastComboPlus
                 && !Game.IsChatOpen
                 && Owner.IsAlive)
             {
-                FindItems();
-
                 if ((Owner.HasModifier("modifier_fountain_aura_buff") && Menu.Item("pushFount").IsActive()))
                 {
                     if (Owner.IsChanneling() || Owner.HasModifier("modifier_tinker_rearm") || Refresh == null) return;
@@ -652,8 +657,6 @@ namespace TinkerFastComboPlus
                 && Utils.SleepCheck("RocketSpam") 
                 && !Game.IsChatOpen)
             {
-				FindItems();
-
 				if (Blink != null && Blink.CanBeCasted() && Menu.Item("RocketSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Blink.Name)
                     && !Owner.IsChanneling()  
 					&& Utils.SleepCheck("Rearms") 
@@ -843,8 +846,7 @@ namespace TinkerFastComboPlus
 			
             //March Spam Mode
 			if (Game.IsKeyDown(Menu.Item("March Spam Key").GetValue<KeyBind>().Key) && Utils.SleepCheck("MarchSpam") && !Game.IsChatOpen)
-            {
-				FindItems();                
+            {          
                 if (Blink != null && Blink.CanBeCasted() 
 					&& Menu.Item("MarchSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Blink.Name) 
 					&& !Owner.IsChanneling()  
@@ -972,8 +974,6 @@ namespace TinkerFastComboPlus
                     && !Owner.IsChanneling() 
                     && !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase))
                 {
-                    FindItems();
-
 					if (Utils.SleepCheck("FASTCOMBO"))
 					{
 						uint elsecount = 0;
@@ -1346,12 +1346,10 @@ namespace TinkerFastComboPlus
 
         private void AD(EventArgs args)
         {
-            if (!Game.IsInGame || Game.IsPaused || Game.IsWatchingGame)
+            if (Game.IsPaused)
             {
                 return;
             }
-
-            FindItems();
 
             Castrange = 0;
 
@@ -1479,7 +1477,7 @@ namespace TinkerFastComboPlus
                         && !e.Modifiers.Any(y => y.Name == "modifier_teleporting")
                         && Utils.SleepCheck(e.Handle.ToString())
                         && (e.IsChanneling()
-                            || (e.FindItem("item_blink") != null && IsCasted(e.FindItem("item_blink")))
+                            || (Blink != null && IsCasted(Blink))
                             //break escape spells (1 hex, 2 seal) no need cyclone
                             || e.HeroId == HeroId.npc_dota_hero_queenofpain && e.FindSpell("queenofpain_blink").IsInAbilityPhase
                             || e.HeroId == HeroId.npc_dota_hero_antimage && e.FindSpell("antimage_blink").IsInAbilityPhase
@@ -1625,7 +1623,7 @@ namespace TinkerFastComboPlus
                             //break hex spell
                             || (e.HeroId == HeroId.npc_dota_hero_lion && e.Spellbook.SpellW.Level > 0 && e.Spellbook.SpellW.Cooldown < 1 && Owner.Distance2D(e) < e.Spellbook.SpellW.GetCastRange() + Ensage_error)
                             || (e.HeroId == HeroId.npc_dota_hero_shadow_shaman && e.Spellbook.SpellW.Level > 0 && e.Spellbook.SpellW.Cooldown < 1 && Owner.Distance2D(e) < e.Spellbook.SpellW.GetCastRange() + Ensage_error)
-                            || (e.FindItem("item_sheepstick") != null && e.FindItem("item_sheepstick").Cooldown < 1 && Owner.Distance2D(e) < e.FindItem("item_sheepstick").GetCastRange() + Ensage_error)
+                            || (Sheep != null && Sheep.Cooldown < 1 && Owner.Distance2D(e) < Sheep.GetCastRange() + Ensage_error)
 
 
 
@@ -1669,7 +1667,7 @@ namespace TinkerFastComboPlus
                         && !e.Modifiers.Any(y => y.Name == "modifier_teleporting")
                         && Utils.SleepCheck(e.Handle.ToString())
                         && (e.IsChanneling()
-                            || (e.FindItem("item_blink") != null && IsCasted(e.FindItem("item_blink")))
+                            || (Blink != null && IsCasted(Blink))
 
                             //break rats shadow blades and invis if they appear close(1 hex, 2 seal, 3 cyclone)
                             || (e.IsMelee && Owner.Distance2D(e) <= 350 && (Owner.Spellbook.SpellR == null || !Owner.Spellbook.SpellR.CanBeCasted())) //test
@@ -1742,7 +1740,7 @@ namespace TinkerFastComboPlus
                             //break hex spell
                             || (e.HeroId == HeroId.npc_dota_hero_lion && e.Spellbook.SpellW.Level > 0 && e.Spellbook.SpellW.Cooldown < 1 && Owner.Distance2D(e) < e.Spellbook.SpellW.GetCastRange() + Ensage_error)
                             || (e.HeroId == HeroId.npc_dota_hero_shadow_shaman && e.Spellbook.SpellW.Level > 0 && e.Spellbook.SpellW.Cooldown < 1 && Owner.Distance2D(e) < e.Spellbook.SpellW.GetCastRange() + Ensage_error)
-                            || (e.FindItem("item_sheepstick") != null && e.FindItem("item_sheepstick").Cooldown < 1 && Owner.Distance2D(e) < e.FindItem("item_sheepstick").GetCastRange() + Ensage_error)
+                            || (Sheep != null && Sheep.Cooldown < 1 && Owner.Distance2D(e) < Sheep.GetCastRange() + Ensage_error)
 
 
                             //break flying stun spells if enemy close (1 hex, 2 seal, 3 cyclone)
@@ -1770,7 +1768,7 @@ namespace TinkerFastComboPlus
                             || (e.HeroId == HeroId.npc_dota_hero_juggernaut && e.Modifiers.Any(y => y.Name == "modifier_juggernaut_omnislash") && Owner.Distance2D(e) <= 300 && !Owner.IsAttackImmune())
 
                             //dodge flying stuns
-                            || (e.FindItem("item_ethereal_blade") != null && IsCasted(e.FindItem("item_ethereal_blade")) && Angle <= 0.1 && Owner.Distance2D(e) < e.FindItem("item_ethereal_blade").GetCastRange() + 250)
+                            || (Ethereal != null && IsCasted(Ethereal) && Angle <= 0.1 && Owner.Distance2D(e) < Ethereal.GetCastRange() + 250)
 
                             || (e.HeroId == HeroId.npc_dota_hero_sniper && IsCasted(e.Spellbook.SpellR) && Owner.Distance2D(e) > 300 && Owner.Modifiers.Any(y => y.Name == "modifier_sniper_assassinate"))//e.FindSpell("sniper_assassinate").Cooldown > 0 && me.Modifiers.Any(y => y.Name == "modifier_sniper_assassinate"))
                             || (e.HeroId == HeroId.npc_dota_hero_tusk && Angle <= 0.35 && e.Modifiers.Any(y => y.Name == "modifier_tusk_snowball_movement") && Owner.Distance2D(e) <= 575)
@@ -2106,13 +2104,8 @@ namespace TinkerFastComboPlus
             }
         }
 
-        public void DrawRanges(EventArgs args)
+        private void DrawRanges()
         {
-			if (!Game.IsInGame || Game.IsPaused || Game.IsWatchingGame || !Utils.SleepCheck("VisibilitySleep"))
-            {
-                return;
-            }
-				
             Castrange = 0;
 
             var aetherLens = Owner.Inventory.Items.FirstOrDefault(x => x.Id == AbilityId.item_aether_lens);
@@ -2182,7 +2175,7 @@ namespace TinkerFastComboPlus
             
             if (Menu.Item("Blink Range").GetValue<bool>())
 			{
-				if (Owner.FindItem("item_blink")!=null)
+				if (Blink != null)
 				{	
 					if(Rangedisplay_dagger == null)
 					{
@@ -2225,7 +2218,7 @@ namespace TinkerFastComboPlus
 			
 			if (Menu.Item("Blink Range Incoming TP").GetValue<bool>())
 			{
-				if (Owner.FindItem("item_blink")!=null )
+				if (Blink != null)
 				{	
 					var units = ObjectManager.GetEntities<Unit>().Where(x =>
 					                                                    (x is Hero && x.Team == Owner.Team) ||
@@ -2362,29 +2355,9 @@ namespace TinkerFastComboPlus
             return retVector;
         }
 
-        private void FindItems()
+        private void OnUpdateAbility()
         {
-            //Skills
-            Laser = Owner.Spellbook.SpellQ;
-            Rocket = Owner.Spellbook.SpellW;
-            Refresh = Owner.Spellbook.SpellR;
-            March = Owner.Spellbook.SpellE;
-
-            //Items
-            Blink = Owner.FindItem("item_blink");
-            Dagon = Owner.Inventory.Items.FirstOrDefault(item => item.Name.Contains("item_dagon"));
-            Atos = Owner.FindItem("item_rod_of_atos");
-            Sheep = Owner.FindItem("item_sheepstick");
-            Soulring = Owner.FindItem("item_soul_ring");
-            Ethereal = Owner.FindItem("item_ethereal_blade");
-            Shiva = Owner.FindItem("item_shivas_guard");
-            Ghost = Owner.FindItem("item_ghost");
-            Cyclone = Owner.FindItem("item_cyclone");
-            Forcestaff = Owner.FindItem("item_force_staff");
-            Glimmer = Owner.FindItem("item_glimmer_cape");
-            Bottle = Owner.FindItem("item_bottle");
-            Veil = Owner.FindItem("item_veil_of_discord");
-            Travel = Owner.Inventory.Items.FirstOrDefault(item => item.Name.Contains("item_travel_boots"));
+            Abilities = new Abilities(Owner);
         }
 
         private Vector2 HeroPositionOnScreen(Hero x)
@@ -2422,26 +2395,13 @@ namespace TinkerFastComboPlus
 
         private bool IsEulhexFind()
         {
-            if ((Owner.FindItem("item_cyclone") != null 
-                && Owner.FindItem("item_cyclone").CanBeCasted()) 
-                || (Owner.FindItem("item_sheepstick") != null 
-                && Owner.FindItem("item_sheepstick").CanBeCasted()))
+            if ((Cyclone != null && Cyclone.CanBeCasted()) || (Sheep != null && Sheep.CanBeCasted()))
             {
                 return true;
             }
 
             return false;
         }
-
-        private bool IsLinkensProtected(Hero x)
-        {
-            if (x.Modifiers.Any(m => m.Name == "modifier_item_sphere_target") || x.FindItem("item_sphere") != null && x.FindItem("item_sphere").Cooldown <= 0)
-            {
-                return true;
-            }
-
-            return false;
-        } 
 		
         private bool IsCasted(Ability ability)
         {
@@ -2765,7 +2725,7 @@ namespace TinkerFastComboPlus
             Hero targetInf = null;
 
             targetInf = Owner.ClosestToMouseTarget(2000);
-            FindItems();
+
             if (targetInf != null && targetInf.IsValid && !targetInf.IsIllusion && targetInf.IsAlive && targetInf.IsVisible)
             {
 				if (Menu.Item("TargetCalculator").GetValue<bool>())
@@ -3371,18 +3331,13 @@ namespace TinkerFastComboPlus
             return closestVector;
         }
                 
-        private void ParticleDraw(EventArgs args)
+        private void ParticleDraw()
         {
-            if (!Game.IsInGame || Game.IsWatchingGame)
-            {
-                return;
-            } 
-
             for (int i = 0; i < SafePos.Count(); ++i)
             {
                 if (!Iscreated)
                 {
-                    ParticleEffect effect = new ParticleEffect(EffectPath, SafePos[i]);
+                    var effect = new ParticleEffect(EffectPath, SafePos[i]);
                     effect.SetControlPoint(1, new Vector3(HIDE_AWAY_RANGE, 0, 0));
                     Effects.Add(effect);
                 }
@@ -3463,5 +3418,10 @@ namespace TinkerFastComboPlus
             new Vector3(-4832, -7072, 384),
             new Vector3(-3744, -7200, 384)
         };
+    }
+
+    public sealed class TEEEEE
+    {
+        public string Name { get; set; } = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     }
 }
