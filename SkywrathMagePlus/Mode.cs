@@ -124,26 +124,44 @@ namespace SkywrathMagePlus
                         && !comboBreaker
                         && (BadUlt(target) || Extensions.Active(target)))
                     {
-                        var enemies = EntityManager<Hero>.Entities.Where(x =>
-                                                                         x.IsValid &&
-                                                                         x.IsVisible &&
-                                                                         x.IsAlive &&
-                                                                         !x.IsIllusion &&
-                                                                         x.IsEnemy(Owner) &&
-                                                                         x.Distance2D(Owner) <= mysticFlare.CastRange).ToList();
-
-                        var dubleMysticFlare = Owner.HasAghanimsScepter() && enemies.Count() == 1;
                         var input = new PredictionInput
                         {
                             Owner = Owner,
+                            Delay = mysticFlare.CastPoint + mysticFlare.ActivationDelay,
                             Range = mysticFlare.CastRange,
-                            Radius = dubleMysticFlare ? -250 : -100
+                            Radius = mysticFlare.Radius,
                         };
 
                         var output = Prediction.GetPrediction(input.WithTarget(target));
+                        var castPosition = output.CastPosition;
 
-                        mysticFlare.UseAbility(output.CastPosition);
-                        await Await.Delay(mysticFlare.GetCastDelay(output.CastPosition), token);
+                        Vector3 position;
+                        if (target.NetworkActivity != NetworkActivity.Move || target.IsStunned() || target.IsRooted())
+                        {
+                            position = castPosition;
+                        }
+                        else
+                        {
+                            position = castPosition + (100 * target.Direction2D().ToVector3());
+                        }
+
+                        if (Owner.HasAghanimsScepter())
+                        {
+                            var dubleMysticFlare = EntityManager<Hero>.Entities.Count(x =>
+                                                                                      x.IsVisible &&
+                                                                                      x.IsAlive &&
+                                                                                      !x.IsIllusion &&
+                                                                                      x.IsEnemy(Owner) &&
+                                                                                      x.Distance2D(Owner) <= mysticFlare.CastRange) <= 1;
+
+                            if (dubleMysticFlare)
+                            {
+                                position = castPosition + (175 * target.Direction2D().ToVector3());
+                            }
+                        }
+
+                        mysticFlare.UseAbility(position);
+                        await Await.Delay(mysticFlare.GetCastDelay(position), token);
                     }
 
                     // Nullifier
