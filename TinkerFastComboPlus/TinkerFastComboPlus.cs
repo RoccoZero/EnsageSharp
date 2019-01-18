@@ -171,9 +171,9 @@ namespace TinkerFastComboPlus
             "tinker_march_of_the_machines"
         };			
 			
-        private int[] Laser_mana { get; } = new int[4] { 95, 120, 145, 170 };
+        private int[] Laser_mana { get; } = new int[4] { 110, 130, 150, 170 };
 
-		private int[] Rocket_mana { get; } = new int[4] { 120, 140, 160, 180 };	
+		private int[] Rocket_mana { get; } = new int[4] { 80, 100, 120, 140 };	
 
 		private int[] Rearm_mana { get; } = new int[3] { 100, 200, 300 };	
 		
@@ -361,7 +361,7 @@ namespace TinkerFastComboPlus
             }
 
             var fastblink = Game.MousePosition;
-            var rearm = Owner.Spellbook().SpellR;
+            var rearm = Refresh;
             if (rearm.CanBeCasted())
             {
                 DelayAction.Add(50, () =>
