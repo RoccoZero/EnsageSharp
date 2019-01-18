@@ -20,21 +20,71 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="clipper_library">
+      <HintPath>D:\Soft\Ensage\References\clipper_library.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetZip">
+      <HintPath>D:\Soft\Ensage\References\DotNetZip.dll</HintPath>
+    </Reference>
     <Reference Include="Ensage">
-      <HintPath>..\..\..\..\..\Ensage\References\Ensage.dll</HintPath>
+      <HintPath>D:\Soft\Ensage\References\Ensage.dll</HintPath>
     </Reference>
     <Reference Include="Ensage.Common">
-      <HintPath>..\..\..\..\..\Ensage\References\Ensage.Common.dll</HintPath>
+      <HintPath>D:\Soft\Ensage\References\Ensage.Common.dll</HintPath>
     </Reference>
     <Reference Include="Ensage.SDK">
-      <HintPath>..\..\..\..\..\Ensage\References\Ensage.SDK.dll</HintPath>
+      <HintPath>D:\Soft\Ensage\References\Ensage.SDK.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Threading">
+      <HintPath>D:\Soft\Ensage\References\Microsoft.VisualStudio.Threading.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Validation">
+      <HintPath>D:\Soft\Ensage\References\Microsoft.VisualStudio.Validation.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>D:\Soft\Ensage\References\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog">
+      <HintPath>D:\Soft\Ensage\References\NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="PlaySharp.Sentry">
+      <HintPath>D:\Soft\Ensage\References\PlaySharp.Sentry.dll</HintPath>
+    </Reference>
+    <Reference Include="PlaySharp.Service">
+      <HintPath>D:\Soft\Ensage\References\PlaySharp.Service.dll</HintPath>
+    </Reference>
+    <Reference Include="PlaySharp.Toolkit">
+      <HintPath>D:\Soft\Ensage\References\PlaySharp.Toolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX">
+      <HintPath>D:\Soft\Ensage\References\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct2D1">
+      <HintPath>D:\Soft\Ensage\References\SharpDX.Direct2D1.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D11">
+      <HintPath>D:\Soft\Ensage\References\SharpDX.Direct3D11.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D9">
+      <HintPath>D:\Soft\Ensage\References\SharpDX.Direct3D9.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.DXGI">
+      <HintPath>D:\Soft\Ensage\References\SharpDX.DXGI.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Mathematics">
-      <HintPath>..\..\..\..\..\Ensage\References\SharpDX.Mathematics.dll</HintPath>
+      <HintPath>D:\Soft\Ensage\References\SharpDX.Mathematics.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.XInput">
+      <HintPath>D:\Soft\Ensage\References\SharpDX.XInput.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.ValueTuple, Version=4.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>D:\Soft\Ensage\References\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
