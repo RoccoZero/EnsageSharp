@@ -354,7 +354,6 @@ namespace TinkerFastComboPlus
         
         private async Task Action(CancellationToken cancellationToken)
         {
-            Console.WriteLine("开始");
             if (Utils.SleepCheck("FASTBLINK"))
             {
                 Owner.MoveToDirection(Game.MousePosition);
@@ -363,10 +362,8 @@ namespace TinkerFastComboPlus
 
             var fastblink = Game.MousePosition;
             var rearm = Refresh;
-            Console.WriteLine("rearm=====");
             if (rearm.CanBeCasted())
             {
-                Console.WriteLine("can casted");
                 DelayAction.Add(50, () =>
                 {
                     var blinkrange = 1200 + Castrange;
