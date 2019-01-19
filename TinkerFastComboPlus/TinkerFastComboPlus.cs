@@ -3212,7 +3212,7 @@ namespace TinkerFastComboPlus
                 totalSpellAmp += (trident.AbilitySpecialData.First(x => x.Name == "spell_amp").Value) / 100.0f;  
             }
 
-            totalSpellAmp += (100.0f + Owner.TotalIntelligence / 15.0f) / 100.0f;
+            totalSpellAmp += (100.0f + Owner.TotalIntelligence * 0.0875f) / 100.0f;
             laserDamage *= totalSpellAmp;
 
             return laserDamage;
@@ -3242,7 +3242,7 @@ namespace TinkerFastComboPlus
                 totalSpellAmp += (trident.AbilitySpecialData.First(x => x.Name == "spell_amp").Value) / 100.0f;
             }
 
-            totalSpellAmp += (100.0f + Owner.TotalIntelligence / 15.0f) / 100.0f;
+            totalSpellAmp += (100.0f + Owner.TotalIntelligence * 0.0875f) / 100.0f;
             rocketDamage *= totalSpellAmp;
 
             return rocketDamage;
@@ -3272,7 +3272,7 @@ namespace TinkerFastComboPlus
                 totalSpellAmp += (trident.AbilitySpecialData.First(x => x.Name == "spell_amp").Value) / 100.0f;
             }
 
-            totalSpellAmp += (100.0f + Owner.TotalIntelligence / 15.0f) / 100.0f;
+            totalSpellAmp += (100.0f + Owner.TotalIntelligence * 0.0875f) / 100.0f;
             dagonDamage *= totalSpellAmp;
 
             return dagonDamage;
@@ -3313,7 +3313,7 @@ namespace TinkerFastComboPlus
                 totalSpellAmp += (trident.AbilitySpecialData.First(x => x.Name == "spell_amp").Value) / 100.0f;
             }
 
-            totalSpellAmp += (100.0f + Owner.TotalIntelligence / 15.0f) / 100.0f;
+            totalSpellAmp += (100.0f + Owner.TotalIntelligence * 0.0875f) / 100.0f;
 
             etherealBladeDamage *= totalSpellAmp;
 
