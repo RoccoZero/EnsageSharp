@@ -218,15 +218,6 @@ namespace EnchantressPlus.Features
                 value += ability.GetAbilitySpecialData("bonus_damage_taken") / 100f;
             }
 
-            // Modifier Shadow Demon Soul Catcher
-            if (hero.HasModifier("modifier_shadow_demon_soul_catcher"))
-            {
-                var shadowDemon = heroes.FirstOrDefault(x => x.IsAlly(Owner) && x.HeroId == HeroId.npc_dota_hero_shadow_demon);
-                var ability = shadowDemon.GetAbilityById(AbilityId.shadow_demon_soul_catcher);
-
-                value += ability.GetAbilitySpecialData("bonus_damage_taken") / 100f;
-            }
-
             return value;
         }
 
