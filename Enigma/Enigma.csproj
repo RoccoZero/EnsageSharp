@@ -45,14 +45,14 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Ensage">
-      <HintPath>..\..\..\..\..\Desktop\Dota 2\EnsageSharp\References\Ensage.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Ensage\References\Ensage.dll</HintPath>
     </Reference>
     <Reference Include="Ensage.Common">
-      <HintPath>..\..\..\..\..\Desktop\Dota 2\EnsageSharp\References\Ensage.Common.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Ensage\References\Ensage.Common.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Mathematics, Version=3.1.0.0, Culture=neutral, PublicKeyToken=7e3dc52b16ce4f66, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Desktop\Dota 2\EnsageSharp\References\SharpDX.Mathematics.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Ensage\References\SharpDX.Mathematics.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="WindowsBase" />
