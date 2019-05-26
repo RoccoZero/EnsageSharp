@@ -38,7 +38,7 @@ namespace DotaMapPlus
             ZoomVar.SetValue(ZoomSliderItem.Value);
 
             RVar = Game.GetConsoleVar("r_farz");
-            RVar.SetValue(2 * ZoomSliderItem.Value);
+            RVar.SetValue(18000);
 
             ZoomSliderItem.PropertyChanged += ZoomSliderItemChanged;
             InputManage.Value.MouseWheel += InputManagerMouseWheel;
@@ -82,7 +82,6 @@ namespace DotaMapPlus
         private void ZoomSliderItemChanged(object sender, PropertyChangedEventArgs e)
         {
             ZoomVar.SetValue(ZoomSliderItem.Value);
-            RVar.SetValue(2 * ZoomSliderItem.Value);
         }
     }
 }
