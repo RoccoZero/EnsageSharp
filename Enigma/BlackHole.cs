@@ -48,8 +48,11 @@ namespace Enigma
             if (!Game.IsInGame || Game.IsPaused || Game.IsWatchingGame)
                 return;
             me = ObjectManager.LocalHero;
-            if (me == null || me.ClassId != ClassId.CDOTA_Unit_Hero_Enigma)
+            if (me == null || me.HeroId != HeroId.npc_dota_hero_enigma)
+            {
                 return;
+            }
+                
             if (Game.IsKeyDown(Menu.Item("Black Hole Key!").GetValue<KeyBind>().Key) && !Game.IsChatOpen)
             {
                 FindItems();
@@ -135,8 +138,28 @@ namespace Enigma
                 shivas = me.FindItem("item_shivas_guard");
                 refresher = me.FindItem("item_refresher");
                 glimmer = me.FindItem("item_glimmer_cape");
-                midnightpulse = me.Spellbook.SpellE;
-                blackhole = me.Spellbook.SpellR;
+
+                midnightpulse = null;
+                blackhole = null;
+
+                foreach (var spell in me.Spellbook.Spells)
+                {
+                    switch (spell.Id)
+                    {
+                        case AbilityId.enigma_midnight_pulse:
+                            {
+                                midnightpulse = spell;
+                            }
+                            break;
+
+                        case AbilityId.enigma_black_hole:
+                            {
+                                blackhole = spell;
+                            }
+                            break;
+                    }
+                }
+
                 Utils.Sleep(500, "FINDITEMS");
             }
         }
