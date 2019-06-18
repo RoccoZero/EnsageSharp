@@ -17,7 +17,7 @@ using Color = System.Drawing.Color;
 
 namespace JungleScanPlus
 {
-    [ExportPlugin("JungleScanPlus", StartupMode.Auto, "YEEEEEEE", "2.0.1.1")]
+    [ExportPlugin("JungleScanPlus", StartupMode.Auto, "YEEEEEEE", "2.0.2.0")]
     public class JungleScanPlus : Plugin
     {
         private Config Config { get; set; }
@@ -51,45 +51,41 @@ namespace JungleScanPlus
                 ExtraSize = 25;
             }
             
-            Entity.OnParticleEffectAdded += OnParticleEvent;
+            Entity.OnParticleEffectReleased += OnParticleEffectReleased;
             RendererManager.Value.Draw += OnDraw;
         }
 
         protected override void OnDeactivate()
         {
             RendererManager.Value.Draw -= OnDraw;
-            Entity.OnParticleEffectAdded -= OnParticleEvent;
+            Entity.OnParticleEffectReleased -= OnParticleEffectReleased;
             
             Config?.Dispose();
         }
 
-        private void OnParticleEvent(Entity sender, ParticleEffectAddedEventArgs args)
+        private void OnParticleEffectReleased(Entity sender, ParticleEffectReleasedEventArgs args)
         {
-            if (args.ParticleEffect.Owner == null || !args.ParticleEffect.IsValid || args.ParticleEffect.Owner.IsVisible)
+            var particleEffect = args.ParticleEffect;
+            if (particleEffect.Owner == null || !particleEffect.IsValid || particleEffect.Owner.IsVisible)
             {
                 return;
             }
 
-            if (!args.Name.Contains("generic_hit_blood") || !sender.Name.Contains("npc_dota_neutral_") && !sender.Name.Contains("npc_dota_roshan"))
+            if (!particleEffect.Name.Contains("generic_hit_blood") || !sender.Name.Contains("npc_dota_neutral_") && !sender.Name.Contains("npc_dota_roshan"))
             {
                 return;
             }
 
+            Pos.RemoveAll(x => x.GetPos.Distance(particleEffect.GetControlPoint(0)) < 500);
+            Pos.Add(new Position(particleEffect.GetControlPoint(0)));
+
+            var rawGameTime = Game.RawGameTime;
             UpdateManager.BeginInvoke(
-                    () =>
-                    {
-                        Pos.RemoveAll(x => x.GetPos.Distance(args.ParticleEffect.GetControlPoint(0)) < 500);
-                        Pos.Add(new Position(args.ParticleEffect.GetControlPoint(0)));
-
-                        var rawGameTime = Game.RawGameTime;
-                        UpdateManager.BeginInvoke(
-                            () =>
-                            {
-                                Pos.RemoveAll(x => x.GetGameTime == rawGameTime);
-                            },
-                            Config.TimerItem.Value * 1000);
-                    },
-                    20);
+                () =>
+                {
+                    Pos.RemoveAll(x => x.GetGameTime == rawGameTime);
+                },
+                Config.TimerItem.Value * 1000);
         }
 
         private void OnDraw(object sender, EventArgs e)
