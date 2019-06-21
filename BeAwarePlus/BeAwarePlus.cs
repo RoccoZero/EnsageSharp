@@ -138,6 +138,11 @@ namespace BeAwarePlus
         private void OnParticleEvent(Entity sender, ParticleEffectAddedEventArgs args)
         {
             var particleEffect = args.ParticleEffect;
+            if (!particleEffect.IsValid)
+            {
+                return;
+            }
+
             var name = particleEffect.Name;
 
             DelayAction.Add(-1, () => 
@@ -344,6 +349,11 @@ namespace BeAwarePlus
 
             UpdateManager.BeginInvoke(() =>
             {
+                if (!particleEffect.IsValid)
+                {
+                    return;
+                }
+
                 // Items
                 if (Config.ParticleToTexture.Items.Any(x => name.Contains(x.Key)))
                 {
@@ -450,6 +460,11 @@ namespace BeAwarePlus
         private void OnParticleEffectReleased(Entity sender, ParticleEffectReleasedEventArgs args)
         {
             var particleEffect = args.ParticleEffect;
+            if (!particleEffect.IsValid)
+            {
+                return;
+            }
+
             var name = particleEffect.Name;
 
             if (name.Contains("blink_dagger_end"))
