@@ -52,6 +52,11 @@ namespace BeAwarePlus.Checker
 
         public void ModifierAlly(Unit sender, ModifierChangedEventArgs args)
         {
+            if (sender == null || args.Modifier == null)
+            {
+                return;
+            }
+
             if (MenuManager.SpellsItem.Value)
             {
                 var HeroTexturName = sender.Name.Substring("npc_dota_hero_".Length);
