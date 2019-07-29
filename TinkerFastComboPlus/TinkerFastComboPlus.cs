@@ -441,7 +441,7 @@ namespace TinkerFastComboPlus
                 Castrange += (int)aetherLens.AbilitySpecialData.First(x => x.Name == "cast_range_bonus").Value;
             }
 
-            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_cast_range_100");
+            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_cast_range_125");
             if (talent10.Level > 0)
             {
                 Castrange += (int)talent10.AbilitySpecialData.First(x => x.Name == "value").Value;
@@ -1359,7 +1359,7 @@ namespace TinkerFastComboPlus
                 Castrange += (int)aetherLens.AbilitySpecialData.First(x => x.Name == "cast_range_bonus").Value;
             }
 
-            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_cast_range_100");
+            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_cast_range_125");
             if (talent10.Level > 0)
             {
                 Castrange += (int)talent10.AbilitySpecialData.First(x => x.Name == "value").Value;
@@ -2114,7 +2114,7 @@ namespace TinkerFastComboPlus
                 Castrange += (int)aetherLens.AbilitySpecialData.First(x => x.Name == "cast_range_bonus").Value;
             }
 
-            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_cast_range_100");
+            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_cast_range_125");
             if (talent10.Level > 0)
             {
                 Castrange += (int)talent10.AbilitySpecialData.First(x => x.Name == "value").Value;
@@ -3200,7 +3200,7 @@ namespace TinkerFastComboPlus
             }
 
             //Spell Amplification Calculation (addition)
-            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_spell_amplify_8");
+            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_spell_amplify_10");
             if (talent10.Level > 0)
             {
                 totalSpellAmp += (talent10.AbilitySpecialData.First(x => x.Name == "value").Value) / 100.0f;
@@ -3230,7 +3230,7 @@ namespace TinkerFastComboPlus
             }
 
             //Spell Amplification Calculation (addition)
-            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_spell_amplify_8");
+            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_spell_amplify_10");
             if (talent10.Level > 0)
             {
                 totalSpellAmp += (talent10.AbilitySpecialData.First(x => x.Name == "value").Value) / 100.0f;
@@ -3260,7 +3260,7 @@ namespace TinkerFastComboPlus
             }
 
             //Spell Amplification Calculation (addition)
-            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_spell_amplify_8");
+            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_spell_amplify_10");
             if (talent10.Level > 0)
             {
                 totalSpellAmp += (talent10.AbilitySpecialData.First(x => x.Name == "value").Value) / 100.0f;
@@ -3301,7 +3301,7 @@ namespace TinkerFastComboPlus
             }
 
             //Spell Amplification Calculation (addition)
-            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_spell_amplify_8");
+            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_spell_amplify_10");
             if (talent10.Level > 0)
             {
                 totalSpellAmp += (talent10.AbilitySpecialData.First(x => x.Name == "value").Value) / 100.0f;
