@@ -17,16 +17,14 @@ namespace BeAwarePlus
     {
         private BeAwarePlusConfig Config { get; set; }
 
-        public IRendererManager Render { get; }
+        public IRenderManager Render { get; }
 
         public IEntityContext<Unit> Context { get; }
 
         private Hero CheckEnemyBlink { get; set; }
 
         [ImportingConstructor]
-        public BeAwarePlus(
-            [Import] IRendererManager render, 
-            [Import] IEntityContext<Unit> context)
+        public BeAwarePlus([Import] IRenderManager render, [Import] IEntityContext<Unit> context)
         {
             Render = render;
             Context = context;

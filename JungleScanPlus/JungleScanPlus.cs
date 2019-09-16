@@ -22,7 +22,7 @@ namespace JungleScanPlus
     {
         private Config Config { get; set; }
 
-        private Lazy<IRendererManager> RendererManager { get; }
+        private IRenderManager RendererManager { get; }
 
         private List<Position> Pos { get; } = new List<Position>();
 
@@ -31,7 +31,7 @@ namespace JungleScanPlus
         private int ExtraSize { get; set; }
 
         [ImportingConstructor]
-        public JungleScanPlus([Import] Lazy<IRendererManager> rendererManager)
+        public JungleScanPlus([Import] IRenderManager rendererManager)
         {
             RendererManager = rendererManager;
         }
@@ -52,12 +52,12 @@ namespace JungleScanPlus
             }
             
             Entity.OnParticleEffectReleased += OnParticleEffectReleased;
-            RendererManager.Value.Draw += OnDraw;
+            RendererManager.Draw += OnDraw;
         }
 
         protected override void OnDeactivate()
         {
-            RendererManager.Value.Draw -= OnDraw;
+            RendererManager.Draw -= OnDraw;
             Entity.OnParticleEffectReleased -= OnParticleEffectReleased;
             
             Config?.Dispose();
@@ -88,7 +88,7 @@ namespace JungleScanPlus
                 Config.TimerItem.Value * 1000);
         }
 
-        private void OnDraw(object sender, EventArgs e)
+        private void OnDraw(IRenderer renderer)
         {
             var color = Color.FromArgb(Config.RedItem, Config.GreenItem, Config.BlueItem);
             foreach (var position in Pos.ToList())
@@ -99,24 +99,14 @@ namespace JungleScanPlus
                     continue;
                 }
 
-                RendererManager.Value.DrawText(
-                    pos.WorldToMinimap() - ExtraPos,
-                    "○",
-                    color,
-                    ExtraSize,
-                    "Arial Black");
+                renderer.DrawText(pos.WorldToMinimap() - ExtraPos, "○", color, ExtraSize, "Arial Black");
 
                 if (Config.DrawWorldItem)
                 {
                     var screenPos = Drawing.WorldToScreen(pos);
                     if (!screenPos.IsZero)
                     {
-                        RendererManager.Value.DrawText(
-                        screenPos,
-                        "Enemy",
-                        color,
-                        35,
-                        "Arial Black");
+                        renderer.DrawText(screenPos, "Enemy", color, 35, "Arial Black");
                     }
                 }
             }

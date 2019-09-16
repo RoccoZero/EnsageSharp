@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 
 using Ensage;
 using Ensage.SDK.Extensions;
 using Ensage.SDK.Helpers;
-using Ensage.SDK.Renderer;
 using Ensage.SDK.Renderer.Particle;
 using Ensage.SDK.Service;
 using Ensage.SDK.Service.Metadata;
@@ -21,13 +18,9 @@ namespace VisibleByEnemyPlus
     {
         private Unit Owner { get; }
 
-        private Lazy<IParticleManager> ParticleManager { get; }
-
-        private Lazy<IRendererManager> RendererManager { get; }
+        private IParticleManager ParticleManager { get; }
 
         private Config Config { get; set; }
-
-        private List<Vector3> PosShrines { get; } = new List<Vector3>();
 
         private bool AddEffectType { get; set; }
 
@@ -39,19 +32,11 @@ namespace VisibleByEnemyPlus
 
         private int Alpha => Config.AlphaItem;
 
-        private Vector2 ExtraPos { get; set; }
-
-        private int ExtraSize { get; set; }
-
         [ImportingConstructor]
-        public VisibleByEnemyPlus(
-            [Import] IServiceContext context, 
-            [Import] Lazy<IParticleManager> particlemanager,
-            [Import] Lazy<IRendererManager> renderermanager)
+        public VisibleByEnemyPlus([Import] IServiceContext context, [Import] IParticleManager particlemanager)
         {
             Owner = context.Owner;
             ParticleManager = particlemanager;
-            RendererManager = renderermanager;
         }
 
         protected override void OnActivate()
@@ -64,17 +49,6 @@ namespace VisibleByEnemyPlus
             Config.GreenItem.PropertyChanged += ItemChanged;
             Config.BlueItem.PropertyChanged += ItemChanged;
             Config.AlphaItem.PropertyChanged += ItemChanged;
-
-            if (Drawing.RenderMode == RenderMode.Dx9)
-            {
-                ExtraPos = new Vector2(8, 7);
-                ExtraSize = 18;
-            }
-            else if (Drawing.RenderMode == RenderMode.Dx11)
-            {
-                ExtraPos = new Vector2(5, 7);
-                ExtraSize = 15;
-            }
 
             UpdateManager.Subscribe(LoopEntities, 250);
         }
@@ -91,7 +65,7 @@ namespace VisibleByEnemyPlus
             Config.AlphaItem.PropertyChanged -= ItemChanged;
 
             Config?.Dispose();
-            ParticleManager.Value.Dispose();
+            ParticleManager.Dispose();
         }
 
         private void ItemChanged(object sender, PropertyChangedEventArgs e)
@@ -225,7 +199,7 @@ namespace VisibleByEnemyPlus
 
             if (visible && unit.IsAlive && unit.Position.IsOnScreen())
             {
-                ParticleManager.Value.AddOrUpdate(
+                ParticleManager.AddOrUpdate(
                     unit,
                     $"unit_{unit.Handle}",
                     Config.Effects[Config.EffectTypeItem.Value.SelectedIndex],
@@ -238,7 +212,7 @@ namespace VisibleByEnemyPlus
             }
             else if (AddEffectType)
             {
-                ParticleManager.Value.Remove($"unit_{ unit.Handle }");
+                ParticleManager.Remove($"unit_{ unit.Handle }");
             }
         }
     }

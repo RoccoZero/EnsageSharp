@@ -16,7 +16,7 @@ namespace BeAwarePlus.Renderer
     {
         private MenuManager MenuManager { get; }
 
-        private IRendererManager Render { get; }
+        private IRenderManager Render { get; }
 
         private GlobalMiniMap GlobalMiniMap { get; }
 
@@ -32,7 +32,7 @@ namespace BeAwarePlus.Renderer
 
         public OnMiniMap(
             MenuManager menumanager,
-            IRendererManager renderer, 
+            IRenderManager renderer, 
             GlobalMiniMap globalminimap)
         {
             MenuManager = menumanager;
@@ -87,29 +87,19 @@ namespace BeAwarePlus.Renderer
         }
 
         private void DrawShadowText(
-            IRendererManager Render, 
+            IRenderer Render, 
             Vector2 pos, 
             string text, 
             System.Drawing.Color color, 
             float size,
             string font)
         {
-            Render.DrawText(
-                pos + 2, 
-                text, 
-                System.Drawing.Color.Black, 
-                size,
-                font);
+            Render.DrawText(pos + 2, text, System.Drawing.Color.Black, size, font);
 
-            Render.DrawText(
-                pos, 
-                text, 
-                color,
-                size,
-                font);
+            Render.DrawText(pos, text, color, size, font);
         }
 
-        private void OnDraw(object sender, EventArgs e)
+        private void OnDraw(IRenderer renderer)
         {
             foreach (var MiniMap in GlobalMiniMap.MiniMapList.ToList())
             {
@@ -121,7 +111,7 @@ namespace BeAwarePlus.Renderer
                 if (MiniMap.GetEnd)
                 {
                     DrawShadowText(
-                        Render,
+                        renderer,
                         new Vector2(pos.X - ExrtaPos, pos.Y - 31),
                         name,
                         MiniMap.GetHeroColor,
@@ -130,7 +120,7 @@ namespace BeAwarePlus.Renderer
                 }
 
                 DrawShadowText(
-                    Render,
+                    renderer,
                     pos - IconExtra,
                     "⚪",
                     MiniMap.GetHeroColor,
@@ -140,7 +130,7 @@ namespace BeAwarePlus.Renderer
                 if (MiniMap.GetTeleport)
                 {
                     DrawShadowText(
-                    Render,
+                    renderer,
                     pos - TPTextExtra,
                     "TP",
                     MiniMap.GetHeroColor,
