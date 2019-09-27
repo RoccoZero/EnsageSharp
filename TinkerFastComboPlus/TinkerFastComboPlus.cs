@@ -3102,8 +3102,8 @@ namespace TinkerFastComboPlus
                 var etheral_blade_magic_reduction = 0.0f;
                 var veil_of_discord_magic_reduction = 0.0f;
 
-                var eblade = Owner.Inventory.Items.FirstOrDefault(x => x.Name.Contains("item_ethereal_blade"));
-
+                var eblade = Abilities.Ethereal;
+                
                 if (((eblade != null && eblade.CanBeCasted())
                     || (eblade != null && IsCasted(eblade)))
                     && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled("item_ethereal_blade")
@@ -3112,7 +3112,7 @@ namespace TinkerFastComboPlus
                     etheral_blade_magic_reduction = 0.4f;
                 }
 
-                var veil = Owner.Inventory.Items.FirstOrDefault(x => x.Name.Contains("item_veil_of_discord"));
+                var veil = Abilities.Veil;
                 if (veil != null
                     && veil.CanBeCasted()
                     && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled("item_veil_of_discord")
@@ -3120,17 +3120,17 @@ namespace TinkerFastComboPlus
                 {
                     veil_of_discord_magic_reduction = 0.25f;
                 }
-
+                
                 var totalMagicResistance = ((1 - enemy.MagicDamageResist) * (1 + etheral_blade_magic_reduction) * (1 + veil_of_discord_magic_reduction));
-                var dagon = Owner.Inventory.Items.FirstOrDefault(x => x.Name.Contains("item_dagon"));
+                var dagon = Abilities.Dagon;
                 if (dagon != null
                     && dagon.CanBeCasted()
                     && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled("item_dagon")
-                    && (Owner.Distance2D(enemy) < dagon.AbilitySpecialData.First(x => x.Name == "#AbilityCastRange").GetValue(dagon.Level - 1) + Castrange + Ensage_error))
+                    && (Owner.Distance2D(enemy) < dagon.AbilitySpecialData.First(x => x.Name == "AbilityCastRange").GetValue(dagon.Level - 1) + Castrange + Ensage_error))
                 {
                     comboDamageByDistance += GetDagonDamage() * totalMagicResistance;
                 }
-
+                
                 if (((eblade != null && eblade.CanBeCasted())
                     || (eblade != null && IsCasted(eblade)))
                     && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled("item_ethereal_blade")
@@ -3139,7 +3139,7 @@ namespace TinkerFastComboPlus
                     comboDamageByDistance += GetEtherealBladeDamage() * totalMagicResistance;
                 }
 
-                var laser = Owner.Spellbook.SpellQ;
+                var laser = Abilities.Laser;
                 if (laser != null
                     && laser.Level > 0
                     && laser.CanBeCasted()
@@ -3149,7 +3149,7 @@ namespace TinkerFastComboPlus
                 }
 
                 //Distance Calculation
-                var rocket = Owner.Spellbook.SpellW;
+                var rocket = Abilities.Rocket;
                 if ((rocket != null && rocket.Level > 0 && rocket.CanBeCasted()) || (rocket != null && rocket.Level > 0 && IsCasted(rocket)))
                 {
                     if (Owner.Distance2D(enemy) < 800 + Castrange + Ensage_error)
