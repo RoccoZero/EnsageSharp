@@ -223,7 +223,8 @@ namespace TinkerFastComboPlus
                 Menu.AddSubMenu(_MarchSpam);
 
                 var _autopush = new Menu("Auto Push", "Auto Push");
-                _autopush.AddItem(new MenuItem("autoPush", "Enable auto push helper").SetValue(false));
+                _autopush.AddItem(new MenuItem("autoPushToggle", "Auto Push Toggle").SetValue(new KeyBind('0', KeyBindType.Toggle, false)));
+                //_autopush.AddItem(new MenuItem("autoPush", "Enable auto push helper").SetValue(false));
                 _autopush.AddItem(new MenuItem("autoRearm", "Enable auto rearm in fountain when travel boots on cooldown").SetValue(false));
                 _autopush.AddItem(new MenuItem("pushFount", "Use auto push if I have modif Fountain").SetValue(false));
                 _autopush.AddItem(new MenuItem("pushSafe", "Use march only after blinking to a safe spot").SetValue(false));
@@ -264,7 +265,6 @@ namespace TinkerFastComboPlus
                 Menu.AddItem(new MenuItem("Combo Key", "Combo Key").SetValue(new KeyBind('D', KeyBindType.Press)));
                 Menu.AddItem(new MenuItem("ComboMode", "Combo Mode")).SetValue(new StringList(new[] { "Fast", "MpSaving" }));
                 Menu.AddItem(new MenuItem("TargetLock", "Target Lock")).SetValue(new StringList(new[] { "Free", "Lock" }));
-                Menu.AddItem(new MenuItem("Chase", "Chase Toggle").SetValue(new KeyBind('F', KeyBindType.Toggle, false)).SetTooltip("Toggle for chasing"));
 
                 Menu.AddItem(new MenuItem("Rocket Spam Key", "Rocket Spam Key").SetValue(new KeyBind('W', KeyBindType.Press)));
                 Menu.AddItem(new MenuItem("March Spam Key", "March Spam Key").SetValue(new KeyBind('E', KeyBindType.Press)));
@@ -449,7 +449,7 @@ namespace TinkerFastComboPlus
 
             //Auto Push
             // ghost -> glimmer -> march -> move or blink to safe -> soulring -> rearm
-            if (Menu.Item("autoPush").IsActive()
+            if (Menu.Item("autoPushToggle").IsActive()
                 && !Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key)
                 && !Game.IsKeyDown(Menu.Item("Rocket Spam Key").GetValue<KeyBind>().Key)
                 && !Game.IsKeyDown(Menu.Item("March Spam Key").GetValue<KeyBind>().Key)
@@ -957,9 +957,7 @@ namespace TinkerFastComboPlus
                 Target = null;
             }
            	
-            if (Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key)
-                && (!Menu.Item("Chase").GetValue<KeyBind>().Active) 
-                && !Game.IsChatOpen)
+            if (Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key) && !Game.IsChatOpen)
             {
 				var targetLock = Menu.Item("TargetLock").GetValue<StringList>().SelectedIndex;
                 if (Utils.SleepCheck("UpdateTarget") && (Target == null || !Target.IsValid || !Target.IsAlive || !Target.IsVisible || (Target.IsVisible && targetLock == 0)))
@@ -1290,55 +1288,6 @@ namespace TinkerFastComboPlus
                     {
                         Owner.Move(Game.MousePosition);
                         Utils.Sleep(150, "MousePosition");
-                    } 
-                }
-            }
-			
-            if ((Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key)) 
-                && (Menu.Item("Chase").GetValue<KeyBind>().Active) 
-                && !Game.IsChatOpen)
-            {
-				var targetLock = Menu.Item("TargetLock").GetValue<StringList>().SelectedIndex;
-                if (Utils.SleepCheck("UpdateTarget")
-                    && (Target == null || !Target.IsValid || !Target.IsAlive || !Target.IsVisible || (Target.IsVisible && targetLock == 0)))
-                {
-                    Target = TargetSelector.ClosestToMouse(Owner, 2000);
-                    Utils.Sleep(250, "UpdateTarget");
-                }
-
-                if (Target != null && Target.IsAlive && !Target.IsIllusion && !Owner.IsChanneling() && !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase))
-                {
-                    if (!Owner.Modifiers.Any(y => y.Name == "modifier_bloodseeker_rupture"))
-                    {
-                        if (!Owner.IsChanneling() && Owner.CanAttack() 			
-                            && !Target.IsAttackImmune() 
-							&& (!Target.Modifiers.Any(y => y.Name == "modifier_nyx_assassin_spiked_carapace") || Owner.IsMagicImmune())
-							&& Utils.SleepCheck("Rearm"))
-                        {
-                            if (Owner.Distance2D(Target) > Owner.GetAttackRange() - 100 )
-                            {
-                                Orbwalking.Orbwalk(Target);
-                            }
-                            else
-                            {
-                                Owner.Attack(Target);
-                            }
-                        }
-                        else
-                        {
-                            Owner.Move(Game.MousePosition, false);
-                        }
-                    }				                   			
-                }
-                else
-                {
-                    if (!Owner.IsChanneling() 			
-                        && !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase)					
-                        && !Owner.Modifiers.Any(y => y.Name == "modifier_bloodseeker_rupture")
-                        && Utils.SleepCheck("SpeedChase"))
-                    {
-                        Owner.Move(Game.MousePosition);
-                        Utils.Sleep(150, "SpeedChase");
                     } 
                 }
             }
@@ -1962,7 +1911,7 @@ namespace TinkerFastComboPlus
                 if (Menu.Item("autoKillsteal").GetValue<bool>()
                     && Owner.IsAlive
                     && Owner.IsVisible
-                    && (Menu.Item("Chase").GetValue<KeyBind>().Active || !Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key)))
+                    && !Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key))
                 {
                     if (e.Health < GetComboDamageByDistance(e)
                         && Owner.Mana >= ManaFactDamage(e)
@@ -2962,8 +2911,7 @@ namespace TinkerFastComboPlus
                 if (Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key) && !Game.IsChatOpen)
                 {
                     Drawing.DrawText(" ON!", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 + 150, HUDInfo.ScreenSizeY() / 2 + 235 + 2), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-                    Drawing.DrawText(" ON!", new Vector2(HUDInfo.ScreenSizeX() / 2 + 150, HUDInfo.ScreenSizeY() / 2 + 235), new Vector2(30, 200), Menu.Item("Chase").GetValue<KeyBind>().Active == true ? Color.Red : Color.LimeGreen, FontFlags.AntiAlias);
-
+                    Drawing.DrawText(" ON!", new Vector2(HUDInfo.ScreenSizeX() / 2 + 150, HUDInfo.ScreenSizeY() / 2 + 235), new Vector2(30, 200), Color.LimeGreen, FontFlags.AntiAlias);
                 }
 
                 if (Game.IsKeyDown(Menu.Item("Rocket Spam Key").GetValue<KeyBind>().Key) && !Game.IsChatOpen)
@@ -2979,16 +2927,16 @@ namespace TinkerFastComboPlus
 
                 }
 
-                Drawing.DrawText(Menu.Item("Chase").GetValue<KeyBind>().Active == true ? "Chase Mode" : "Combo Mode", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2, HUDInfo.ScreenSizeY() / 2 + 235 + 2), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-                Drawing.DrawText(Menu.Item("Chase").GetValue<KeyBind>().Active == true ? "Chase Mode" : "Combo Mode", new Vector2(HUDInfo.ScreenSizeX() / 2, HUDInfo.ScreenSizeY() / 2 + 235), new Vector2(30, 200), Menu.Item("Chase").GetValue<KeyBind>().Active == true ? Color.Red : Color.LimeGreen, FontFlags.AntiAlias);
+                Drawing.DrawText("Combo Mode", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2, HUDInfo.ScreenSizeY() / 2 + 235 + 2), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText("Combo Mode", new Vector2(HUDInfo.ScreenSizeX() / 2, HUDInfo.ScreenSizeY() / 2 + 235), new Vector2(30, 200), Color.LimeGreen, FontFlags.AntiAlias);
 
                 Drawing.DrawText(Menu.Item("TargetLock").GetValue<StringList>().SelectedIndex == 0 ? "Target: Free" : "Target: Lock", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2, HUDInfo.ScreenSizeY() / 2 + 285 + 2), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
                 Drawing.DrawText(Menu.Item("TargetLock").GetValue<StringList>().SelectedIndex == 0 ? "Target: Free" : "Target: Lock", new Vector2(HUDInfo.ScreenSizeX() / 2, HUDInfo.ScreenSizeY() / 2 + 285), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
 
                 if (Menu.Item("autoKillsteal").GetValue<bool>())
                 {
-                    Drawing.DrawText((Menu.Item("Chase").GetValue<KeyBind>().Active == true || !Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key)) ? "KS: on" : "KS: off", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2, HUDInfo.ScreenSizeY() / 2 + 260 + 2), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-                    Drawing.DrawText((Menu.Item("Chase").GetValue<KeyBind>().Active == true || !Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key)) ? "KS: on" : "KS: off", new Vector2(HUDInfo.ScreenSizeX() / 2, HUDInfo.ScreenSizeY() / 2 + 260), new Vector2(30, 200), (Menu.Item("Chase").GetValue<KeyBind>().Active == true || !Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key)) ? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);
+                    Drawing.DrawText(!Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key) ? "KS: on" : "KS: off", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2, HUDInfo.ScreenSizeY() / 2 + 260 + 2), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                    Drawing.DrawText(!Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key) ? "KS: on" : "KS: off", new Vector2(HUDInfo.ScreenSizeX() / 2, HUDInfo.ScreenSizeY() / 2 + 260), new Vector2(30, 200), !Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key) ? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);
                 }
             }
 		}
