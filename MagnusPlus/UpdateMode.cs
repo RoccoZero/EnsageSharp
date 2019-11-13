@@ -88,7 +88,7 @@ namespace MagnusPlus
                         2,
                         420 * -1.1f);
 
-                    Context.Particle.AddOrUpdate(
+                    /*Context.Particle.AddOrUpdate(
                         Context.Owner,
                         $"Text{Output.Unit.Handle}",
                         "materials/ensage_ui/particle_textures/combo.vpcf",
@@ -101,7 +101,7 @@ namespace MagnusPlus
                         2,
                         new Vector3(200, 255, 0),
                         3,
-                        new Vector3(255, 255, 255));
+                        new Vector3(255, 255, 255));*/
                 }
                 else
                 {

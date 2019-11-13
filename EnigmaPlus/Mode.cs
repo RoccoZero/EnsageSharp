@@ -275,7 +275,7 @@ namespace EnigmaPlus
             }
             else
             {
-                Context.Particle.AddOrUpdate(
+                /*Context.Particle.AddOrUpdate(
                     Owner,
                     "Text",
                     "materials/ensage_ui/particles/text.vpcf",
@@ -300,7 +300,7 @@ namespace EnigmaPlus
                     10,
                     new Vector3(50, 16, 0),
                     11,
-                    new Vector3(255, 0, 0));
+                    new Vector3(255, 0, 0));*/
             }
 
             var Targets =
