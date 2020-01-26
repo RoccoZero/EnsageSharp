@@ -18,11 +18,11 @@ namespace DotaMapPlus
 
         private ConVar RVar { get; }
 
-        private int DefaultZoomValue { get; } = 1134;
+        private int DefaultZoomValue { get; } = 1200;
 
         private int MaxZoomValue { get; } = 9000;
 
-        private int MinZoomValue { get; } = 1134;
+        private int MinZoomValue { get; } = 1200;
 
         private Lazy<IInputManager> InputManage { get; }
 
