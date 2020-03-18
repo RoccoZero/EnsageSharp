@@ -441,7 +441,7 @@ namespace TinkerFastComboPlus
                 Castrange += (int)aetherLens.AbilitySpecialData.First(x => x.Name == "cast_range_bonus").Value;
             }
 
-            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_cast_range_125");
+            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_cast_range_150");
             if (talent10.Level > 0)
             {
                 Castrange += (int)talent10.AbilitySpecialData.First(x => x.Name == "value").Value;
@@ -1308,7 +1308,7 @@ namespace TinkerFastComboPlus
                 Castrange += (int)aetherLens.AbilitySpecialData.First(x => x.Name == "cast_range_bonus").Value;
             }
 
-            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_cast_range_125");
+            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_cast_range_150");
             if (talent10.Level > 0)
             {
                 Castrange += (int)talent10.AbilitySpecialData.First(x => x.Name == "value").Value;
@@ -2063,7 +2063,7 @@ namespace TinkerFastComboPlus
                 Castrange += (int)aetherLens.AbilitySpecialData.First(x => x.Name == "cast_range_bonus").Value;
             }
 
-            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_cast_range_125");
+            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_cast_range_150");
             if (talent10.Level > 0)
             {
                 Castrange += (int)talent10.AbilitySpecialData.First(x => x.Name == "value").Value;
