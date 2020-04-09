@@ -21,7 +21,7 @@ namespace PudgePlus
 
         public MenuManager Menu { get; }
 
-        public Extensions Extensions { get; }
+        public Helpers Helpers { get; }
 
         public UpdateMode UpdateMode { get; }
 
@@ -48,7 +48,7 @@ namespace PudgePlus
             MultiSleeper = new MultiSleeper();
 
             Menu = new MenuManager(this);
-            Extensions = new Extensions(this);
+            Helpers = new Helpers(this);
 
             UpdateMode = new UpdateMode(this);
             DamageCalculation = new DamageCalculation(this);

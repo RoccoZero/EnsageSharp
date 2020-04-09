@@ -30,7 +30,7 @@ namespace PudgePlus
 
         private UpdateMode UpdateMode { get; }
 
-        private Extensions Extensions { get; }
+        private Helpers Extensions { get; }
 
         private MultiSleeper MultiSleeper { get; }
 
@@ -49,7 +49,7 @@ namespace PudgePlus
             Menu = config.Menu;
             Main = config.Main;
             UpdateMode = config.UpdateMode;
-            Extensions = config.Extensions;
+            Extensions = config.Helpers;
             MultiSleeper = config.MultiSleeper;
 
             Entity.OnBoolPropertyChange += OnHookCast;

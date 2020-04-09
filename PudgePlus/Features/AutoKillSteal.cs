@@ -20,7 +20,7 @@ namespace PudgePlus.Features
 
         private PudgePlus Main { get; }
 
-        private Extensions Extensions { get; }
+        private Helpers Extensions { get; }
 
         private DamageCalculation DamageCalculation { get; }
 
@@ -39,7 +39,7 @@ namespace PudgePlus.Features
             Config = config;
             Menu = config.Menu;
             Main = config.Main;
-            Extensions = config.Extensions;
+            Extensions = config.Helpers;
             DamageCalculation = config.DamageCalculation;
             MultiSleeper = config.MultiSleeper;
             Owner = config.Main.Context.Owner;
@@ -199,7 +199,7 @@ namespace PudgePlus.Features
                 && !target.IsMagicImmune()
                 && !target.IsInvulnerable()
                 && !target.HasAnyModifiers("modifier_dazzle_shallow_grave", "modifier_necrolyte_reapers_scythe")
-                && !Config.Extensions.DuelAghanimsScepter(target)
+                && !Config.Helpers.DuelAghanimsScepter(target)
                 && !Reincarnation(target);
         }
 

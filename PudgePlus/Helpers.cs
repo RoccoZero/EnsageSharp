@@ -7,13 +7,13 @@ using Ensage.SDK.Prediction;
 
 namespace PudgePlus
 {
-    internal class Extensions
+    internal class Helpers
     {
         private MenuManager Menu { get; }
 
         private Unit Owner { get; }
 
-        public Extensions(Config config)
+        public Helpers(Config config)
         {
             Menu = config.Menu;
             Owner = config.Main.Context.Owner;

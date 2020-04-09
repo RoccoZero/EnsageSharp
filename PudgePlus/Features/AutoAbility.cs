@@ -18,7 +18,7 @@ namespace PudgePlus.Features
 
         private UpdateMode UpdateMode { get; }
 
-        private Extensions Extensions { get; }
+        private Helpers Extensions { get; }
 
         private Unit Owner { get; }
 
@@ -31,7 +31,7 @@ namespace PudgePlus.Features
             Menu = config.Menu;
             Main = config.Main;
             UpdateMode = config.UpdateMode;
-            Extensions = config.Extensions;
+            Extensions = config.Helpers;
             Owner = config.Main.Context.Owner;
 
             Player.OnExecuteOrder += OnExecuteOrder;
