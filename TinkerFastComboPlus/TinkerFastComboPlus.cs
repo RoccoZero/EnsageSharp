@@ -80,12 +80,12 @@ namespace TinkerFastComboPlus
         private Hero Owner { get; }
 
         private Hero Target { get; set; }
-        
+
         private Dictionary<Unit, ParticleEffect> VisibleUnit { get; } = new Dictionary<Unit, ParticleEffect>();
 
         private List<ParticleEffect> Effects { get; } = new List<ParticleEffect>();
 
-        private string EffectPath { get; } = @"materials\ensage_ui\particles\other_range_blue.vpcf";        
+        private string EffectPath { get; } = @"materials\ensage_ui\particles\other_range_blue.vpcf";
 
         private Menu Menu { get; } = new Menu("TinkerFastComboPlus", "TinkerFastComboPlus", true, "npc_dota_hero_tinker", true).SetFontColor(Color.Aqua);
 
@@ -138,7 +138,7 @@ namespace TinkerFastComboPlus
             {"item_cyclone",true},
             {"tinker_laser",true}
         };
-            
+
         private Dictionary<string, bool> RocketSpamSkills { get; } = new Dictionary<string, bool>
         {
             {"tinker_rearm",true},
@@ -164,24 +164,24 @@ namespace TinkerFastComboPlus
             {"item_ghost",false}
         };
 
-        private string[] SoulringSpells { get; } = 
+        private string[] SoulringSpells { get; } =
         {
             "tinker_heat_seeking_missile",
             "tinker_rearm",
             "tinker_march_of_the_machines"
-        };			
-			
+        };
+
         private int[] Laser_mana { get; } = new int[4] { 110, 130, 150, 170 };
 
-		private int[] Rocket_mana { get; } = new int[4] { 80, 100, 120, 140 };	
+        private int[] Rocket_mana { get; } = new int[4] { 80, 100, 120, 140 };
 
-		private int[] Rearm_mana { get; } = new int[3] { 100, 200, 300 };	
-		
+        private int[] Rearm_mana { get; } = new int[3] { 100, 200, 300 };
+
         private int[] Dagondistance { get; } = new int[5] { 600, 650, 700, 750, 800 };
-        
-		private int Ensage_error { get; } = 50;
 
-		private int Castrange { get; set; } = 0;
+        private int Ensage_error { get; } = 50;
+
+        private int Castrange { get; set; } = 0;
 
         private double Angle { get; set; }
 
@@ -289,7 +289,7 @@ namespace TinkerFastComboPlus
 
                 UpdateManager.Subscribe(DrawRanges, 50);
                 ParticleDraw();
-            }, 
+            },
             5000);
         }
 
@@ -299,7 +299,7 @@ namespace TinkerFastComboPlus
         }
 
         public async void OnUpdate(EventArgs args)
-        {           
+        {
             if (FastRearmBlink && Utils.SleepCheck("updateAdd"))
             {
                 var safeRange = 1200 + Castrange;
@@ -311,7 +311,7 @@ namespace TinkerFastComboPlus
                     var a = tpos.ToVector2().FindAngleBetween(Game.MousePosition.ToVector2(), true);
 
                     safeRange -= (int)Owner.HullRadius;
-                    blinkparticlerange = new Vector3(tpos.X + safeRange * (float)Math.Cos(a), tpos.Y + safeRange * (float)Math.Sin(a),100);
+                    blinkparticlerange = new Vector3(tpos.X + safeRange * (float)Math.Cos(a), tpos.Y + safeRange * (float)Math.Sin(a), 100);
                 }
 
                 Blinkeffect?.Dispose();
@@ -325,7 +325,7 @@ namespace TinkerFastComboPlus
             {
                 DelayAction.Add(Time, () =>
                 {
-                    Blinkeffect?.Dispose();                
+                    Blinkeffect?.Dispose();
                 });
 
                 Utils.Sleep(2000, "updateRemover");
@@ -351,7 +351,7 @@ namespace TinkerFastComboPlus
                 }
             }
         }
-        
+
         private async Task Action(CancellationToken cancellationToken)
         {
             if (Utils.SleepCheck("FASTBLINK"))
@@ -402,9 +402,9 @@ namespace TinkerFastComboPlus
         }
         private void OnExecuteOrder(Player sender, ExecuteOrderEventArgs args)
         {
-            if (!BlockRearm) 
+            if (!BlockRearm)
             {
-                return;          
+                return;
             }
 
             if ((!Owner.HasModifier("modifier_fountain_aura_buff") || !NoBlockRearmFountain) && (!Owner.HasModifier("modifier_teleporting") || !NoBlockRearmTeleporting))
@@ -415,13 +415,13 @@ namespace TinkerFastComboPlus
                 }
             }
         }
-        
+
         private void ComboEngine(EventArgs args)
         {
             if (!Game.IsInGame || Game.IsWatchingGame)
             {
                 return;
-            } 
+            }
 
             var fount = EntityManager<Unit>.Entities.Where(x => x.Team == Owner.Team && x.NetworkName == "CDOTA_Unit_Fountain").ToList();
             var creeps = EntityManager<Creep>.Entities.Where(creep =>
@@ -565,12 +565,12 @@ namespace TinkerFastComboPlus
                         {
                             Utils.Sleep(3010, "Rearms");
                         }
-                            
+
                         if (Refresh.Level == 2)
                         {
                             Utils.Sleep(1510, "Rearms");
                         }
-                            
+
                         if (Refresh.Level == 3)
                         {
                             Utils.Sleep(760, "Rearms");
@@ -639,12 +639,12 @@ namespace TinkerFastComboPlus
                     {
                         Utils.Sleep(3010, "Rearms");
                     }
-                        
+
                     if (Refresh.Level == 2)
                     {
                         Utils.Sleep(1510, "Rearms");
                     }
-                        
+
                     if (Refresh.Level == 3)
                     {
                         Utils.Sleep(760, "Rearms");
@@ -653,19 +653,19 @@ namespace TinkerFastComboPlus
             }
 
             //Rocket Spam Mode
-            if (Game.IsKeyDown(Menu.Item("Rocket Spam Key").GetValue<KeyBind>().Key) 
-                && Utils.SleepCheck("RocketSpam") 
+            if (Game.IsKeyDown(Menu.Item("Rocket Spam Key").GetValue<KeyBind>().Key)
+                && Utils.SleepCheck("RocketSpam")
                 && !Game.IsChatOpen)
             {
-				if (Blink != null && Blink.CanBeCasted() && Menu.Item("RocketSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Blink.Name)
-                    && !Owner.IsChanneling()  
-					&& Utils.SleepCheck("Rearms") 
-					&& (!Owner.Modifiers.Any(y => y.Name == "modifier_bloodseeker_rupture") || (Owner.Distance2D(Game.MousePosition) > 1325 && Castrange!=0))
-					&& (Owner.Distance2D(Game.MousePosition) > 650 + Castrange + Ensage_error)
+                if (Blink != null && Blink.CanBeCasted() && Menu.Item("RocketSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Blink.Name)
+                    && !Owner.IsChanneling()
+                    && Utils.SleepCheck("Rearms")
+                    && (!Owner.Modifiers.Any(y => y.Name == "modifier_bloodseeker_rupture") || (Owner.Distance2D(Game.MousePosition) > 1325 && Castrange != 0))
+                    && (Owner.Distance2D(Game.MousePosition) > 650 + Castrange + Ensage_error)
                     && Utils.SleepCheck("Blinks"))
-				{
+                {
                     var safeRange = 1200 + Castrange;
-					var p = Game.MousePosition;
+                    var p = Game.MousePosition;
 
                     if (Owner.Distance2D(Game.MousePosition) > safeRange)
                     {
@@ -678,42 +678,42 @@ namespace TinkerFastComboPlus
                             tpos.Y + safeRange * (float)Math.Sin(a),
                             100);
                     }
-				
-					Blink.UseAbility(p);
-                    Utils.Sleep(50, "Blinks");
-				}
-               						
-                if (Bottle != null 
-                    && Bottle.CanBeCasted() 
-                    && !Owner.IsChanneling() 
-                    && (Blink==null || (Blink!=null && Owner.Distance2D(Game.MousePosition) <= 650+ Castrange  + Ensage_error)) 
-                    && !Owner.Modifiers.Any(x => x.Name == "modifier_bottle_regeneration") 
-                    && (Owner.MaximumMana - Owner.Mana)>60 && Menu.Item("RocketSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Bottle.Name) 
-                    && Utils.SleepCheck("Rearms"))
-				{
-					Bottle.UseAbility();
-				}
 
-				foreach (var e in EntityManager<Hero>.Entities.Where(x => x.IsVisible && x.IsAlive && x.Team == Owner.GetEnemyTeam() && !x.IsIllusion))
-				{
-					if ((Rocket != null && Rocket.CanBeCasted() || (Soulring.CanBeCasted() && Menu.Item("RocketSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name))
+                    Blink.UseAbility(p);
+                    Utils.Sleep(50, "Blinks");
+                }
+
+                if (Bottle != null
+                    && Bottle.CanBeCasted()
+                    && !Owner.IsChanneling()
+                    && (Blink == null || (Blink != null && Owner.Distance2D(Game.MousePosition) <= 650 + Castrange + Ensage_error))
+                    && !Owner.Modifiers.Any(x => x.Name == "modifier_bottle_regeneration")
+                    && (Owner.MaximumMana - Owner.Mana) > 60 && Menu.Item("RocketSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Bottle.Name)
+                    && Utils.SleepCheck("Rearms"))
+                {
+                    Bottle.UseAbility();
+                }
+
+                foreach (var e in EntityManager<Hero>.Entities.Where(x => x.IsVisible && x.IsAlive && x.Team == Owner.GetEnemyTeam() && !x.IsIllusion))
+                {
+                    if ((Rocket != null && Rocket.CanBeCasted() || (Soulring.CanBeCasted() && Menu.Item("RocketSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name))
                         || !Menu.Item("RocketSpamSkills: ").GetValue<AbilityToggler>().IsEnabled(Rocket.Name))
-                        && Owner.Distance2D(e) < 2500                   
-						&& !Owner.IsChanneling() 
-						&& !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase)  
-						&& Utils.SleepCheck("Rearms"))
-					{
+                        && Owner.Distance2D(e) < 2500
+                        && !Owner.IsChanneling()
+                        && !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase)
+                        && Utils.SleepCheck("Rearms"))
+                    {
                         if (Soulring != null
-                            && Soulring.CanBeCasted() 
-                            && !Owner.IsChanneling() 
+                            && Soulring.CanBeCasted()
+                            && !Owner.IsChanneling()
                             && Menu.Item("RocketSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name)
                             && (Soulring.CanBeCasted() || Menu.Item("RocketSpamSkills: ").GetValue<AbilityToggler>().IsEnabled(Refresh.Name))
                             && Utils.SleepCheck("Rearms"))
-						{
-							Soulring.UseAbility();
-						}
+                        {
+                            Soulring.UseAbility();
+                        }
 
-                        if (Ghost != null && Ghost.CanBeCasted()              
+                        if (Ghost != null && Ghost.CanBeCasted()
                             && Menu.Item("RocketSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Ghost.Name)
                             && (Ghost.CanBeCasted() || Menu.Item("RocketSpamSkills: ").GetValue<AbilityToggler>().IsEnabled(Refresh.Name))
                             && Utils.SleepCheck("Rearms"))
@@ -721,7 +721,7 @@ namespace TinkerFastComboPlus
                             Ghost.UseAbility();
                         }
 
-                        if (Ethereal != null && Ghost == null && Ethereal.CanBeCasted()               
+                        if (Ethereal != null && Ghost == null && Ethereal.CanBeCasted()
                             && Menu.Item("RocketSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Ethereal.Name)
                             && (Ethereal.CanBeCasted() || Menu.Item("RocketSpamSkills: ").GetValue<AbilityToggler>().IsEnabled(Refresh.Name))
                             && !Owner.Modifiers.Any(y => y.Name == "modifier_item_ethereal_blade_ethereal")
@@ -730,33 +730,33 @@ namespace TinkerFastComboPlus
                             Ethereal.UseAbility(Owner);
                         }
 
-                        if (Glimmer != null && Glimmer.CanBeCasted() 
+                        if (Glimmer != null && Glimmer.CanBeCasted()
                             && Menu.Item("RocketSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Glimmer.Name)
                             && (Glimmer.CanBeCasted() || Menu.Item("RocketSpamSkills: ").GetValue<AbilityToggler>().IsEnabled(Refresh.Name))
                             && !Owner.Modifiers.Any(y => y.Name == "modifier_invisible")
                             && Utils.SleepCheck("Rearms"))
                         {
                             Glimmer.UseAbility(Owner);
-                        }  
-                        else  
+                        }
+                        else
 
                         if (Menu.Item("RocketSpamSkills: ").GetValue<AbilityToggler>().IsEnabled(Rocket.Name)
                             && (Rocket.CanBeCasted() || Menu.Item("RocketSpamSkills: ").GetValue<AbilityToggler>().IsEnabled(Refresh.Name)))
                         {
                             Rocket.UseAbility();
-                        }                      
-					}
-                   
-                    if ((Soulring == null || !Soulring.CanBeCasted() || !Menu.Item("RocketSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name)) 
-                         
-                        && Owner.Distance2D(e) <= 2500 
-                        && (!Rocket.CanBeCasted() || Rocket.Level <= 0 || !Menu.Item("RocketSpamSkills: ").GetValue<AbilityToggler>().IsEnabled(Rocket.Name))  
-                        && (Refresh.Level >= 0 && Refresh.CanBeCasted()) 
+                        }
+                    }
+
+                    if ((Soulring == null || !Soulring.CanBeCasted() || !Menu.Item("RocketSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name))
+
+                        && Owner.Distance2D(e) <= 2500
+                        && (!Rocket.CanBeCasted() || Rocket.Level <= 0 || !Menu.Item("RocketSpamSkills: ").GetValue<AbilityToggler>().IsEnabled(Rocket.Name))
+                        && (Refresh.Level >= 0 && Refresh.CanBeCasted())
                         && !Owner.IsChanneling()
-                        && !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase) 
-                        && Utils.SleepCheck("Rearms") 
+                        && !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase)
+                        && Utils.SleepCheck("Rearms")
                         && Utils.SleepCheck("Blinks"))
-					{
+                    {
                         if (Menu.Item("RocketSpamSkills: ").GetValue<AbilityToggler>().IsEnabled(Refresh.Name))
                         {
                             Refresh.UseAbility();
@@ -764,21 +764,21 @@ namespace TinkerFastComboPlus
                             {
                                 Utils.Sleep(3010, "Rearms");
                             }
-                                
+
                             if (Refresh.Level == 2)
                             {
                                 Utils.Sleep(1510, "Rearms");
                             }
-                                
+
                             if (Refresh.Level == 3)
                             {
                                 Utils.Sleep(760, "Rearms");
-                            } 
-                        }                                         
-					}                                      
+                            }
+                        }
+                    }
                 }
-          
-                if ((Blink != null && Menu.Item("RocketSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Blink.Name)                  
+
+                if ((Blink != null && Menu.Item("RocketSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Blink.Name)
                     && Owner.Distance2D(Game.MousePosition) > 650 + Castrange + Ensage_error)
                     && (Refresh.Level >= 0 && Refresh.CanBeCasted())
                     && (!Owner.Modifiers.Any(y => y.Name == "modifier_bloodseeker_rupture") || (Owner.Distance2D(Game.MousePosition) > 1325 && Castrange != 0))
@@ -787,11 +787,11 @@ namespace TinkerFastComboPlus
                     && Utils.SleepCheck("Rearms")
                     && Utils.SleepCheck("Blinks"))
                 {
-                    if (Soulring != null                 
-                        && Soulring.CanBeCasted()          
-                        && !Owner.IsChanneling()     
-                        && (Blink != null && Owner.Distance2D(Game.MousePosition) > 650 + Castrange + Ensage_error) 
-                        && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name)       
+                    if (Soulring != null
+                        && Soulring.CanBeCasted()
+                        && !Owner.IsChanneling()
+                        && (Blink != null && Owner.Distance2D(Game.MousePosition) > 650 + Castrange + Ensage_error)
+                        && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name)
                         && Utils.SleepCheck("Rearms"))
                     {
                         Soulring.UseAbility();
@@ -802,34 +802,34 @@ namespace TinkerFastComboPlus
                     {
                         Utils.Sleep(3010, "Rearms");
                     }
-                        
+
                     if (Refresh.Level == 2)
                     {
                         Utils.Sleep(1510, "Rearms");
                     }
-                        
+
                     if (Refresh.Level == 3)
                     {
                         Utils.Sleep(760, "Rearms");
                     }
                 }
-                		
-				if ((Blink == null 
-                    || (Blink != null 
-                    && Owner.Distance2D(Game.MousePosition) <= 650+ Castrange  + Ensage_error) && Menu.Item("RocketSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Blink.Name)) 
-                    && !Owner.IsChanneling() 
+
+                if ((Blink == null
+                    || (Blink != null
+                    && Owner.Distance2D(Game.MousePosition) <= 650 + Castrange + Ensage_error) && Menu.Item("RocketSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Blink.Name))
+                    && !Owner.IsChanneling()
                     && !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase)
                     && !Owner.Modifiers.Any(y => y.Name == "modifier_bloodseeker_rupture")
-                    && Utils.SleepCheck("Rearms")) 
-				{
+                    && Utils.SleepCheck("Rearms"))
+                {
                     Owner.Move(Game.MousePosition);
-				}
+                }
 
                 if (Blink != null
                     && !Owner.IsChanneling()
-                    && !Menu.Item("RocketSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Blink.Name)            
-                    && !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase)            
-                    && !Owner.Modifiers.Any(y => y.Name == "modifier_bloodseeker_rupture")              
+                    && !Menu.Item("RocketSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Blink.Name)
+                    && !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase)
+                    && !Owner.Modifiers.Any(y => y.Name == "modifier_bloodseeker_rupture")
                     && Utils.SleepCheck("Rearms"))
                 {
                     Owner.Move(Game.MousePosition);
@@ -839,48 +839,48 @@ namespace TinkerFastComboPlus
                 {
                     Game.ExecuteCommand("dota_player_units_auto_attack_mode 0");
                     Utils.Sleep(10000, "Autoattack");
-                } 
-                
+                }
+
                 Utils.Sleep(120, "RocketSpam");
-			}
-			
+            }
+
             //March Spam Mode
-			if (Game.IsKeyDown(Menu.Item("March Spam Key").GetValue<KeyBind>().Key) && Utils.SleepCheck("MarchSpam") && !Game.IsChatOpen)
-            {          
-                if (Blink != null && Blink.CanBeCasted() 
-					&& Menu.Item("MarchSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Blink.Name) 
-					&& !Owner.IsChanneling()  
-					&& Utils.SleepCheck("Rearms") 
-					&& (!Owner.Modifiers.Any(y => y.Name == "modifier_bloodseeker_rupture") || (Owner.Distance2D(Game.MousePosition)>1325 && Castrange!=0))
-					&& (Owner.Distance2D(Game.MousePosition) > 650+ Castrange  + Ensage_error))
-				{
+            if (Game.IsKeyDown(Menu.Item("March Spam Key").GetValue<KeyBind>().Key) && Utils.SleepCheck("MarchSpam") && !Game.IsChatOpen)
+            {
+                if (Blink != null && Blink.CanBeCasted()
+                    && Menu.Item("MarchSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Blink.Name)
+                    && !Owner.IsChanneling()
+                    && Utils.SleepCheck("Rearms")
+                    && (!Owner.Modifiers.Any(y => y.Name == "modifier_bloodseeker_rupture") || (Owner.Distance2D(Game.MousePosition) > 1325 && Castrange != 0))
+                    && (Owner.Distance2D(Game.MousePosition) > 650 + Castrange + Ensage_error))
+                {
                     var safeRange = 1200 + Castrange;
-					var p = Game.MousePosition;
-					
-					if (Owner.Distance2D(Game.MousePosition) > safeRange)
-					{
-						var tpos = Owner.Position;
-						var a = tpos.ToVector2().FindAngleBetween(Game.MousePosition.ToVector2(), true);
-						
-						safeRange -= (int)Owner.HullRadius;
-						p = new Vector3(
-							tpos.X + safeRange * (float)Math.Cos(a),
-							tpos.Y + safeRange * (float)Math.Sin(a),
-							100);
-					}
+                    var p = Game.MousePosition;
+
+                    if (Owner.Distance2D(Game.MousePosition) > safeRange)
+                    {
+                        var tpos = Owner.Position;
+                        var a = tpos.ToVector2().FindAngleBetween(Game.MousePosition.ToVector2(), true);
+
+                        safeRange -= (int)Owner.HullRadius;
+                        p = new Vector3(
+                            tpos.X + safeRange * (float)Math.Cos(a),
+                            tpos.Y + safeRange * (float)Math.Sin(a),
+                            100);
+                    }
 
                     Blink.UseAbility(p);
                     Utils.Sleep(250, "Blinks");
-				}
-				
-				if (Soulring != null 
-                    && Soulring.CanBeCasted() 
-                    && !Owner.IsChanneling() 
-                    && Menu.Item("MarchSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name) 
+                }
+
+                if (Soulring != null
+                    && Soulring.CanBeCasted()
+                    && !Owner.IsChanneling()
+                    && Menu.Item("MarchSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name)
                     && Utils.SleepCheck("Rearms"))
-				{
-					Soulring.UseAbility();
-				}
+                {
+                    Soulring.UseAbility();
+                }
 
                 if (Ghost != null
                     && Ghost.CanBeCasted()
@@ -892,175 +892,175 @@ namespace TinkerFastComboPlus
                 }
 
                 if (Bottle != null
-                    && Bottle.CanBeCasted() 
-                    && !Owner.IsChanneling() 
-                    && !Owner.Modifiers.Any(x => x.Name == "modifier_bottle_regeneration") 
-                    && Menu.Item("MarchSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Bottle.Name) 
+                    && Bottle.CanBeCasted()
+                    && !Owner.IsChanneling()
+                    && !Owner.Modifiers.Any(x => x.Name == "modifier_bottle_regeneration")
+                    && Menu.Item("MarchSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Bottle.Name)
                     && Utils.SleepCheck("Rearms"))
-				{
-					Bottle.UseAbility();
-				}
+                {
+                    Bottle.UseAbility();
+                }
 
-				if (March != null 
-                    && March.CanBeCasted() 
-                    && (Blink == null 
-                    || !Blink.CanBeCasted() 
-                    || Owner.Distance2D(Game.MousePosition) <= 650+ Castrange + Ensage_error 
-                    || !Menu.Item("MarchSpamItems: ").GetValue<AbilityToggler>().IsEnabled("item_blink")) 
-                    && !Owner.IsChanneling()                      
-                    && Utils.SleepCheck("Rearms")) //&& me.Mana >= March.ManaCost + 75 
-				{
-					March.UseAbility(Game.MousePosition);
-				}
-                
-                if ((Soulring == null 
-                    || !Soulring.CanBeCasted() 
-                    || !Menu.Item("MarchSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name)) 
-                    && (Blink == null 
-                    || !Blink.CanBeCasted() 
-                    || Owner.Distance2D(Game.MousePosition) <= 650+ Castrange + Ensage_error 
+                if (March != null
+                    && March.CanBeCasted()
+                    && (Blink == null
+                    || !Blink.CanBeCasted()
+                    || Owner.Distance2D(Game.MousePosition) <= 650 + Castrange + Ensage_error
                     || !Menu.Item("MarchSpamItems: ").GetValue<AbilityToggler>().IsEnabled("item_blink"))
-                    && (!March.CanBeCasted()  || March.Level <= 0)
-                    && (Refresh.Level >= 0 && Refresh.CanBeCasted()) 
-                    && !Owner.IsChanneling() 
+                    && !Owner.IsChanneling()
+                    && Utils.SleepCheck("Rearms")) //&& me.Mana >= March.ManaCost + 75 
+                {
+                    March.UseAbility(Game.MousePosition);
+                }
+
+                if ((Soulring == null
+                    || !Soulring.CanBeCasted()
+                    || !Menu.Item("MarchSpamItems: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name))
+                    && (Blink == null
+                    || !Blink.CanBeCasted()
+                    || Owner.Distance2D(Game.MousePosition) <= 650 + Castrange + Ensage_error
+                    || !Menu.Item("MarchSpamItems: ").GetValue<AbilityToggler>().IsEnabled("item_blink"))
+                    && (!March.CanBeCasted() || March.Level <= 0)
+                    && (Refresh.Level >= 0 && Refresh.CanBeCasted())
+                    && !Owner.IsChanneling()
                     && Utils.SleepCheck("Rearms"))
-				{
-					Refresh.UseAbility();
-					if (Refresh.Level == 1)
+                {
+                    Refresh.UseAbility();
+                    if (Refresh.Level == 1)
                     {
                         Utils.Sleep(3010, "Rearms");
                     }
-						
-					if (Refresh.Level == 2)
+
+                    if (Refresh.Level == 2)
                     {
                         Utils.Sleep(1510, "Rearms");
                     }
-						
-					if (Refresh.Level == 3)
+
+                    if (Refresh.Level == 3)
                     {
                         Utils.Sleep(760, "Rearms");
                     }
-				}
+                }
 
                 if (Utils.SleepCheck("Autoattack"))
                 {
                     Game.ExecuteCommand("dota_player_units_auto_attack_mode 0");
                     Utils.Sleep(10000, "Autoattack");
-                } 
-                
+                }
+
                 Utils.Sleep(150, "MarchSpam");
-			}
-				
+            }
+
             //Combo Mode
-			if (!Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key))
+            if (!Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key))
             {
                 Target = null;
             }
-           	
+
             if (Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key) && !Game.IsChatOpen)
             {
-				var targetLock = Menu.Item("TargetLock").GetValue<StringList>().SelectedIndex;
+                var targetLock = Menu.Item("TargetLock").GetValue<StringList>().SelectedIndex;
                 if (Utils.SleepCheck("UpdateTarget") && (Target == null || !Target.IsValid || !Target.IsAlive || !Target.IsVisible || (Target.IsVisible && targetLock == 0)))
                 {
                     Target = TargetSelector.ClosestToMouse(Owner, 2000);
                     Utils.Sleep(250, "UpdateTarget");
                 }
-				
-                if (Target != null 
-                    && Target.IsAlive 
-                    && !Target.IsIllusion 
-                    && !Owner.IsChanneling() 
+
+                if (Target != null
+                    && Target.IsAlive
+                    && !Target.IsIllusion
+                    && !Owner.IsChanneling()
                     && !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase))
                 {
-					if (Utils.SleepCheck("FASTCOMBO"))
-					{
-						uint elsecount = 0;
-						bool magicimune = (!Target.IsMagicImmune() && !Target.Modifiers.Any(x => x.Name == "modifier_eul_cyclone"));
-						// soulring -> glimmer -> sheep -> veil-> ghost ->  ->   -> ethereal -> dagon ->  laser -> rocket -> shivas 
+                    if (Utils.SleepCheck("FASTCOMBO"))
+                    {
+                        uint elsecount = 0;
+                        bool magicimune = (!Target.IsMagicImmune() && !Target.Modifiers.Any(x => x.Name == "modifier_eul_cyclone"));
+                        // soulring -> glimmer -> sheep -> veil-> ghost ->  ->   -> ethereal -> dagon ->  laser -> rocket -> shivas 
 
-						if (Soulring != null && Soulring.CanBeCasted() 
-							&& Target.NetworkPosition.Distance2D(Owner) <= 2500
-							&& Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name)  )
-						{
-							Soulring.UseAbility();
-						}
-						else
+                        if (Soulring != null && Soulring.CanBeCasted()
+                            && Target.NetworkPosition.Distance2D(Owner) <= 2500
+                            && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name))
                         {
-                            elsecount += 1;	
+                            Soulring.UseAbility();
                         }
-
-						if (Glimmer != null && Glimmer.CanBeCasted() && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Glimmer.Name) )
-						{
-							Glimmer.UseAbility(Owner);
-						}
-						else
+                        else
                         {
                             elsecount += 1;
                         }
 
-                        if (Blink != null && Blink.CanBeCasted() && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Blink.Name) 
-							&& !Owner.IsChanneling() && !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase)
-							&& (Owner.Distance2D(Game.MousePosition) > 650+Castrange + Ensage_error)  
-							&& (!Owner.Modifiers.Any(y => y.Name == "modifier_bloodseeker_rupture") || (Owner.Distance2D(Game.MousePosition)>1325 && Castrange!=0))
-							&& (Target.NetworkPosition.Distance2D(Owner) <= 1200 + 650 + Ensage_error*2 +Castrange*2)
-							&& Utils.SleepCheck("Blinks"))
-						{
+                        if (Glimmer != null && Glimmer.CanBeCasted() && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Glimmer.Name))
+                        {
+                            Glimmer.UseAbility(Owner);
+                        }
+                        else
+                        {
+                            elsecount += 1;
+                        }
+
+                        if (Blink != null && Blink.CanBeCasted() && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Blink.Name)
+                            && !Owner.IsChanneling() && !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase)
+                            && (Owner.Distance2D(Game.MousePosition) > 650 + Castrange + Ensage_error)
+                            && (!Owner.Modifiers.Any(y => y.Name == "modifier_bloodseeker_rupture") || (Owner.Distance2D(Game.MousePosition) > 1325 && Castrange != 0))
+                            && (Target.NetworkPosition.Distance2D(Owner) <= 1200 + 650 + Ensage_error * 2 + Castrange * 2)
+                            && Utils.SleepCheck("Blinks"))
+                        {
                             var safeRange = 1200 + Castrange;
-							var p13 = Game.MousePosition;
-							
-							if (Owner.Distance2D(Game.MousePosition) > safeRange + Ensage_error)
-							{
-								var tpos = Owner.Position;
-								var a = tpos.ToVector2().FindAngleBetween(Game.MousePosition.ToVector2(), true);
-								
-								safeRange -= (int)Owner.HullRadius;
-								p13 = new Vector3(
-									tpos.X + safeRange * (float)Math.Cos(a),
-									tpos.Y + safeRange * (float)Math.Sin(a),
-									100);
-							}
+                            var p13 = Game.MousePosition;
 
-							Blink.UseAbility(p13);
-							Utils.Sleep(200, "Blinks");
-						}			
-						else
-                        {
-                            elsecount += 1;
+                            if (Owner.Distance2D(Game.MousePosition) > safeRange + Ensage_error)
+                            {
+                                var tpos = Owner.Position;
+                                var a = tpos.ToVector2().FindAngleBetween(Game.MousePosition.ToVector2(), true);
+
+                                safeRange -= (int)Owner.HullRadius;
+                                p13 = new Vector3(
+                                    tpos.X + safeRange * (float)Math.Cos(a),
+                                    tpos.Y + safeRange * (float)Math.Sin(a),
+                                    100);
+                            }
+
+                            Blink.UseAbility(p13);
+                            Utils.Sleep(200, "Blinks");
                         }
-							
-						if (!Owner.IsChanneling() 
-							&& Owner.CanAttack() 
-							&& !Target.IsAttackImmune() 
-							&& !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase)
-							&& OneHitLeft(Target)
-							&& Target.NetworkPosition.Distance2D(Owner) <= Owner.GetAttackRange() + 50)
-						{
-							Owner.Attack(Target);
-						}
-						else
+                        else
                         {
                             elsecount += 1;
                         }
 
-						if (Target.IsLinkensProtected() && Utils.SleepCheck("combo2"))
-						{
-							if (Forcestaff != null && Forcestaff.CanBeCasted() && Menu.Item("LinkenBreaker: ").GetValue<AbilityToggler>().IsEnabled(Forcestaff.Name))
+                        if (!Owner.IsChanneling()
+                            && Owner.CanAttack()
+                            && !Target.IsAttackImmune()
+                            && !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase)
+                            && OneHitLeft(Target)
+                            && Target.NetworkPosition.Distance2D(Owner) <= Owner.GetAttackRange() + 50)
+                        {
+                            Owner.Attack(Target);
+                        }
+                        else
+                        {
+                            elsecount += 1;
+                        }
+
+                        if (Target.IsLinkensProtected() && Utils.SleepCheck("combo2"))
+                        {
+                            if (Forcestaff != null && Forcestaff.CanBeCasted() && Menu.Item("LinkenBreaker: ").GetValue<AbilityToggler>().IsEnabled(Forcestaff.Name))
                             {
                                 Forcestaff.UseAbility(Target);
-                            } 
-							else if (Cyclone != null && Cyclone.CanBeCasted() && Menu.Item("LinkenBreaker: ").GetValue<AbilityToggler>().IsEnabled(Cyclone.Name))
+                            }
+                            else if (Cyclone != null && Cyclone.CanBeCasted() && Menu.Item("LinkenBreaker: ").GetValue<AbilityToggler>().IsEnabled(Cyclone.Name))
                             {
                                 Cyclone.UseAbility(Target);
-                            }	
-							else if (Laser.Level >= 1 && Laser.CanBeCasted() && Menu.Item("LinkenBreaker: ").GetValue<AbilityToggler>().IsEnabled(Laser.Name))
+                            }
+                            else if (Laser.Level >= 1 && Laser.CanBeCasted() && Menu.Item("LinkenBreaker: ").GetValue<AbilityToggler>().IsEnabled(Laser.Name))
                             {
                                 Laser.UseAbility(Target);
                             }
 
-							Utils.Sleep(200, "combo2");
-						}
-						else
-						{
+                            Utils.Sleep(200, "combo2");
+                        }
+                        else
+                        {
                             if (Atos != null && Atos.CanBeCasted()
                                 && magicimune
                                 && Target.NetworkPosition.Distance2D(Owner) <= 1150 + Castrange + Ensage_error
@@ -1068,32 +1068,32 @@ namespace TinkerFastComboPlus
                                 && Utils.SleepCheck("Blinks"))
                             {
                                 Atos.UseAbility(Target);
-                            } 
+                            }
                             else
                             {
                                 elsecount += 1;
                             }
 
                             if (Sheep != null && Sheep.CanBeCasted()
-								&& magicimune
-								&& Target.NetworkPosition.Distance2D(Owner) <= 800+Castrange + Ensage_error
-								&& Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Sheep.Name)
-								&& Utils.SleepCheck("Blinks"))
+                                && magicimune
+                                && Target.NetworkPosition.Distance2D(Owner) <= 800 + Castrange + Ensage_error
+                                && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Sheep.Name)
+                                && Utils.SleepCheck("Blinks"))
                             {
                                 Sheep.UseAbility(Target);
                             }
-							else
+                            else
                             {
                                 elsecount += 1;
                             }
 
-							if (Veil != null && Veil.CanBeCasted() 
-								&& magicimune
-								&& Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Veil.Name)
-								&& Target.NetworkPosition.Distance2D(Owner) <= 1600+Castrange + Ensage_error
-								&& !(Target.Modifiers.Any(y => y.Name == "modifier_teleporting") && IsEulhexFind())
-								&& !Target.Modifiers.Any(y => y.Name == "modifier_item_veil_of_discord_debuff")
-								&& Utils.SleepCheck("Blinks"))
+                            if (Veil != null && Veil.CanBeCasted()
+                                && magicimune
+                                && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Veil.Name)
+                                && Target.NetworkPosition.Distance2D(Owner) <= 1600 + Castrange + Ensage_error
+                                && !(Target.Modifiers.Any(y => y.Name == "modifier_teleporting") && IsEulhexFind())
+                                && !Target.Modifiers.Any(y => y.Name == "modifier_item_veil_of_discord_debuff")
+                                && Utils.SleepCheck("Blinks"))
                             {
                                 if (Owner.Distance2D(Target) > 1000 + Castrange + Ensage_error)
                                 {
@@ -1109,160 +1109,160 @@ namespace TinkerFastComboPlus
                                     Veil.UseAbility(Target.NetworkPosition);
                                 }
                             }
-							else
-                            {
-                                elsecount += 1;
-                            }
-								
-							if (Ghost != null && Ethereal == null && Ghost.CanBeCasted() 
-								&& Target.NetworkPosition.Distance2D(Owner) <= 800+Castrange + Ensage_error
-								&& !OneHitLeft(Target)
-								&& Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Ghost.Name) )
-							{
-								Ghost.UseAbility();
-							}
-							else
+                            else
                             {
                                 elsecount += 1;
                             }
 
-							var comboMode = Menu.Item("ComboMode").GetValue<StringList>().SelectedIndex;
-							if (Rocket.Level > 0 && Rocket.CanBeCasted()
+                            if (Ghost != null && Ethereal == null && Ghost.CanBeCasted()
+                                && Target.NetworkPosition.Distance2D(Owner) <= 800 + Castrange + Ensage_error
+                                && !OneHitLeft(Target)
+                                && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Ghost.Name))
+                            {
+                                Ghost.UseAbility();
+                            }
+                            else
+                            {
+                                elsecount += 1;
+                            }
+
+                            var comboMode = Menu.Item("ComboMode").GetValue<StringList>().SelectedIndex;
+                            if (Rocket.Level > 0 && Rocket.CanBeCasted()
                                 && Target.NetworkPosition.Distance2D(Owner) <= 2500
-								&& !OneHitLeft(Target)
-								&& magicimune  
-								&& (!Target.Modifiers.Any(y => y.Name == "modifier_item_blade_mail_reflect") || Owner.IsMagicImmune())
-								&& (!Target.Modifiers.Any(y => y.Name == "modifier_nyx_assassin_spiked_carapace") || Owner.IsMagicImmune())
-								&& (((Veil == null 
-                                || !Veil.CanBeCasted() 
-                                || Target.Modifiers.Any(y => y.Name == "modifier_item_veil_of_discord_debuff") 
+                                && !OneHitLeft(Target)
+                                && magicimune
+                                && (!Target.Modifiers.Any(y => y.Name == "modifier_item_blade_mail_reflect") || Owner.IsMagicImmune())
+                                && (!Target.Modifiers.Any(y => y.Name == "modifier_nyx_assassin_spiked_carapace") || Owner.IsMagicImmune())
+                                && (((Veil == null
+                                || !Veil.CanBeCasted()
+                                || Target.Modifiers.Any(y => y.Name == "modifier_item_veil_of_discord_debuff")
                                 | !Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Veil.Name))))
-								&& (((Ethereal == null 
-                                || (Ethereal!=null && !Ethereal.CanBeCasted()) 
+                                && (((Ethereal == null
+                                || (Ethereal != null && !Ethereal.CanBeCasted())
                                 || IsCasted(Ethereal)
                                 | !Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Ethereal.Name))))
-								&& (Laser == null ||  !Laser.CanBeCasted() || comboMode==0)
-								&& (Dagon == null ||  !Dagon.CanBeCasted() || comboMode==0)
-								&& !(Target.Modifiers.Any(y => y.Name == "modifier_teleporting") && IsEulhexFind())
+                                && (Laser == null || !Laser.CanBeCasted() || comboMode == 0)
+                                && (Dagon == null || !Dagon.CanBeCasted() || comboMode == 0)
+                                && !(Target.Modifiers.Any(y => y.Name == "modifier_teleporting") && IsEulhexFind())
                                 && Menu.Item("ComboSkills: ").GetValue<AbilityToggler>().IsEnabled(Rocket.Name)
                                 && Utils.SleepCheck("Blinks"))
-							{
+                            {
                                 Rocket.UseAbility();
-							}
-							else
+                            }
+                            else
                             {
                                 elsecount += 1;
                             }
 
-							if (Ethereal != null && Ethereal.CanBeCasted() 
-								&& Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Ethereal.Name)
-								&& (!Veil.CanBeCasted() 
-                                || Target.Modifiers.Any(y => y.Name == "modifier_item_veil_of_discord_debuff") 
-                                || Veil == null | !Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Veil.Name)) 
-								&& magicimune
-								&& !OneHitLeft(Target)
-								&& (!CanReflectDamage(Target) || Owner.IsMagicImmune())
-								&& Target.NetworkPosition.Distance2D(Owner) <= 800+Castrange + Ensage_error
-								&& !(Target.Modifiers.Any(y => y.Name == "modifier_teleporting") && IsEulhexFind())
-								&& Utils.SleepCheck("Blinks"))
-							{
-								Ethereal.UseAbility(Target);
-							}
-							else
+                            if (Ethereal != null && Ethereal.CanBeCasted()
+                                && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Ethereal.Name)
+                                && (!Veil.CanBeCasted()
+                                || Target.Modifiers.Any(y => y.Name == "modifier_item_veil_of_discord_debuff")
+                                || Veil == null | !Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Veil.Name))
+                                && magicimune
+                                && !OneHitLeft(Target)
+                                && (!CanReflectDamage(Target) || Owner.IsMagicImmune())
+                                && Target.NetworkPosition.Distance2D(Owner) <= 800 + Castrange + Ensage_error
+                                && !(Target.Modifiers.Any(y => y.Name == "modifier_teleporting") && IsEulhexFind())
+                                && Utils.SleepCheck("Blinks"))
+                            {
+                                Ethereal.UseAbility(Target);
+                            }
+                            else
                             {
                                 elsecount += 1;
                             }
 
-							if (Dagon != null && Dagon.CanBeCasted() 
-								&& Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled("item_dagon")
-								&& (!Veil.CanBeCasted() 
-                                || Target.Modifiers.Any(y => y.Name == "modifier_item_veil_of_discord_debuff") 
-                                || Veil == null | !Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Veil.Name)) 
-								&& (Ethereal == null 
-                                || (Ethereal!=null 
-                                && !IsCasted(Ethereal) 
-                                && !Ethereal.CanBeCasted()) 
-                                || Target.Modifiers.Any(y => y.Name == "modifier_item_ethereal_blade_ethereal") 
+                            if (Dagon != null && Dagon.CanBeCasted()
+                                && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled("item_dagon")
+                                && (!Veil.CanBeCasted()
+                                || Target.Modifiers.Any(y => y.Name == "modifier_item_veil_of_discord_debuff")
+                                || Veil == null | !Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Veil.Name))
+                                && (Ethereal == null
+                                || (Ethereal != null
+                                && !IsCasted(Ethereal)
+                                && !Ethereal.CanBeCasted())
+                                || Target.Modifiers.Any(y => y.Name == "modifier_item_ethereal_blade_ethereal")
                                 | !Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Ethereal.Name))
-								&& magicimune
-								&& (!CanReflectDamage(Target) || Owner.IsMagicImmune())
-								&& !OneHitLeft(Target)
-								&& Target.NetworkPosition.Distance2D(Owner) <= Dagondistance[Dagon.Level - 1]+Castrange + Ensage_error
-								&& !(Target.Modifiers.Any(y => y.Name == "modifier_teleporting") && IsEulhexFind())
-								&& Utils.SleepCheck("Blinks"))
+                                && magicimune
+                                && (!CanReflectDamage(Target) || Owner.IsMagicImmune())
+                                && !OneHitLeft(Target)
+                                && Target.NetworkPosition.Distance2D(Owner) <= Dagondistance[Dagon.Level - 1] + Castrange + Ensage_error
+                                && !(Target.Modifiers.Any(y => y.Name == "modifier_teleporting") && IsEulhexFind())
+                                && Utils.SleepCheck("Blinks"))
                             {
                                 Dagon.UseAbility(Target);
                             }
-							else
-                            {
-                                elsecount += 1;
-                            }
-																
-							if (Laser.Level > 0 && Laser.CanBeCasted() 
-								&& Menu.Item("ComboSkills: ").GetValue<AbilityToggler>().IsEnabled(Laser.Name)
-								&& !OneHitLeft(Target)
-								&& magicimune 
-								&& (!CanReflectDamage(Target) || Owner.IsMagicImmune())
-								&& Target.NetworkPosition.Distance2D(Owner) <= 650+Castrange + Ensage_error
-								&& !(Target.Modifiers.Any(y => y.Name == "modifier_teleporting") && IsEulhexFind())
-								&& Utils.SleepCheck("Blinks"))
-                            {
-                                Laser.UseAbility(Target);
-                            }
-							else
-                            {
-                                elsecount += 1;
-                            }
-												
-							if (Shiva != null && Shiva.CanBeCasted() 
-								&& magicimune
-								&& !OneHitLeft(Target)
-								&& (!Target.Modifiers.Any(y => y.Name == "modifier_item_blade_mail_reflect") || Owner.IsMagicImmune())
-								&& (!Target.Modifiers.Any(y => y.Name == "modifier_nyx_assassin_spiked_carapace") || Owner.IsMagicImmune())
-								&& Target.NetworkPosition.Distance2D(Owner) <= 900 + Ensage_error
-								&& !(Target.Modifiers.Any(y => y.Name == "modifier_teleporting") && IsEulhexFind())
-								&& Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Shiva.Name)
-								&& Utils.SleepCheck("Blinks"))
-                            {
-                                Shiva.UseAbility();
-                            }
-							else
+                            else
                             {
                                 elsecount += 1;
                             }
 
-							if (elsecount == 13 
-								&& Refresh != null && Refresh.CanBeCasted() 
-								&& Menu.Item("ComboSkills: ").GetValue<AbilityToggler>().IsEnabled(Refresh.Name) 
-								&& !Owner.IsChanneling() && !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase) 
-								&& Utils.SleepCheck("Rearm") 
-								&& Ready_for_refresh()
-								&& Utils.SleepCheck("Blinks"))
-							{
-								Refresh.UseAbility();
-								if (Refresh.Level == 1)
+                            if (Laser.Level > 0 && Laser.CanBeCasted()
+                                && Menu.Item("ComboSkills: ").GetValue<AbilityToggler>().IsEnabled(Laser.Name)
+                                && !OneHitLeft(Target)
+                                && magicimune
+                                && (!CanReflectDamage(Target) || Owner.IsMagicImmune())
+                                && Target.NetworkPosition.Distance2D(Owner) <= 650 + Castrange + Ensage_error
+                                && !(Target.Modifiers.Any(y => y.Name == "modifier_teleporting") && IsEulhexFind())
+                                && Utils.SleepCheck("Blinks"))
+                            {
+                                Laser.UseAbility(Target);
+                            }
+                            else
+                            {
+                                elsecount += 1;
+                            }
+
+                            if (Shiva != null && Shiva.CanBeCasted()
+                                && magicimune
+                                && !OneHitLeft(Target)
+                                && (!Target.Modifiers.Any(y => y.Name == "modifier_item_blade_mail_reflect") || Owner.IsMagicImmune())
+                                && (!Target.Modifiers.Any(y => y.Name == "modifier_nyx_assassin_spiked_carapace") || Owner.IsMagicImmune())
+                                && Target.NetworkPosition.Distance2D(Owner) <= 900 + Ensage_error
+                                && !(Target.Modifiers.Any(y => y.Name == "modifier_teleporting") && IsEulhexFind())
+                                && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Shiva.Name)
+                                && Utils.SleepCheck("Blinks"))
+                            {
+                                Shiva.UseAbility();
+                            }
+                            else
+                            {
+                                elsecount += 1;
+                            }
+
+                            if (elsecount == 13
+                                && Refresh != null && Refresh.CanBeCasted()
+                                && Menu.Item("ComboSkills: ").GetValue<AbilityToggler>().IsEnabled(Refresh.Name)
+                                && !Owner.IsChanneling() && !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase)
+                                && Utils.SleepCheck("Rearm")
+                                && Ready_for_refresh()
+                                && Utils.SleepCheck("Blinks"))
+                            {
+                                Refresh.UseAbility();
+                                if (Refresh.Level == 1)
                                 {
                                     Utils.Sleep(3010, "Rearm");
                                 }
-									
-								if (Refresh.Level == 2)
+
+                                if (Refresh.Level == 2)
                                 {
                                     Utils.Sleep(1510, "Rearm");
                                 }
-									
-								if (Refresh.Level == 3)
+
+                                if (Refresh.Level == 3)
                                 {
                                     Utils.Sleep(760, "Rearm");
                                 }
-							}
-							else if (!Owner.Modifiers.Any(y => y.Name == "modifier_bloodseeker_rupture"))
-							{
-								if (!Owner.IsChanneling() 
-									&& !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase)
-									&& Owner.CanAttack() 
-									&& !Target.IsAttackImmune() 
-									&& (!Target.Modifiers.Any(y => y.Name == "modifier_nyx_assassin_spiked_carapace") || Owner.IsMagicImmune())
-									&& Utils.SleepCheck("Rearm"))
+                            }
+                            else if (!Owner.Modifiers.Any(y => y.Name == "modifier_bloodseeker_rupture"))
+                            {
+                                if (!Owner.IsChanneling()
+                                    && !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase)
+                                    && Owner.CanAttack()
+                                    && !Target.IsAttackImmune()
+                                    && (!Target.Modifiers.Any(y => y.Name == "modifier_nyx_assassin_spiked_carapace") || Owner.IsMagicImmune())
+                                    && Utils.SleepCheck("Rearm"))
                                 {
                                     if (Owner.Distance2D(Target) > Owner.GetAttackRange() - 100)
                                     {
@@ -1273,22 +1273,22 @@ namespace TinkerFastComboPlus
                                         Owner.Attack(Target);
                                     }
                                 }
-							}
+                            }
 
-							Utils.Sleep(150, "FASTCOMBO");
-						}
+                            Utils.Sleep(150, "FASTCOMBO");
+                        }
                     }
                 }
                 else
                 {
-                    if (!Owner.IsChanneling() 
-						&& !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase)
-						&& !Owner.Modifiers.Any(y => y.Name == "modifier_bloodseeker_rupture")
+                    if (!Owner.IsChanneling()
+                        && !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase)
+                        && !Owner.Modifiers.Any(y => y.Name == "modifier_bloodseeker_rupture")
                         && Utils.SleepCheck("MousePosition"))
                     {
                         Owner.Move(Game.MousePosition);
                         Utils.Sleep(150, "MousePosition");
-                    } 
+                    }
                 }
             }
         }
@@ -1314,27 +1314,27 @@ namespace TinkerFastComboPlus
                 Castrange += (int)talent10.AbilitySpecialData.First(x => x.Name == "value").Value;
             }
 
-            if (Bottle != null 
-                && !Owner.IsInvisible() 
-                && !Owner.IsChanneling() 
-                && !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase) 
-                && !March.IsInAbilityPhase 
-                && Owner.Modifiers.Any(x => x.Name == "modifier_fountain_aura_buff") 
-                && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Bottle.Name) 
+            if (Bottle != null
+                && !Owner.IsInvisible()
+                && !Owner.IsChanneling()
+                && !Owner.Spellbook.Spells.Any(x => x.IsInAbilityPhase)
+                && !March.IsInAbilityPhase
+                && Owner.Modifiers.Any(x => x.Name == "modifier_fountain_aura_buff")
+                && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Bottle.Name)
                 && Utils.SleepCheck("bottle1"))
             {
                 if (!Owner.Modifiers.Any(x => x.Name == "modifier_bottle_regeneration") && (Owner.Health < Owner.MaximumHealth || Owner.Mana < Owner.MaximumMana))
                 {
                     Bottle.UseAbility();
                 }
-                    
-                var alies = EntityManager<Hero>.Entities.Where(x => 
-                                                               x.Team == Owner.Team && 
-                                                               x != Owner && 
-                                                               (x.Health < x.MaximumHealth || x.Mana < x.MaximumMana) && 
-                                                               !x.Modifiers.Any(y => y.Name == "modifier_bottle_regeneration") && 
-                                                               x.IsAlive && 
-                                                               !x.IsIllusion && 
+
+                var alies = EntityManager<Hero>.Entities.Where(x =>
+                                                               x.Team == Owner.Team &&
+                                                               x != Owner &&
+                                                               (x.Health < x.MaximumHealth || x.Mana < x.MaximumMana) &&
+                                                               !x.Modifiers.Any(y => y.Name == "modifier_bottle_regeneration") &&
+                                                               x.IsAlive &&
+                                                               !x.IsIllusion &&
                                                                x.Distance2D(Owner) <= Bottle.CastRange).ToList();
 
                 foreach (Hero v in alies)
@@ -1344,7 +1344,7 @@ namespace TinkerFastComboPlus
                         Bottle.UseAbility(v);
                     }
                 }
-                    
+
                 Utils.Sleep(255, "bottle1");
             }
 
@@ -1354,7 +1354,7 @@ namespace TinkerFastComboPlus
                 {
                     return;
                 }
-                    
+
                 Angle = Math.Abs(e.FindAngleR() - Utils.DegreeToRadian(e.FindAngleForTurnTime(Owner.NetworkPosition)));
 
                 if (Menu.Item("autoDisable").GetValue<bool>() && Owner.IsAlive && Owner.IsVisibleToEnemies)
@@ -1411,7 +1411,7 @@ namespace TinkerFastComboPlus
                         {
                             Cyclone.UseAbility(e);
                         }
-                            
+
                         Utils.Sleep(150, "tplink1");
                     }
 
@@ -1864,7 +1864,7 @@ namespace TinkerFastComboPlus
                     }
 
 
-                    else 
+                    else
                     if ( //break special (1 hex, 2 cyclone)
                                     !Owner.IsChanneling()
                                     && Cyclone != null
@@ -1888,7 +1888,7 @@ namespace TinkerFastComboPlus
                         Utils.Sleep(150, "Ghost");
                     }
 
-                    else 
+                    else
                     if ( // Если ВРка
                             (Ghost == null || !Ghost.CanBeCasted())
                             && (Laser == null || !Laser.CanBeCasted())
@@ -1897,7 +1897,7 @@ namespace TinkerFastComboPlus
                             && !Owner.IsAttackImmune()
                             && !e.Modifiers.Any(y => y.Name == "modifier_skywrath_mystic_flare_aura_effect")
                             && e.HeroId == HeroId.npc_dota_hero_windrunner && IsCasted(e.Spellbook.SpellR)//&& e.Modifiers.Any(y => y.Name == "modifier_windrunner_focusfire")
-                                                                                                              //&& e.IsAttacking() 
+                                                                                                          //&& e.IsAttacking() 
                            && Angle <= 0.03
                             && Utils.SleepCheck("Ghost")
                             )
@@ -1946,27 +1946,27 @@ namespace TinkerFastComboPlus
                                 Owner.Attack(e);
                             }
 
-                            if (Soulring != null && Soulring.CanBeCasted() 
+                            if (Soulring != null && Soulring.CanBeCasted()
                                 && e.NetworkPosition.Distance2D(Owner) < 2500
                                 && magicimune
                                 && !OneHitLeft(e)
-                                && (((Veil == null 
-                                || !Veil.CanBeCasted() 
-                                || e.Modifiers.Any(y => y.Name == "modifier_item_veil_of_discord_debuff")) 
-                                && e.NetworkPosition.Distance2D(Owner) <= 1600 + Castrange) 
-                                || ((e.NetworkPosition.Distance2D(Owner) > 1600 + Castrange) 
+                                && (((Veil == null
+                                || !Veil.CanBeCasted()
+                                || e.Modifiers.Any(y => y.Name == "modifier_item_veil_of_discord_debuff"))
+                                && e.NetworkPosition.Distance2D(Owner) <= 1600 + Castrange)
+                                || ((e.NetworkPosition.Distance2D(Owner) > 1600 + Castrange)
                                 && (e.Health < (int)GetRocketDamage() * (1 - e.MagicDamageResist))))
-                                && (((Ethereal == null 
-                                || (Ethereal != null 
-                                && !Ethereal.CanBeCasted()) 
-                                || IsCasted(Ethereal)) 
-                                && e.NetworkPosition.Distance2D(Owner) <= 800 + Castrange) 
+                                && (((Ethereal == null
+                                || (Ethereal != null
+                                && !Ethereal.CanBeCasted())
+                                || IsCasted(Ethereal))
+                                && e.NetworkPosition.Distance2D(Owner) <= 800 + Castrange)
                                 || ((e.NetworkPosition.Distance2D(Owner) > 800 + Castrange)
                                 && (e.Health < (int)GetRocketDamage() * (1 - e.MagicDamageResist)))))
                             {
                                 Soulring.UseAbility();
                             }
-                                
+
                             if (Veil != null && Veil.CanBeCasted()
                                 && magicimune
                                 && e.NetworkPosition.Distance2D(Owner) <= 1600 + Castrange + Ensage_error
@@ -1998,9 +1998,9 @@ namespace TinkerFastComboPlus
                             {
                                 Ethereal.UseAbility(e);
                             }
-                                
+
                             if (Dagon != null && Dagon.CanBeCasted()
-                                && (!Veil.CanBeCasted() || e.Modifiers.Any(y => y.Name == "modifier_item_veil_of_discord_debuff") || Veil == null )
+                                && (!Veil.CanBeCasted() || e.Modifiers.Any(y => y.Name == "modifier_item_veil_of_discord_debuff") || Veil == null)
                                 && (Ethereal == null || (Ethereal != null && !IsCasted(Ethereal) && !Ethereal.CanBeCasted()) || e.Modifiers.Any(y => y.Name == "modifier_item_ethereal_blade_ethereal"))
                                 && !OneHitLeft(e)
                                 && magicimune
@@ -2009,15 +2009,15 @@ namespace TinkerFastComboPlus
                             {
                                 Dagon.UseAbility(e);
                             }
-                            
+
                             if (Rocket.Level > 0 && Rocket.CanBeCasted()
                                 && e.NetworkPosition.Distance2D(Owner) <= 2500
                                 && (!EzkillCheck || e.NetworkPosition.Distance2D(Owner) >= 800 + Castrange + Ensage_error)
                                 && !OneHitLeft(e)
                                 && magicimune
-                                && (((Veil == null 
-                                || !Veil.CanBeCasted() 
-                                || e.Modifiers.Any(y => y.Name == "modifier_item_veil_of_discord_debuff")) 
+                                && (((Veil == null
+                                || !Veil.CanBeCasted()
+                                || e.Modifiers.Any(y => y.Name == "modifier_item_veil_of_discord_debuff"))
                                 && e.NetworkPosition.Distance2D(Owner) <= 1600 + Castrange) || (e.NetworkPosition.Distance2D(Owner) > 1600 + Castrange))
                                 && (((Ethereal == null || (Ethereal != null && !Ethereal.CanBeCasted()) || IsCasted(Ethereal)) && e.NetworkPosition.Distance2D(Owner) <= 800 + Castrange) || (e.NetworkPosition.Distance2D(Owner) > 800 + Castrange))
                                 && !(e.Modifiers.Any(y => y.Name == "modifier_teleporting") && IsEulhexFind()))
@@ -2070,33 +2070,33 @@ namespace TinkerFastComboPlus
             }
 
             if (Menu.Item("Show Direction").GetValue<bool>())
-			{
-				if (Owner.IsChanneling())
-				{
-					if (Effect3 == null)
-					{						     
-						Effect3 = new ParticleEffect(@"materials\ensage_ui\particles\line.vpcf", Owner);     
-						
-						Effect3.SetControlPoint(1, Owner.Position);
-						Effect3.SetControlPoint(2, FindVector(Owner.Position, Owner.Rotation, 1200 + Castrange));
+            {
+                if (Owner.IsChanneling())
+                {
+                    if (Effect3 == null)
+                    {
+                        Effect3 = new ParticleEffect(@"materials\ensage_ui\particles\line.vpcf", Owner);
+
+                        Effect3.SetControlPoint(1, Owner.Position);
+                        Effect3.SetControlPoint(2, FindVector(Owner.Position, Owner.Rotation, 1200 + Castrange));
                         Effect3.SetControlPoint(3, new Vector3(100, 70, 10));
                         Effect3.SetControlPoint(4, new Vector3(150, 255, 255));
                     }
-					else 
-					{
-						Effect3.SetControlPoint(1, Owner.Position);
-						Effect3.SetControlPoint(2, FindVector(Owner.Position, Owner.Rotation, 1200 + Castrange));
+                    else
+                    {
+                        Effect3.SetControlPoint(1, Owner.Position);
+                        Effect3.SetControlPoint(2, FindVector(Owner.Position, Owner.Rotation, 1200 + Castrange));
                         Effect3.SetControlPoint(3, new Vector3(100, 70, 10));
                         Effect3.SetControlPoint(4, new Vector3(150, 255, 255));
-					} 
-				}
-				else if (Effect3 != null)
-				{
-				   Effect3.Dispose();
-				   Effect3 = null;
-				}  
-				
-			}
+                    }
+                }
+                else if (Effect3 != null)
+                {
+                    Effect3.Dispose();
+                    Effect3 = null;
+                }
+
+            }
 
             if (Target != null && Target.IsValid && !Target.IsIllusion && Target.IsAlive && Target.IsVisible && Owner.Distance2D(Target.Position) < 2000 && Menu.Item("Show Target Effect").GetValue<bool>())
             {
@@ -2120,117 +2120,117 @@ namespace TinkerFastComboPlus
             {
                 Effect4.Dispose();
                 Effect4 = null;
-            }  		
-            
+            }
+
             if (Menu.Item("Blink Range").GetValue<bool>())
-			{
-				if (Blink != null)
-				{	
-					if(Rangedisplay_dagger == null)
-					{
-						Rangedisplay_dagger = Owner.AddParticleEffect(@"materials\ensage_ui\particles\range_display_mod.vpcf");
-						Range_dagger = 1200  + Castrange;						
-						Rangedisplay_dagger.SetControlPoint(1, new Vector3(Range_dagger, 255, 5));
-                        Rangedisplay_dagger.SetControlPoint(2, new Vector3(150, 255, 255));
-                    }
-
-					if (Range_dagger != 1200 + Castrange)
-					{
-						Range_dagger = 1200 + Castrange;
-
-						if(Rangedisplay_dagger != null)
-                        {
-                            Rangedisplay_dagger.Dispose();
-                        }
-							
-						Rangedisplay_dagger = Owner.AddParticleEffect(@"materials\ensage_ui\particles\range_display_mod.vpcf");
+            {
+                if (Blink != null)
+                {
+                    if (Rangedisplay_dagger == null)
+                    {
+                        Rangedisplay_dagger = Owner.AddParticleEffect(@"materials\ensage_ui\particles\range_display_mod.vpcf");
+                        Range_dagger = 1200 + Castrange;
                         Rangedisplay_dagger.SetControlPoint(1, new Vector3(Range_dagger, 255, 5));
                         Rangedisplay_dagger.SetControlPoint(2, new Vector3(150, 255, 255));
                     }
-				}
+
+                    if (Range_dagger != 1200 + Castrange)
+                    {
+                        Range_dagger = 1200 + Castrange;
+
+                        if (Rangedisplay_dagger != null)
+                        {
+                            Rangedisplay_dagger.Dispose();
+                        }
+
+                        Rangedisplay_dagger = Owner.AddParticleEffect(@"materials\ensage_ui\particles\range_display_mod.vpcf");
+                        Rangedisplay_dagger.SetControlPoint(1, new Vector3(Range_dagger, 255, 5));
+                        Rangedisplay_dagger.SetControlPoint(2, new Vector3(150, 255, 255));
+                    }
+                }
                 else
-				{
-					if(Rangedisplay_dagger != null)
+                {
+                    if (Rangedisplay_dagger != null)
                     {
                         Rangedisplay_dagger.Dispose();
                     }
-						
-					Rangedisplay_dagger = null;
-				}
 
-			}
-			else if (Rangedisplay_dagger!=null)
-			{
-			    Rangedisplay_dagger.Dispose();
-			    Rangedisplay_dagger = null;
-			}
-			
-			if (Menu.Item("Blink Range Incoming TP").GetValue<bool>())
-			{
-				if (Blink != null)
-				{	
-					var units = ObjectManager.GetEntities<Unit>().Where(x =>
-					                                                    (x is Hero && x.Team == Owner.Team) ||
-                                                                        (x is Creep && x.Team == Owner.Team) || 
-                                                                        (x is Building && x.Team == Owner.Team) || 
-                                                                        (!(x is Hero) && !(x is Building) && !(x is Creep) && 
-                                                                        x.NetworkName != "CDOTA_NPC_TechiesMines" && 
-                                                                        x.NetworkName != "CDOTA_NPC_Observer_Ward" && 
-                                                                        x.NetworkName != "CDOTA_NPC_Observer_Ward_TrueSight" && 
+                    Rangedisplay_dagger = null;
+                }
+
+            }
+            else if (Rangedisplay_dagger != null)
+            {
+                Rangedisplay_dagger.Dispose();
+                Rangedisplay_dagger = null;
+            }
+
+            if (Menu.Item("Blink Range Incoming TP").GetValue<bool>())
+            {
+                if (Blink != null)
+                {
+                    var units = ObjectManager.GetEntities<Unit>().Where(x =>
+                                                                        (x is Hero && x.Team == Owner.Team) ||
+                                                                        (x is Creep && x.Team == Owner.Team) ||
+                                                                        (x is Building && x.Team == Owner.Team) ||
+                                                                        (!(x is Hero) && !(x is Building) && !(x is Creep) &&
+                                                                        x.NetworkName != "CDOTA_NPC_TechiesMines" &&
+                                                                        x.NetworkName != "CDOTA_NPC_Observer_Ward" &&
+                                                                        x.NetworkName != "CDOTA_NPC_Observer_Ward_TrueSight" &&
                                                                         x.Team == Owner.Team)).ToList();
-					
-					foreach (var unit in units)
-					{
-					    HandleEffectR(unit);
-					    HandleEffectD(unit);
-					}
-				}
-			}
-			
-			if (Menu.Item("Rocket Range").GetValue<bool>())
-			{
-				if(Rangedisplay_rocket == null)
-				{
-				    Rangedisplay_rocket = Owner.AddParticleEffect(@"materials\ensage_ui\particles\range_display_mod.vpcf");
-				    Range_rocket = 2500;
-				    Rangedisplay_rocket.SetControlPoint(1, new Vector3(Range_rocket, 255, 5));
+
+                    foreach (var unit in units)
+                    {
+                        HandleEffectR(unit);
+                        HandleEffectD(unit);
+                    }
+                }
+            }
+
+            if (Menu.Item("Rocket Range").GetValue<bool>())
+            {
+                if (Rangedisplay_rocket == null)
+                {
+                    Rangedisplay_rocket = Owner.AddParticleEffect(@"materials\ensage_ui\particles\range_display_mod.vpcf");
+                    Range_rocket = 2500;
+                    Rangedisplay_rocket.SetControlPoint(1, new Vector3(Range_rocket, 255, 5));
                     Rangedisplay_rocket.SetControlPoint(2, new Vector3(255, 255, 0));
                 }
-			}
-			else if (Rangedisplay_rocket!=null)
-			{
-			    Rangedisplay_rocket.Dispose();
-			    Rangedisplay_rocket = null;
-			}
-			
-			
-			
-			if (Menu.Item("Laser Range").GetValue<bool>())
-			{
-				if(Rangedisplay_laser == null)
-				{
-				    Rangedisplay_laser = Owner.AddParticleEffect(@"materials\ensage_ui\particles\range_display_mod.vpcf");
-				    Range_laser = 650 + Castrange;
-				    Rangedisplay_laser.SetControlPoint(1, new Vector3(Range_laser, 255, 5));
-                    Rangedisplay_laser.SetControlPoint(2, new Vector3(0, 150, 255));
-                }
-				if (Range_laser != 650 + Castrange)
-				{
-					Range_laser = 650 + Castrange;
-					if(Rangedisplay_laser != null)
-						Rangedisplay_laser.Dispose();
-					Rangedisplay_laser = Owner.AddParticleEffect(@"materials\ensage_ui\particles\range_display_mod.vpcf");
+            }
+            else if (Rangedisplay_rocket != null)
+            {
+                Rangedisplay_rocket.Dispose();
+                Rangedisplay_rocket = null;
+            }
+
+
+
+            if (Menu.Item("Laser Range").GetValue<bool>())
+            {
+                if (Rangedisplay_laser == null)
+                {
+                    Rangedisplay_laser = Owner.AddParticleEffect(@"materials\ensage_ui\particles\range_display_mod.vpcf");
+                    Range_laser = 650 + Castrange;
                     Rangedisplay_laser.SetControlPoint(1, new Vector3(Range_laser, 255, 5));
                     Rangedisplay_laser.SetControlPoint(2, new Vector3(0, 150, 255));
-                }				
-			}
-			else if (Rangedisplay_laser!=null)
-			{
-			    Rangedisplay_laser.Dispose();
-			    Rangedisplay_laser = null;
-			}
-		}
-		
+                }
+                if (Range_laser != 650 + Castrange)
+                {
+                    Range_laser = 650 + Castrange;
+                    if (Rangedisplay_laser != null)
+                        Rangedisplay_laser.Dispose();
+                    Rangedisplay_laser = Owner.AddParticleEffect(@"materials\ensage_ui\particles\range_display_mod.vpcf");
+                    Rangedisplay_laser.SetControlPoint(1, new Vector3(Range_laser, 255, 5));
+                    Rangedisplay_laser.SetControlPoint(2, new Vector3(0, 150, 255));
+                }
+            }
+            else if (Rangedisplay_laser != null)
+            {
+                Rangedisplay_laser.Dispose();
+                Rangedisplay_laser = null;
+            }
+        }
+
         private void HandleEffectR(Unit unit)
         {
             if (unit == null)
@@ -2239,7 +2239,7 @@ namespace TinkerFastComboPlus
             }
 
             ParticleEffect effect;
-			
+
             if (unit.Modifiers.Any(y => y.Name == "modifier_boots_of_travel_incoming") && Owner.HasModifier("modifier_teleporting"))
             {
                 if (VisibleUnit.TryGetValue(unit, out effect))
@@ -2248,8 +2248,8 @@ namespace TinkerFastComboPlus
                 }
 
                 effect = unit.AddParticleEffect(@"materials\ensage_ui\particles\range_display_mod.vpcf");
-				Range_dagger = 1200 + Castrange;
-				effect.SetControlPoint(1, new Vector3(Range_dagger, 255, 5));
+                Range_dagger = 1200 + Castrange;
+                effect.SetControlPoint(1, new Vector3(Range_dagger, 255, 5));
                 effect.SetControlPoint(2, new Vector3(150, 255, 255));
                 VisibleUnit.Add(unit, effect);
             }
@@ -2264,42 +2264,42 @@ namespace TinkerFastComboPlus
                 VisibleUnit.Remove(unit);
             }
         }
-		
+
         private void HandleEffectD(Unit unit)
         {
             if (unit == null)
             {
                 return;
             }
-			
+
             if (unit != null && unit.IsValid && unit.IsAlive && unit.Modifiers.Any(y => y.Name == "modifier_boots_of_travel_incoming") && Owner.HasModifier("modifier_teleporting"))
-			{
-				if (Effect2 == null)
-				{
-					Effect2 = new ParticleEffect(@"materials\ensage_ui\particles\line.vpcf", unit);     
-					Effect2.SetControlPoint(1, unit.Position);
-					Effect2.SetControlPoint(2, FindVector(unit.Position, Owner.Rotation, 1200 + Castrange));
+            {
+                if (Effect2 == null)
+                {
+                    Effect2 = new ParticleEffect(@"materials\ensage_ui\particles\line.vpcf", unit);
+                    Effect2.SetControlPoint(1, unit.Position);
+                    Effect2.SetControlPoint(2, FindVector(unit.Position, Owner.Rotation, 1200 + Castrange));
                     Effect2.SetControlPoint(3, new Vector3(100, 70, 10));
                     Effect2.SetControlPoint(4, new Vector3(150, 255, 255));
                 }
-				else 
-				{
-					Effect2.SetControlPoint(1, unit.Position);
-					Effect2.SetControlPoint(2, FindVector(unit.Position, Owner.Rotation, 1200 + Castrange));
+                else
+                {
+                    Effect2.SetControlPoint(1, unit.Position);
+                    Effect2.SetControlPoint(2, FindVector(unit.Position, Owner.Rotation, 1200 + Castrange));
                     Effect2.SetControlPoint(3, new Vector3(100, 70, 10));
                     Effect2.SetControlPoint(4, new Vector3(150, 255, 255));
-                } 
-			}
-			if (!Owner.HasModifier("modifier_teleporting") && Effect2 != null)
-			{
-			   Effect2.Dispose();
-			   Effect2 = null;
-			}	
+                }
+            }
+            if (!Owner.HasModifier("modifier_teleporting") && Effect2 != null)
+            {
+                Effect2.Dispose();
+                Effect2 = null;
+            }
         }
 
         private Vector3 FindVector(Vector3 first, double ret, float distance)
         {
-            var retVector = new Vector3(first.X + (float) Math.Cos(Utils.DegreeToRadian(ret)) * distance, first.Y + (float) Math.Sin(Utils.DegreeToRadian(ret)) * distance, 100);
+            var retVector = new Vector3(first.X + (float)Math.Cos(Utils.DegreeToRadian(ret)) * distance, first.Y + (float)Math.Sin(Utils.DegreeToRadian(ret)) * distance, 100);
 
             return retVector;
         }
@@ -2334,7 +2334,7 @@ namespace TinkerFastComboPlus
 
         private bool CanReflectDamage(Hero x)
         {
-            if (x.Modifiers.Any(m => (m.Name == "modifier_item_blade_mail_reflect" ) || (m.Name == "modifier_nyx_assassin_spiked_carapace") || (m.Name == "modifier_item_lotus_orb_active")))
+            if (x.Modifiers.Any(m => (m.Name == "modifier_item_blade_mail_reflect") || (m.Name == "modifier_nyx_assassin_spiked_carapace") || (m.Name == "modifier_item_lotus_orb_active")))
             {
                 return true;
             }
@@ -2351,7 +2351,7 @@ namespace TinkerFastComboPlus
 
             return false;
         }
-		
+
         private bool IsCasted(Ability ability)
         {
             return ability.Level > 0 && ability.CooldownLength > 0 && Math.Ceiling(ability.CooldownLength).Equals(Math.Ceiling(ability.Cooldown));
@@ -2360,19 +2360,19 @@ namespace TinkerFastComboPlus
         private bool IsPhysDamageImune(Hero v)
         {
             if (Owner.Modifiers.Any(x =>
-                                    x.Name == "modifier_tinker_laser_blind" || 
-                                    x.Name == "modifier_troll_warlord_whirling_axes_blind" || 
-                                    x.Name == "modifier_brewmaster_drunken_haze" || 
-                                    x.Name == "modifier_pugna_decrepify" || 
+                                    x.Name == "modifier_tinker_laser_blind" ||
+                                    x.Name == "modifier_troll_warlord_whirling_axes_blind" ||
+                                    x.Name == "modifier_brewmaster_drunken_haze" ||
+                                    x.Name == "modifier_pugna_decrepify" ||
                                     x.Name == "modifier_item_ethereal_blade_ethereal") ||
                                     v.Modifiers.Any(x => x.Name == "modifier_omniknight_guardian_angel"
-									|| x.Name == "modifier_nyx_assassin_spiked_carapace"
-									|| x.Name == "modifier_pugna_decrepify"
-									|| x.Name == "modifier_windrunner_windrun"
-									|| x.Name == "modifier_winter_wyverny_cold_embrace"
-									|| x.Name == "modifier_ghost_state" 
-									|| x.Name == "modifier_item_ethereal_blade_ethereal")
-                                    || (v.HeroId == HeroId.npc_dota_hero_tiny && v.Spellbook.SpellE.Level > 0)|| v.IsInvul())
+                                    || x.Name == "modifier_nyx_assassin_spiked_carapace"
+                                    || x.Name == "modifier_pugna_decrepify"
+                                    || x.Name == "modifier_windrunner_windrun"
+                                    || x.Name == "modifier_winter_wyverny_cold_embrace"
+                                    || x.Name == "modifier_ghost_state"
+                                    || x.Name == "modifier_item_ethereal_blade_ethereal")
+                                    || (v.HeroId == HeroId.npc_dota_hero_tiny && v.Spellbook.SpellE.Level > 0) || v.IsInvul())
             {
                 return true;
             }
@@ -2380,206 +2380,206 @@ namespace TinkerFastComboPlus
             return false;
         }
 
-		private int Manaprocast()
+        private int Manaprocast()
         {
             int manalaser = 0, manarocket = 0, manarearm = 0, manadagon = 0, manaveil = 0, manasheep = 0, manaethereal = 0, manashiva = 0, manasoulring = 0;
 
-			if (Laser!=null && Laser.Level>0)
+            if (Laser != null && Laser.Level > 0)
             {
                 manalaser = Laser_mana[Laser.Level - 1];
             }
-			else
+            else
             {
                 manalaser = 0;
             }
-				
-			if (Rocket != null && Rocket.Level>0)
+
+            if (Rocket != null && Rocket.Level > 0)
             {
                 manarocket = Rocket_mana[Rocket.Level - 1];
             }
-			else
+            else
             {
                 manarocket = 0;
             }
-				
-				
-			if (Refresh != null && Refresh.Level>0)
+
+
+            if (Refresh != null && Refresh.Level > 0)
             {
                 manarearm = Rearm_mana[Refresh.Level - 1];
-            }	
-			else
+            }
+            else
             {
                 manarearm = 0;
             }
-				
-			if (Dagon != null && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled("item_dagon"))
+
+            if (Dagon != null && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled("item_dagon"))
             {
                 manadagon = 180;
             }
-			else
+            else
             {
                 manadagon = 0;
             }
 
-			if (Ethereal != null && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Ethereal.Name))
+            if (Ethereal != null && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Ethereal.Name))
             {
                 manaethereal = 100;
             }
-			else
+            else
             {
                 manaethereal = 0;
             }
-				
-			if (Veil != null && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Veil.Name))
+
+            if (Veil != null && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Veil.Name))
             {
                 manaveil = 50;
             }
-			else
+            else
             {
                 manaveil = 0;
             }
-				
-			if (Sheep != null && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Sheep.Name))
+
+            if (Sheep != null && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Sheep.Name))
             {
                 manasheep = 100;
             }
-			else
+            else
             {
                 manasheep = 0;
             }
-				
-			if (Shiva != null && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Shiva.Name))
+
+            if (Shiva != null && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Shiva.Name))
             {
                 manashiva = 100;
-            }		
-			else
+            }
+            else
             {
                 manashiva = 0;
             }
 
-			if (Soulring != null && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name))
+            if (Soulring != null && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name))
             {
                 manasoulring = 150;
             }
-			else
+            else
             {
                 manasoulring = 0;
             }
-							
-			return manalaser + manarocket + manadagon + manaethereal + manaveil + manasheep + manashiva - manasoulring;
-        }	
 
-		private int Manaonerocket()
+            return manalaser + manarocket + manadagon + manaethereal + manaveil + manasheep + manashiva - manasoulring;
+        }
+
+        private int Manaonerocket()
         {
-            int  manarocket = 0, manarearm = 0, manasoulring = 0;
+            int manarocket = 0, manarearm = 0, manasoulring = 0;
 
-			if (Rocket != null && Rocket.Level>0)
+            if (Rocket != null && Rocket.Level > 0)
             {
                 manarocket = Rocket_mana[Rocket.Level - 1];
             }
-			else
+            else
             {
                 manarocket = 0;
             }
-				
-			if (Refresh != null && Refresh.Level>0)
+
+            if (Refresh != null && Refresh.Level > 0)
             {
                 manarearm = Rearm_mana[Refresh.Level - 1];
             }
-			else
+            else
             {
                 manarearm = 0;
             }
-				
-			if (Soulring != null && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name))
+
+            if (Soulring != null && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name))
             {
                 manasoulring = 150;
             }
-			else
+            else
             {
                 manasoulring = 0;
             }
-            
-			return manarocket - manasoulring;
-        }	
 
-		private int ManaFactDamage(Hero en)
+            return manarocket - manasoulring;
+        }
+
+        private int ManaFactDamage(Hero en)
         {
             if (en != null && en.IsAlive && en.IsValid)
             {
-				int manalaser = 0, manarocket = 0, manarearm = 0, manadagon = 0, dagondist = 0, manaethereal = 0, manashiva = 0, manasoulring = 0;
+                int manalaser = 0, manarocket = 0, manarearm = 0, manadagon = 0, dagondist = 0, manaethereal = 0, manashiva = 0, manasoulring = 0;
 
-				if (Laser != null &&  Laser.Level> 0 && Laser.CanBeCasted())
+                if (Laser != null && Laser.Level > 0 && Laser.CanBeCasted())
                 {
                     manalaser = Laser_mana[Laser.Level - 1];
                 }
-				else
+                else
                 {
                     manalaser = 0;
                 }
-					
-				if (Rocket != null &&  Rocket.Level > 0 && Rocket.CanBeCasted())
+
+                if (Rocket != null && Rocket.Level > 0 && Rocket.CanBeCasted())
                 {
                     manarocket = Rocket_mana[Rocket.Level - 1];
                 }
-				else
+                else
                 {
                     manarocket = 0;
                 }
-					
-				if (Refresh != null &&  Refresh.Level > 0   && Refresh.CanBeCasted())
+
+                if (Refresh != null && Refresh.Level > 0 && Refresh.CanBeCasted())
                 {
                     manarearm = Rearm_mana[Refresh.Level - 1];
                 }
-				else
+                else
                 {
                     manarearm = 0;
                 }
-					
-				if (Dagon != null && Dagon.CanBeCasted())
-				{
-					dagondist = Dagondistance[Dagon.Level - 1];
-					manadagon = 180;
-				}
-				else
-				{
-					manadagon = 0;		
-					dagondist = 0;
-				}	
 
-				if (Ethereal != null && Ethereal.CanBeCasted())
+                if (Dagon != null && Dagon.CanBeCasted())
+                {
+                    dagondist = Dagondistance[Dagon.Level - 1];
+                    manadagon = 180;
+                }
+                else
+                {
+                    manadagon = 0;
+                    dagondist = 0;
+                }
+
+                if (Ethereal != null && Ethereal.CanBeCasted())
                 {
                     manaethereal = 100;
                 }
-				else
+                else
                 {
                     manaethereal = 0;
                 }
-					
-				if (Shiva != null && Shiva.CanBeCasted())
+
+                if (Shiva != null && Shiva.CanBeCasted())
                 {
                     manashiva = 100;
                 }
-				else
+                else
                 {
                     manashiva = 0;
                 }
-					
-				if (Soulring != null && Soulring.CanBeCasted())
+
+                if (Soulring != null && Soulring.CanBeCasted())
                 {
                     manasoulring = 150;
                 }
-				else
+                else
                 {
                     manasoulring = 0;
                 }
 
                 //factical mana consume in current range
-				return (Owner.Distance2D(en) < 650 + Castrange + Ensage_error ? manalaser : 0) 
-                    + (Owner.Distance2D(en) < 2500 ? manarocket : 0) 
-                    + (Owner.Distance2D(en) < 800 + Castrange + Ensage_error ? manaethereal : 0) 
-                    + (Owner.Distance2D(en) < dagondist + Castrange + Ensage_error ? manadagon : 0) 
-                    + (Owner.Distance2D(en) < 900 + Ensage_error ? manashiva : 0) 
+                return (Owner.Distance2D(en) < 650 + Castrange + Ensage_error ? manalaser : 0)
+                    + (Owner.Distance2D(en) < 2500 ? manarocket : 0)
+                    + (Owner.Distance2D(en) < 800 + Castrange + Ensage_error ? manaethereal : 0)
+                    + (Owner.Distance2D(en) < dagondist + Castrange + Ensage_error ? manadagon : 0)
+                    + (Owner.Distance2D(en) < 900 + Ensage_error ? manashiva : 0)
                     - manasoulring;
             }
 
@@ -2587,10 +2587,10 @@ namespace TinkerFastComboPlus
         }
 
         private int ProcastCounter(Hero en)
-		{
+        {
             if (!en.IsMagicImmune() && !en.IsInvul())
             {
-				if (IsPhysDamageImune(en))
+                if (IsPhysDamageImune(en))
                 {
                     return (int)Math.Ceiling(en.Health / GetComboDamage());
                 }
@@ -2602,10 +2602,10 @@ namespace TinkerFastComboPlus
         }
 
         private int RktCount(Hero en)
-		{
+        {
             if (!en.IsMagicImmune() && !en.IsInvul())
-			{
-				if (((int)((en.Health - GetComboDamage(en) + GetOneAutoAttackDamage(en)) / GetRocketDamage())) <= 0)
+            {
+                if (((int)((en.Health - GetComboDamage(en) + GetOneAutoAttackDamage(en)) / GetRocketDamage())) <= 0)
                 {
                     return 0;
                 }
@@ -2617,7 +2617,7 @@ namespace TinkerFastComboPlus
         }
 
         private int OnlyRktCount(Hero en)
-		{
+        {
             if (!en.IsMagicImmune() && !en.IsInvul())
             {
                 return ((int)(en.Health / GetRocketDamage() + 1));
@@ -2627,20 +2627,20 @@ namespace TinkerFastComboPlus
         }
 
         private int OnlyRktCountDmg(Hero en)
-		{
+        {
             if (!en.IsMagicImmune() && !en.IsInvul())
             {
-				return ((int)(en.Health / (int)GetRocketDamage() + 1) * (int)GetRocketDamage());
+                return ((int)(en.Health / (int)GetRocketDamage() + 1) * (int)GetRocketDamage());
             }
 
             return 999;
         }
 
         private int HitCount(Hero en)
-		{
+        {
             if (Owner.CanAttack() && !en.IsAttackImmune() && !en.IsInvul())
             {
-				if ((int)Math.Ceiling((en.Health - GetComboDamage(en) + 2 * GetOneAutoAttackDamage(en)) / GetOneAutoAttackDamage(en)) <= 0)
+                if ((int)Math.Ceiling((en.Health - GetComboDamage(en) + 2 * GetOneAutoAttackDamage(en)) / GetOneAutoAttackDamage(en)) <= 0)
                 {
                     return 0;
                 }
@@ -2652,11 +2652,11 @@ namespace TinkerFastComboPlus
         }
 
         private bool OneHitLeft(Hero en)
-		{
-			
-			if (((en.Health < GetComboDamageByDistance(en)) && (en.Health > GetComboDamageByDistance(en) - GetOneAutoAttackDamage(en)))
-				&& !IsPhysDamageImune(en)
-				&& Owner.Distance2D(en) < Owner.GetAttackRange()+50)
+        {
+
+            if (((en.Health < GetComboDamageByDistance(en)) && (en.Health > GetComboDamageByDistance(en) - GetOneAutoAttackDamage(en)))
+                && !IsPhysDamageImune(en)
+                && Owner.Distance2D(en) < Owner.GetAttackRange() + 50)
             {
                 return true;
             }
@@ -2677,67 +2677,67 @@ namespace TinkerFastComboPlus
 
             if (targetInf != null && targetInf.IsValid && !targetInf.IsIllusion && targetInf.IsAlive && targetInf.IsVisible)
             {
-				if (Menu.Item("TargetCalculator").GetValue<bool>())
-				{	
-					var start = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(0, HUDInfo.GetHpBarSizeY() - 70);
-					var starts = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(1, HUDInfo.GetHpBarSizeY() - 69);
-					var start2 = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(0, HUDInfo.GetHpBarSizeY() - 90);
-					var start2s = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(1, HUDInfo.GetHpBarSizeY() - 89);
-					var start3 = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(0, HUDInfo.GetHpBarSizeY() - 110);
-					var start3s = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(1, HUDInfo.GetHpBarSizeY() - 109);
-					var start4 = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(-25, HUDInfo.GetHpBarSizeY() - 13);
-					var start4s = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(-24, HUDInfo.GetHpBarSizeY() - 12);
-					
-					Drawing.DrawText(EZKill(targetInf) ? GetEZKillDamage(targetInf).ToString()+" ez" : GetEZKillDamage(targetInf).ToString(), starts, new Vector2(21, 21), Color.Black, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
-					Drawing.DrawText(EZKill(targetInf) ? GetEZKillDamage(targetInf).ToString()+" ez" : GetEZKillDamage(targetInf).ToString(), start, new Vector2(21, 21), EZKill(targetInf) ? Color.Lime : Color.Red, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
-					
-					Drawing.DrawText((GetComboDamage(targetInf) + GetOneAutoAttackDamage(targetInf)).ToString(), start2s, new Vector2(21, 21), Color.Black, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
-					Drawing.DrawText((GetComboDamage(targetInf) + GetOneAutoAttackDamage(targetInf)).ToString(), start2, new Vector2(21, 21), (targetInf.Health < (GetComboDamage(targetInf) + GetOneAutoAttackDamage(targetInf))) ? Color.Lime : Color.Red, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
+                if (Menu.Item("TargetCalculator").GetValue<bool>())
+                {
+                    var start = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(0, HUDInfo.GetHpBarSizeY() - 70);
+                    var starts = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(1, HUDInfo.GetHpBarSizeY() - 69);
+                    var start2 = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(0, HUDInfo.GetHpBarSizeY() - 90);
+                    var start2s = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(1, HUDInfo.GetHpBarSizeY() - 89);
+                    var start3 = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(0, HUDInfo.GetHpBarSizeY() - 110);
+                    var start3s = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(1, HUDInfo.GetHpBarSizeY() - 109);
+                    var start4 = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(-25, HUDInfo.GetHpBarSizeY() - 13);
+                    var start4s = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(-24, HUDInfo.GetHpBarSizeY() - 12);
 
-					Drawing.DrawText(GetComboDamageByDistance(targetInf).ToString(), start3s, new Vector2(21, 21), Color.Black, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
-					Drawing.DrawText(GetComboDamageByDistance(targetInf).ToString(), start3, new Vector2(21, 21), (targetInf.Health < GetComboDamageByDistance(targetInf)) ? Color.Lime : Color.Red, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
-					
-					Drawing.DrawText("x"+ProcastCounter(targetInf).ToString(), start4s, new Vector2(21, 21), Color.Black, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
-					Drawing.DrawText("x"+ProcastCounter(targetInf).ToString(), start4, new Vector2(21, 21), Color.White, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
+                    Drawing.DrawText(EZKill(targetInf) ? GetEZKillDamage(targetInf).ToString() + " ez" : GetEZKillDamage(targetInf).ToString(), starts, new Vector2(21, 21), Color.Black, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
+                    Drawing.DrawText(EZKill(targetInf) ? GetEZKillDamage(targetInf).ToString() + " ez" : GetEZKillDamage(targetInf).ToString(), start, new Vector2(21, 21), EZKill(targetInf) ? Color.Lime : Color.Red, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
 
-				}
+                    Drawing.DrawText((GetComboDamage(targetInf) + GetOneAutoAttackDamage(targetInf)).ToString(), start2s, new Vector2(21, 21), Color.Black, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
+                    Drawing.DrawText((GetComboDamage(targetInf) + GetOneAutoAttackDamage(targetInf)).ToString(), start2, new Vector2(21, 21), (targetInf.Health < (GetComboDamage(targetInf) + GetOneAutoAttackDamage(targetInf))) ? Color.Lime : Color.Red, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
 
-				if (Menu.Item("HitCounter").GetValue<bool>())
-				{	
-					var hitcounter = HitCount(targetInf);
-					var starthit = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(117, HUDInfo.GetHpBarSizeY() - 13);
-					var starthits = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(118, HUDInfo.GetHpBarSizeY() - 12);
-					Drawing.DrawText(hitcounter.ToString()+" hits", starthits, new Vector2(21, 21), Color.Black, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
-					Drawing.DrawText(hitcounter.ToString()+" hits", starthit, new Vector2(21, 21), (hitcounter<=1)?Color.Lime:Color.White, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
-				}
+                    Drawing.DrawText(GetComboDamageByDistance(targetInf).ToString(), start3s, new Vector2(21, 21), Color.Black, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
+                    Drawing.DrawText(GetComboDamageByDistance(targetInf).ToString(), start3, new Vector2(21, 21), (targetInf.Health < GetComboDamageByDistance(targetInf)) ? Color.Lime : Color.Red, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
 
-				if (Menu.Item("RocketCounter").GetValue<bool>() && Rocket.Level>0)
-				{	
-					var startrocket = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(117, HUDInfo.GetHpBarSizeY() + 6);
-					var startrockets = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(118, HUDInfo.GetHpBarSizeY() + 7);
+                    Drawing.DrawText("x" + ProcastCounter(targetInf).ToString(), start4s, new Vector2(21, 21), Color.Black, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
+                    Drawing.DrawText("x" + ProcastCounter(targetInf).ToString(), start4, new Vector2(21, 21), Color.White, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
+
+                }
+
+                if (Menu.Item("HitCounter").GetValue<bool>())
+                {
+                    var hitcounter = HitCount(targetInf);
+                    var starthit = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(117, HUDInfo.GetHpBarSizeY() - 13);
+                    var starthits = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(118, HUDInfo.GetHpBarSizeY() - 12);
+                    Drawing.DrawText(hitcounter.ToString() + " hits", starthits, new Vector2(21, 21), Color.Black, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
+                    Drawing.DrawText(hitcounter.ToString() + " hits", starthit, new Vector2(21, 21), (hitcounter <= 1) ? Color.Lime : Color.White, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
+                }
+
+                if (Menu.Item("RocketCounter").GetValue<bool>() && Rocket.Level > 0)
+                {
+                    var startrocket = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(117, HUDInfo.GetHpBarSizeY() + 6);
+                    var startrockets = HUDInfo.GetHPbarPosition(targetInf) + new Vector2(118, HUDInfo.GetHpBarSizeY() + 7);
                     Drawing.DrawText(RktCount(targetInf).ToString() + " rkts", startrockets, new Vector2(21, 21), Color.Black, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
-                    Drawing.DrawText(RktCount(targetInf).ToString() + " rkts", startrocket, new Vector2(21, 21), (RktCount(targetInf)<=1)?Color.Lime:Color.Yellow, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
+                    Drawing.DrawText(RktCount(targetInf).ToString() + " rkts", startrocket, new Vector2(21, 21), (RktCount(targetInf) <= 1) ? Color.Lime : Color.Yellow, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
 
-					if (Refresh != null && Refresh.Level>0)
-					{
-						Drawing.DrawText("          (x" + OnlyRktCount(targetInf).ToString() + ") ", startrockets, new Vector2(21, 21), Color.Black, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
-						Drawing.DrawText("          (x" + OnlyRktCount(targetInf).ToString() + ") ", startrocket, new Vector2(21, 21), (Math.Ceiling((Owner.Mana-Manaonerocket())/(Manaonerocket()+Rearm_mana[Refresh.Level - 1]))>=OnlyRktCount(targetInf))?Color.Lime:Color.Red, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
-					}
-				}
-			}  
-			
-			if (Menu.Item("Calculator").GetValue<bool>())
-			{
-				var coordX = Menu.Item("BarPosX").GetValue<Slider>().Value;
-				var coordY = Menu.Item("BarPosY").GetValue<Slider>().Value;
-				
-				Drawing.DrawText("Full cast:", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -200 + coordX, HUDInfo.ScreenSizeY() / 2 + 210 + 2 + coordY), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText("Full cast:", new Vector2(HUDInfo.ScreenSizeX() / 2-200 + coordX, HUDInfo.ScreenSizeY() / 2 + 210 + coordY), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);			
-				
-				Drawing.DrawText("x1", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -240 + coordX, HUDInfo.ScreenSizeY() / 2 + 260 + 2 + coordY), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText("x1", new Vector2(HUDInfo.ScreenSizeX() / 2-240 + coordX, HUDInfo.ScreenSizeY() / 2 + 260 + coordY), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);			
-				Drawing.DrawText("x2", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2-240 + coordX, HUDInfo.ScreenSizeY() / 2 + 285 + 2 + coordY), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText("x2", new Vector2(HUDInfo.ScreenSizeX() / 2-240 + coordX, HUDInfo.ScreenSizeY() / 2 + 285 + coordY), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
+                    if (Refresh != null && Refresh.Level > 0)
+                    {
+                        Drawing.DrawText("          (x" + OnlyRktCount(targetInf).ToString() + ") ", startrockets, new Vector2(21, 21), Color.Black, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
+                        Drawing.DrawText("          (x" + OnlyRktCount(targetInf).ToString() + ") ", startrocket, new Vector2(21, 21), (Math.Ceiling((Owner.Mana - Manaonerocket()) / (Manaonerocket() + Rearm_mana[Refresh.Level - 1])) >= OnlyRktCount(targetInf)) ? Color.Lime : Color.Red, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
+                    }
+                }
+            }
+
+            if (Menu.Item("Calculator").GetValue<bool>())
+            {
+                var coordX = Menu.Item("BarPosX").GetValue<Slider>().Value;
+                var coordY = Menu.Item("BarPosY").GetValue<Slider>().Value;
+
+                Drawing.DrawText("Full cast:", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 200 + coordX, HUDInfo.ScreenSizeY() / 2 + 210 + 2 + coordY), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText("Full cast:", new Vector2(HUDInfo.ScreenSizeX() / 2 - 200 + coordX, HUDInfo.ScreenSizeY() / 2 + 210 + coordY), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
+
+                Drawing.DrawText("x1", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 240 + coordX, HUDInfo.ScreenSizeY() / 2 + 260 + 2 + coordY), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText("x1", new Vector2(HUDInfo.ScreenSizeX() / 2 - 240 + coordX, HUDInfo.ScreenSizeY() / 2 + 260 + coordY), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
+                Drawing.DrawText("x2", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 240 + coordX, HUDInfo.ScreenSizeY() / 2 + 285 + 2 + coordY), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText("x2", new Vector2(HUDInfo.ScreenSizeX() / 2 - 240 + coordX, HUDInfo.ScreenSizeY() / 2 + 285 + coordY), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
                 Drawing.DrawText("x3", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 240 + coordX, HUDInfo.ScreenSizeY() / 2 + 310 + 2 + coordY), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
                 Drawing.DrawText("x3", new Vector2(HUDInfo.ScreenSizeX() / 2 - 240 + coordX, HUDInfo.ScreenSizeY() / 2 + 310 + coordY), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
                 Drawing.DrawText(GetComboDamage().ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 200 + coordX, HUDInfo.ScreenSizeY() / 2 + 260 + 2 + coordY), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
@@ -2800,111 +2800,111 @@ namespace TinkerFastComboPlus
                     Drawing.DrawText(GetEZKillDamage(targetInf).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 + coordX - 400, HUDInfo.ScreenSizeY() / 2 + 385 + coordY), new Vector2(30, 200), Color.LimeGreen, FontFlags.AntiAlias);
                 }
 
-                Drawing.DrawText("dmg", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -200 + coordX, HUDInfo.ScreenSizeY() / 2 + 232 + 2 + coordY), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText("dmg", new Vector2(HUDInfo.ScreenSizeX() / 2-200 + coordX, HUDInfo.ScreenSizeY() / 2 + 232 + coordY), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
-				
+                Drawing.DrawText("dmg", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 200 + coordX, HUDInfo.ScreenSizeY() / 2 + 232 + 2 + coordY), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText("dmg", new Vector2(HUDInfo.ScreenSizeX() / 2 - 200 + coordX, HUDInfo.ScreenSizeY() / 2 + 232 + coordY), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
 
-				Drawing.DrawText("mana", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -80 + coordX, HUDInfo.ScreenSizeY() / 2 + 232 + 2 + coordY), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText("mana", new Vector2(HUDInfo.ScreenSizeX() / 2 -80 + coordX, HUDInfo.ScreenSizeY() / 2 + 232 + coordY), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);			
-				if (Refresh != null && Refresh.Level>0)
-				{
-					Drawing.DrawText(Manaprocast().ToString()+" ("+(-Manaprocast()+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -80 + coordX, HUDInfo.ScreenSizeY() / 2 + 260 + 2 + coordY), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-					Drawing.DrawText(Manaprocast().ToString()+" ("+(-Manaprocast()+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 -80 + coordX, HUDInfo.ScreenSizeY() / 2 + 260 + coordY), new Vector2(30, 200),(Owner.Mana>Manaprocast())? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);			
-					Drawing.DrawText((2*Manaprocast()+Rearm_mana[Refresh.Level - 1]).ToString()+" ("+(-(2*Manaprocast()+Rearm_mana[Refresh.Level - 1])+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -80 + coordX, HUDInfo.ScreenSizeY() / 2 + 285 + 2 + coordY), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-					Drawing.DrawText((2*Manaprocast()+Rearm_mana[Refresh.Level - 1]).ToString()+" ("+(-(2*Manaprocast()+Rearm_mana[Refresh.Level - 1])+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 -80 + coordX , HUDInfo.ScreenSizeY() / 2 + 285 + coordY), new Vector2(30, 200), (Owner.Mana>(2*Manaprocast()+Rearm_mana[Refresh.Level - 1]))? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);			
-					Drawing.DrawText((3*Manaprocast()+2*Rearm_mana[Refresh.Level - 1]).ToString()+" ("+(-(3*Manaprocast()+2*Rearm_mana[Refresh.Level - 1])+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -80 + coordX, HUDInfo.ScreenSizeY() / 2 + 310 + 2 + coordY), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-					Drawing.DrawText((3*Manaprocast()+2*Rearm_mana[Refresh.Level - 1]).ToString()+" ("+(-(3*Manaprocast()+2*Rearm_mana[Refresh.Level - 1])+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 -80 + coordX, HUDInfo.ScreenSizeY() / 2 + 310 + coordY), new Vector2(30, 200), (Owner.Mana>(3*Manaprocast()+2*Rearm_mana[Refresh.Level - 1]))? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);			
-				}
-				else
-				{
-					Drawing.DrawText(Manaprocast().ToString()+" ("+(-Manaprocast()+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -80 + coordX, HUDInfo.ScreenSizeY() / 2 + 260 + 2 + coordY), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-					Drawing.DrawText(Manaprocast().ToString()+" ("+(-Manaprocast()+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 -80 + coordX, HUDInfo.ScreenSizeY() / 2 + 260 + coordY), new Vector2(30, 200), (Owner.Mana>Manaprocast())? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);			
-				}
-			}
-				
-			if (Menu.Item("CalculatorRkt").GetValue<bool>())
-			{
-				var coordXr = Menu.Item("BarPosXr").GetValue<Slider>().Value;
-				var coordYr = Menu.Item("BarPosYr").GetValue<Slider>().Value;
-				
-				Drawing.DrawText("Rockets:", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 210 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText("Rockets:", new Vector2(HUDInfo.ScreenSizeX() / 2-200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 210 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);			
-				
-				Drawing.DrawText("x1", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 260 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText("x1", new Vector2(HUDInfo.ScreenSizeX() / 2-240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 260 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);			
-				Drawing.DrawText("x2", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2-240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 285 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText("x2", new Vector2(HUDInfo.ScreenSizeX() / 2-240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 285 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);			
-				Drawing.DrawText("x3", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2-240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 310 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText("x3", new Vector2(HUDInfo.ScreenSizeX() / 2-240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 310 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);			
-				Drawing.DrawText("x4", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2-240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 335 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText("x4", new Vector2(HUDInfo.ScreenSizeX() / 2-240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 335 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);			
-				Drawing.DrawText("x5", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2-240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 360 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText("x5", new Vector2(HUDInfo.ScreenSizeX() / 2-240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 360 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);			
-				Drawing.DrawText("x6", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2-240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 385 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText("x6", new Vector2(HUDInfo.ScreenSizeX() / 2-240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 385 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);			
-				Drawing.DrawText("x7", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2-240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 410 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText("x7", new Vector2(HUDInfo.ScreenSizeX() / 2-240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 410 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);			
-				Drawing.DrawText("x8", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2-240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 435 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText("x8", new Vector2(HUDInfo.ScreenSizeX() / 2-240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 435 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);			
-				Drawing.DrawText("x9", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2-240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 460 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText("x9", new Vector2(HUDInfo.ScreenSizeX() / 2-240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 460 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);			
-				
 
-				Drawing.DrawText("dmg", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 232 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText("dmg", new Vector2(HUDInfo.ScreenSizeX() / 2-200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 232 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
-				
-				Drawing.DrawText(GetRocketDamage().ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 260 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText(GetRocketDamage().ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2-200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 260 + coordYr), new Vector2(30, 200), Color.LimeGreen, FontFlags.AntiAlias);			
-				Drawing.DrawText((2*GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 + 2-200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 285 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText((2*GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2-200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 285 + coordYr), new Vector2(30, 200), Color.LimeGreen, FontFlags.AntiAlias);			
-				Drawing.DrawText((3*GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 + 2-200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 310 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText((3*GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2-200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 310 + coordYr), new Vector2(30, 200), Color.LimeGreen, FontFlags.AntiAlias);			
-				Drawing.DrawText((4*GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 + 2-200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 335 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText((4*GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2-200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 335 + coordYr), new Vector2(30, 200), Color.LimeGreen, FontFlags.AntiAlias);			
-				Drawing.DrawText((5*GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 + 2-200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 360 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText((5*GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2-200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 360 + coordYr), new Vector2(30, 200), Color.LimeGreen, FontFlags.AntiAlias);			
-				Drawing.DrawText((6*GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 + 2-200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 385 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText((6*GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2-200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 385 + coordYr), new Vector2(30, 200), Color.LimeGreen, FontFlags.AntiAlias);			
-				Drawing.DrawText((7*GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 + 2-200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 410 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText((7*GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2-200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 410 + coordYr), new Vector2(30, 200), Color.LimeGreen, FontFlags.AntiAlias);			
-				Drawing.DrawText((8*GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 + 2-200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 435 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText((8*GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2-200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 435 + coordYr), new Vector2(30, 200), Color.LimeGreen, FontFlags.AntiAlias);			
-				Drawing.DrawText((9*GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 + 2-200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 460 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText((9*GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2-200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 460 + coordYr), new Vector2(30, 200), Color.LimeGreen, FontFlags.AntiAlias);			
-	
-				Drawing.DrawText("mana", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 232 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-				Drawing.DrawText("mana", new Vector2(HUDInfo.ScreenSizeX() / 2 -80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 232 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);			
-				
-				if (Refresh != null && Refresh.Level>0)
-				{
-					Drawing.DrawText("               x"+ Math.Ceiling((Owner.Mana-Manaonerocket())/(Manaonerocket()+Rearm_mana[Refresh.Level - 1] )).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 210 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-					Drawing.DrawText("               x"+ Math.Ceiling((Owner.Mana-Manaonerocket())/(Manaonerocket()+Rearm_mana[Refresh.Level - 1] )).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2-200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 210 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);			
-				
-					Drawing.DrawText(Manaonerocket().ToString()+" ("+(-Manaonerocket()+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 260 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-					Drawing.DrawText(Manaonerocket().ToString()+" ("+(-Manaonerocket()+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 -80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 260 + coordYr), new Vector2(30, 200),(Owner.Mana>Manaonerocket())? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);			
-					Drawing.DrawText((2*Manaonerocket()+Rearm_mana[Refresh.Level - 1]).ToString()+" ("+(-(2*Manaonerocket()+Rearm_mana[Refresh.Level - 1])+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 285 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-					Drawing.DrawText((2*Manaonerocket()+Rearm_mana[Refresh.Level - 1]).ToString()+" ("+(-(2*Manaonerocket()+Rearm_mana[Refresh.Level - 1])+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 -80 + coordXr , HUDInfo.ScreenSizeY() / 2 + 285 + coordYr), new Vector2(30, 200), (Owner.Mana>(2*Manaonerocket()+Rearm_mana[Refresh.Level - 1]))? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);			
-					Drawing.DrawText((3*Manaonerocket()+2*Rearm_mana[Refresh.Level - 1]).ToString()+" ("+(-(3*Manaonerocket()+2*Rearm_mana[Refresh.Level - 1])+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 310 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-					Drawing.DrawText((3*Manaonerocket()+2*Rearm_mana[Refresh.Level - 1]).ToString()+" ("+(-(3*Manaonerocket()+2*Rearm_mana[Refresh.Level - 1])+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 -80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 310 + coordYr), new Vector2(30, 200), (Owner.Mana>(3*Manaonerocket()+2*Rearm_mana[Refresh.Level - 1]))? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);			
-					Drawing.DrawText((4*Manaonerocket()+3*Rearm_mana[Refresh.Level - 1]).ToString()+" ("+(-(4*Manaonerocket()+3*Rearm_mana[Refresh.Level - 1])+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 335 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-					Drawing.DrawText((4*Manaonerocket()+3*Rearm_mana[Refresh.Level - 1]).ToString()+" ("+(-(4*Manaonerocket()+3*Rearm_mana[Refresh.Level - 1])+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 -80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 335 + coordYr), new Vector2(30, 200), (Owner.Mana>(4*Manaonerocket()+3*Rearm_mana[Refresh.Level - 1]))? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);			
-					Drawing.DrawText((5*Manaonerocket()+4*Rearm_mana[Refresh.Level - 1]).ToString()+" ("+(-(5*Manaonerocket()+4*Rearm_mana[Refresh.Level - 1])+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 360 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-					Drawing.DrawText((5*Manaonerocket()+4*Rearm_mana[Refresh.Level - 1]).ToString()+" ("+(-(5*Manaonerocket()+4*Rearm_mana[Refresh.Level - 1])+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 -80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 360 + coordYr), new Vector2(30, 200), (Owner.Mana>(5*Manaonerocket()+4*Rearm_mana[Refresh.Level - 1]))? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);			
-					Drawing.DrawText((6*Manaonerocket()+5*Rearm_mana[Refresh.Level - 1]).ToString()+" ("+(-(6*Manaonerocket()+5*Rearm_mana[Refresh.Level - 1])+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 385 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-					Drawing.DrawText((6*Manaonerocket()+5*Rearm_mana[Refresh.Level - 1]).ToString()+" ("+(-(6*Manaonerocket()+5*Rearm_mana[Refresh.Level - 1])+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 -80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 385 + coordYr), new Vector2(30, 200), (Owner.Mana>(6*Manaonerocket()+5*Rearm_mana[Refresh.Level - 1]))? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);			
-					Drawing.DrawText((7*Manaonerocket()+6*Rearm_mana[Refresh.Level - 1]).ToString()+" ("+(-(7*Manaonerocket()+6*Rearm_mana[Refresh.Level - 1])+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 410 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-					Drawing.DrawText((7*Manaonerocket()+6*Rearm_mana[Refresh.Level - 1]).ToString()+" ("+(-(7*Manaonerocket()+6*Rearm_mana[Refresh.Level - 1])+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 -80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 410 + coordYr), new Vector2(30, 200), (Owner.Mana>(7*Manaonerocket()+6*Rearm_mana[Refresh.Level - 1]))? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);			
-					Drawing.DrawText((8*Manaonerocket()+7*Rearm_mana[Refresh.Level - 1]).ToString()+" ("+(-(8*Manaonerocket()+7*Rearm_mana[Refresh.Level - 1])+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 435 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-					Drawing.DrawText((8*Manaonerocket()+7*Rearm_mana[Refresh.Level - 1]).ToString()+" ("+(-(8*Manaonerocket()+7*Rearm_mana[Refresh.Level - 1])+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 -80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 435 + coordYr), new Vector2(30, 200), (Owner.Mana>(8*Manaonerocket()+7*Rearm_mana[Refresh.Level - 1]))? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);			
-					Drawing.DrawText((9*Manaonerocket()+8*Rearm_mana[Refresh.Level - 1]).ToString()+" ("+(-(9*Manaonerocket()+8*Rearm_mana[Refresh.Level - 1])+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 460 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-					Drawing.DrawText((9*Manaonerocket()+8*Rearm_mana[Refresh.Level - 1]).ToString()+" ("+(-(9*Manaonerocket()+8*Rearm_mana[Refresh.Level - 1])+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 -80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 460 + coordYr), new Vector2(30, 200), (Owner.Mana>(9*Manaonerocket()+8*Rearm_mana[Refresh.Level - 1]))? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);			
-				}
-				else
-				{
-					Drawing.DrawText(Manaonerocket().ToString()+" ("+(-Manaonerocket()+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 -80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 260 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
-					Drawing.DrawText(Manaonerocket().ToString()+" ("+(-Manaonerocket()+(int)Owner.Mana).ToString()+")", new Vector2(HUDInfo.ScreenSizeX() / 2 -80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 260 + coordYr), new Vector2(30, 200), (Owner.Mana>Manaonerocket())? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);			
-				}
-			}
+                Drawing.DrawText("mana", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 80 + coordX, HUDInfo.ScreenSizeY() / 2 + 232 + 2 + coordY), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText("mana", new Vector2(HUDInfo.ScreenSizeX() / 2 - 80 + coordX, HUDInfo.ScreenSizeY() / 2 + 232 + coordY), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
+                if (Refresh != null && Refresh.Level > 0)
+                {
+                    Drawing.DrawText(Manaprocast().ToString() + " (" + (-Manaprocast() + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 80 + coordX, HUDInfo.ScreenSizeY() / 2 + 260 + 2 + coordY), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                    Drawing.DrawText(Manaprocast().ToString() + " (" + (-Manaprocast() + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 - 80 + coordX, HUDInfo.ScreenSizeY() / 2 + 260 + coordY), new Vector2(30, 200), (Owner.Mana > Manaprocast()) ? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);
+                    Drawing.DrawText((2 * Manaprocast() + Rearm_mana[Refresh.Level - 1]).ToString() + " (" + (-(2 * Manaprocast() + Rearm_mana[Refresh.Level - 1]) + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 80 + coordX, HUDInfo.ScreenSizeY() / 2 + 285 + 2 + coordY), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                    Drawing.DrawText((2 * Manaprocast() + Rearm_mana[Refresh.Level - 1]).ToString() + " (" + (-(2 * Manaprocast() + Rearm_mana[Refresh.Level - 1]) + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 - 80 + coordX, HUDInfo.ScreenSizeY() / 2 + 285 + coordY), new Vector2(30, 200), (Owner.Mana > (2 * Manaprocast() + Rearm_mana[Refresh.Level - 1])) ? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);
+                    Drawing.DrawText((3 * Manaprocast() + 2 * Rearm_mana[Refresh.Level - 1]).ToString() + " (" + (-(3 * Manaprocast() + 2 * Rearm_mana[Refresh.Level - 1]) + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 80 + coordX, HUDInfo.ScreenSizeY() / 2 + 310 + 2 + coordY), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                    Drawing.DrawText((3 * Manaprocast() + 2 * Rearm_mana[Refresh.Level - 1]).ToString() + " (" + (-(3 * Manaprocast() + 2 * Rearm_mana[Refresh.Level - 1]) + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 - 80 + coordX, HUDInfo.ScreenSizeY() / 2 + 310 + coordY), new Vector2(30, 200), (Owner.Mana > (3 * Manaprocast() + 2 * Rearm_mana[Refresh.Level - 1])) ? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);
+                }
+                else
+                {
+                    Drawing.DrawText(Manaprocast().ToString() + " (" + (-Manaprocast() + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 80 + coordX, HUDInfo.ScreenSizeY() / 2 + 260 + 2 + coordY), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                    Drawing.DrawText(Manaprocast().ToString() + " (" + (-Manaprocast() + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 - 80 + coordX, HUDInfo.ScreenSizeY() / 2 + 260 + coordY), new Vector2(30, 200), (Owner.Mana > Manaprocast()) ? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);
+                }
+            }
+
+            if (Menu.Item("CalculatorRkt").GetValue<bool>())
+            {
+                var coordXr = Menu.Item("BarPosXr").GetValue<Slider>().Value;
+                var coordYr = Menu.Item("BarPosYr").GetValue<Slider>().Value;
+
+                Drawing.DrawText("Rockets:", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 210 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText("Rockets:", new Vector2(HUDInfo.ScreenSizeX() / 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 210 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
+
+                Drawing.DrawText("x1", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 260 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText("x1", new Vector2(HUDInfo.ScreenSizeX() / 2 - 240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 260 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
+                Drawing.DrawText("x2", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 285 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText("x2", new Vector2(HUDInfo.ScreenSizeX() / 2 - 240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 285 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
+                Drawing.DrawText("x3", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 310 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText("x3", new Vector2(HUDInfo.ScreenSizeX() / 2 - 240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 310 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
+                Drawing.DrawText("x4", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 335 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText("x4", new Vector2(HUDInfo.ScreenSizeX() / 2 - 240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 335 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
+                Drawing.DrawText("x5", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 360 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText("x5", new Vector2(HUDInfo.ScreenSizeX() / 2 - 240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 360 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
+                Drawing.DrawText("x6", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 385 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText("x6", new Vector2(HUDInfo.ScreenSizeX() / 2 - 240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 385 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
+                Drawing.DrawText("x7", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 410 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText("x7", new Vector2(HUDInfo.ScreenSizeX() / 2 - 240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 410 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
+                Drawing.DrawText("x8", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 435 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText("x8", new Vector2(HUDInfo.ScreenSizeX() / 2 - 240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 435 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
+                Drawing.DrawText("x9", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 460 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText("x9", new Vector2(HUDInfo.ScreenSizeX() / 2 - 240 + coordXr, HUDInfo.ScreenSizeY() / 2 + 460 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
+
+
+                Drawing.DrawText("dmg", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 232 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText("dmg", new Vector2(HUDInfo.ScreenSizeX() / 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 232 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
+
+                Drawing.DrawText(GetRocketDamage().ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 260 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText(GetRocketDamage().ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 260 + coordYr), new Vector2(30, 200), Color.LimeGreen, FontFlags.AntiAlias);
+                Drawing.DrawText((2 * GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 285 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText((2 * GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 285 + coordYr), new Vector2(30, 200), Color.LimeGreen, FontFlags.AntiAlias);
+                Drawing.DrawText((3 * GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 310 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText((3 * GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 310 + coordYr), new Vector2(30, 200), Color.LimeGreen, FontFlags.AntiAlias);
+                Drawing.DrawText((4 * GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 335 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText((4 * GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 335 + coordYr), new Vector2(30, 200), Color.LimeGreen, FontFlags.AntiAlias);
+                Drawing.DrawText((5 * GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 360 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText((5 * GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 360 + coordYr), new Vector2(30, 200), Color.LimeGreen, FontFlags.AntiAlias);
+                Drawing.DrawText((6 * GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 385 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText((6 * GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 385 + coordYr), new Vector2(30, 200), Color.LimeGreen, FontFlags.AntiAlias);
+                Drawing.DrawText((7 * GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 410 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText((7 * GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 410 + coordYr), new Vector2(30, 200), Color.LimeGreen, FontFlags.AntiAlias);
+                Drawing.DrawText((8 * GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 435 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText((8 * GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 435 + coordYr), new Vector2(30, 200), Color.LimeGreen, FontFlags.AntiAlias);
+                Drawing.DrawText((9 * GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 460 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText((9 * GetRocketDamage()).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 460 + coordYr), new Vector2(30, 200), Color.LimeGreen, FontFlags.AntiAlias);
+
+                Drawing.DrawText("mana", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 232 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                Drawing.DrawText("mana", new Vector2(HUDInfo.ScreenSizeX() / 2 - 80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 232 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
+
+                if (Refresh != null && Refresh.Level > 0)
+                {
+                    Drawing.DrawText("               x" + Math.Ceiling((Owner.Mana - Manaonerocket()) / (Manaonerocket() + Rearm_mana[Refresh.Level - 1])).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 210 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                    Drawing.DrawText("               x" + Math.Ceiling((Owner.Mana - Manaonerocket()) / (Manaonerocket() + Rearm_mana[Refresh.Level - 1])).ToString(), new Vector2(HUDInfo.ScreenSizeX() / 2 - 200 + coordXr, HUDInfo.ScreenSizeY() / 2 + 210 + coordYr), new Vector2(30, 200), Color.White, FontFlags.AntiAlias);
+
+                    Drawing.DrawText(Manaonerocket().ToString() + " (" + (-Manaonerocket() + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 260 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                    Drawing.DrawText(Manaonerocket().ToString() + " (" + (-Manaonerocket() + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 - 80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 260 + coordYr), new Vector2(30, 200), (Owner.Mana > Manaonerocket()) ? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);
+                    Drawing.DrawText((2 * Manaonerocket() + Rearm_mana[Refresh.Level - 1]).ToString() + " (" + (-(2 * Manaonerocket() + Rearm_mana[Refresh.Level - 1]) + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 285 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                    Drawing.DrawText((2 * Manaonerocket() + Rearm_mana[Refresh.Level - 1]).ToString() + " (" + (-(2 * Manaonerocket() + Rearm_mana[Refresh.Level - 1]) + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 - 80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 285 + coordYr), new Vector2(30, 200), (Owner.Mana > (2 * Manaonerocket() + Rearm_mana[Refresh.Level - 1])) ? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);
+                    Drawing.DrawText((3 * Manaonerocket() + 2 * Rearm_mana[Refresh.Level - 1]).ToString() + " (" + (-(3 * Manaonerocket() + 2 * Rearm_mana[Refresh.Level - 1]) + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 310 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                    Drawing.DrawText((3 * Manaonerocket() + 2 * Rearm_mana[Refresh.Level - 1]).ToString() + " (" + (-(3 * Manaonerocket() + 2 * Rearm_mana[Refresh.Level - 1]) + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 - 80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 310 + coordYr), new Vector2(30, 200), (Owner.Mana > (3 * Manaonerocket() + 2 * Rearm_mana[Refresh.Level - 1])) ? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);
+                    Drawing.DrawText((4 * Manaonerocket() + 3 * Rearm_mana[Refresh.Level - 1]).ToString() + " (" + (-(4 * Manaonerocket() + 3 * Rearm_mana[Refresh.Level - 1]) + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 335 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                    Drawing.DrawText((4 * Manaonerocket() + 3 * Rearm_mana[Refresh.Level - 1]).ToString() + " (" + (-(4 * Manaonerocket() + 3 * Rearm_mana[Refresh.Level - 1]) + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 - 80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 335 + coordYr), new Vector2(30, 200), (Owner.Mana > (4 * Manaonerocket() + 3 * Rearm_mana[Refresh.Level - 1])) ? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);
+                    Drawing.DrawText((5 * Manaonerocket() + 4 * Rearm_mana[Refresh.Level - 1]).ToString() + " (" + (-(5 * Manaonerocket() + 4 * Rearm_mana[Refresh.Level - 1]) + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 360 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                    Drawing.DrawText((5 * Manaonerocket() + 4 * Rearm_mana[Refresh.Level - 1]).ToString() + " (" + (-(5 * Manaonerocket() + 4 * Rearm_mana[Refresh.Level - 1]) + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 - 80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 360 + coordYr), new Vector2(30, 200), (Owner.Mana > (5 * Manaonerocket() + 4 * Rearm_mana[Refresh.Level - 1])) ? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);
+                    Drawing.DrawText((6 * Manaonerocket() + 5 * Rearm_mana[Refresh.Level - 1]).ToString() + " (" + (-(6 * Manaonerocket() + 5 * Rearm_mana[Refresh.Level - 1]) + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 385 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                    Drawing.DrawText((6 * Manaonerocket() + 5 * Rearm_mana[Refresh.Level - 1]).ToString() + " (" + (-(6 * Manaonerocket() + 5 * Rearm_mana[Refresh.Level - 1]) + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 - 80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 385 + coordYr), new Vector2(30, 200), (Owner.Mana > (6 * Manaonerocket() + 5 * Rearm_mana[Refresh.Level - 1])) ? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);
+                    Drawing.DrawText((7 * Manaonerocket() + 6 * Rearm_mana[Refresh.Level - 1]).ToString() + " (" + (-(7 * Manaonerocket() + 6 * Rearm_mana[Refresh.Level - 1]) + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 410 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                    Drawing.DrawText((7 * Manaonerocket() + 6 * Rearm_mana[Refresh.Level - 1]).ToString() + " (" + (-(7 * Manaonerocket() + 6 * Rearm_mana[Refresh.Level - 1]) + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 - 80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 410 + coordYr), new Vector2(30, 200), (Owner.Mana > (7 * Manaonerocket() + 6 * Rearm_mana[Refresh.Level - 1])) ? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);
+                    Drawing.DrawText((8 * Manaonerocket() + 7 * Rearm_mana[Refresh.Level - 1]).ToString() + " (" + (-(8 * Manaonerocket() + 7 * Rearm_mana[Refresh.Level - 1]) + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 435 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                    Drawing.DrawText((8 * Manaonerocket() + 7 * Rearm_mana[Refresh.Level - 1]).ToString() + " (" + (-(8 * Manaonerocket() + 7 * Rearm_mana[Refresh.Level - 1]) + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 - 80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 435 + coordYr), new Vector2(30, 200), (Owner.Mana > (8 * Manaonerocket() + 7 * Rearm_mana[Refresh.Level - 1])) ? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);
+                    Drawing.DrawText((9 * Manaonerocket() + 8 * Rearm_mana[Refresh.Level - 1]).ToString() + " (" + (-(9 * Manaonerocket() + 8 * Rearm_mana[Refresh.Level - 1]) + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 460 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                    Drawing.DrawText((9 * Manaonerocket() + 8 * Rearm_mana[Refresh.Level - 1]).ToString() + " (" + (-(9 * Manaonerocket() + 8 * Rearm_mana[Refresh.Level - 1]) + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 - 80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 460 + coordYr), new Vector2(30, 200), (Owner.Mana > (9 * Manaonerocket() + 8 * Rearm_mana[Refresh.Level - 1])) ? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);
+                }
+                else
+                {
+                    Drawing.DrawText(Manaonerocket().ToString() + " (" + (-Manaonerocket() + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 + 2 - 80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 260 + 2 + coordYr), new Vector2(30, 200), Color.Black, FontFlags.AntiAlias);
+                    Drawing.DrawText(Manaonerocket().ToString() + " (" + (-Manaonerocket() + (int)Owner.Mana).ToString() + ")", new Vector2(HUDInfo.ScreenSizeX() / 2 - 80 + coordXr, HUDInfo.ScreenSizeY() / 2 + 260 + coordYr), new Vector2(30, 200), (Owner.Mana > Manaonerocket()) ? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);
+                }
+            }
 
             if (Menu.Item("ComboModeDrawing").GetValue<bool>())
             {
@@ -2939,7 +2939,7 @@ namespace TinkerFastComboPlus
                     Drawing.DrawText(!Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key) ? "KS: on" : "KS: off", new Vector2(HUDInfo.ScreenSizeX() / 2, HUDInfo.ScreenSizeY() / 2 + 260), new Vector2(30, 200), !Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key) ? Color.LimeGreen : Color.Red, FontFlags.AntiAlias);
                 }
             }
-		}
+        }
 
         private float GetComboDamage()
         {
@@ -3051,7 +3051,7 @@ namespace TinkerFastComboPlus
                 var veil_of_discord_magic_reduction = 0.0f;
 
                 var eblade = Abilities.Ethereal;
-                
+
                 if (((eblade != null && eblade.CanBeCasted())
                     || (eblade != null && IsCasted(eblade)))
                     && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled("item_ethereal_blade")
@@ -3068,7 +3068,7 @@ namespace TinkerFastComboPlus
                 {
                     veil_of_discord_magic_reduction = 0.25f;
                 }
-                
+
                 var totalMagicResistance = ((1 - enemy.MagicDamageResist) * (1 + etheral_blade_magic_reduction) * (1 + veil_of_discord_magic_reduction));
                 var dagon = Abilities.Dagon;
                 if (dagon != null
@@ -3078,7 +3078,7 @@ namespace TinkerFastComboPlus
                 {
                     comboDamageByDistance += GetDagonDamage() * totalMagicResistance;
                 }
-                
+
                 if (((eblade != null && eblade.CanBeCasted())
                     || (eblade != null && IsCasted(eblade)))
                     && Menu.Item("ComboItems: ").GetValue<AbilityToggler>().IsEnabled("item_ethereal_blade")
@@ -3111,7 +3111,7 @@ namespace TinkerFastComboPlus
                     else if (Owner.Distance2D(enemy) >= 1600 + Castrange + Ensage_error && Owner.Distance2D(enemy) < 2500)
                     {
                         comboDamageByDistance += GetRocketDamage() * ((1 - enemy.MagicDamageResist));
-                    }   
+                    }
                 }
 
                 if (Owner.CanAttack()
@@ -3157,7 +3157,7 @@ namespace TinkerFastComboPlus
             var trident = Owner.Inventory.Items.FirstOrDefault(x => x.Id == AbilityId.item_trident);
             if (trident != null)
             {
-                totalSpellAmp += (trident.AbilitySpecialData.First(x => x.Name == "spell_amp").Value) / 100.0f;  
+                totalSpellAmp += (trident.AbilitySpecialData.First(x => x.Name == "spell_amp").Value) / 100.0f;
             }
 
             totalSpellAmp += (100.0f + Owner.TotalIntelligence / 15.0f) / 100.0f;
@@ -3275,10 +3275,10 @@ namespace TinkerFastComboPlus
             {
                 closestVector = v;
             }
-                
+
             return closestVector;
         }
-                
+
         private void ParticleDraw()
         {
             for (int i = 0; i < SafePos.Count(); ++i)
@@ -3366,10 +3366,5 @@ namespace TinkerFastComboPlus
             new Vector3(-4832, -7072, 384),
             new Vector3(-3744, -7200, 384)
         };
-    }
-
-    public sealed class TEEEEE
-    {
-        public string Name { get; set; } = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     }
 }

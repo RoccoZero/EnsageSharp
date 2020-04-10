@@ -133,10 +133,16 @@ namespace TinkerFastComboPlus
                         }
                         break;
 
+                    case AbilityId.item_tpscroll:
+                        {
+                            TownPortalScroll = item;
+                        }
+                        break;
+
                     case AbilityId.item_travel_boots:
                     case AbilityId.item_travel_boots_2:
                         {
-                            Travel = item;
+                            travel = item;
                         }
                         break;
                 }
@@ -173,10 +179,25 @@ namespace TinkerFastComboPlus
 
         public Item Bottle { get; }
 
-        public Item Travel { get; }
-
         public Item Veil { get; }
 
         public Item Atos { get; }
+
+        private readonly Item TownPortalScroll;
+
+        private readonly Item travel;
+
+        public Item Travel
+        {
+            get
+            {
+                if (travel != null && TownPortalScroll != null)
+                {
+                    return TownPortalScroll;
+                }
+
+                return null;
+            }
+        }
     }
 }
