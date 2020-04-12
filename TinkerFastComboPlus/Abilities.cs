@@ -133,12 +133,6 @@ namespace TinkerFastComboPlus
                         }
                         break;
 
-                    case AbilityId.item_tpscroll:
-                        {
-                            TownPortalScroll = item;
-                        }
-                        break;
-
                     case AbilityId.item_travel_boots:
                     case AbilityId.item_travel_boots_2:
                         {
@@ -147,6 +141,8 @@ namespace TinkerFastComboPlus
                         break;
                 }
             }
+
+            TownPortalScroll = owner.Inventory.TownPortals;
         }
 
         public Ability Laser { get; }

@@ -277,7 +277,7 @@ namespace TinkerFastComboPlus
                 Orbwalking.Load();
 
                 OnUpdateAbility();
-                UpdateManager.Subscribe(OnUpdateAbility, 500);
+                UpdateManager.Subscribe(OnUpdateAbility, 250);
 
                 Game.OnUpdate += ComboEngine;
                 Game.OnUpdate += AD;
@@ -551,6 +551,9 @@ namespace TinkerFastComboPlus
                         Soulring.UseAbility();
                         Utils.Sleep(250, "soulring");
                     }
+
+                    //Console.WriteLine(Travel);
+                    //Console.WriteLine(!Travel.CanBeCasted());
 
                     if (Refresh != null
                         && Refresh.CanBeCasted()
