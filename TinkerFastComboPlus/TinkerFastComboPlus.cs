@@ -25,13 +25,6 @@ namespace TinkerFastComboPlus
         public TinkerFastComboPlus([Import] IEntityContext<Unit> entityContext)
         {
             Owner = entityContext.Owner as Hero;
-
-            unsafe
-            {
-                var value = 555;
-                var ptr = &value;
-                Console.WriteLine(((long)ptr).ToString("X"));
-            }
         }
 
         private Task RearmBlink { get; set; }
