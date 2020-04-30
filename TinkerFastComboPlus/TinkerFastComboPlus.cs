@@ -2674,9 +2674,7 @@ namespace TinkerFastComboPlus
                 return;
             }
 
-            Hero targetInf = null;
-
-            targetInf = Owner.ClosestToMouseTarget(2000);
+            var targetInf = Owner.ClosestToMouseTarget(2000);
 
             if (targetInf != null && targetInf.IsValid && !targetInf.IsIllusion && targetInf.IsAlive && targetInf.IsVisible)
             {
@@ -3150,9 +3148,8 @@ namespace TinkerFastComboPlus
                 laserDamage += talent25.AbilitySpecialData.First(x => x.Name == "value").Value;
             }
 
-            //Spell Amplification Calculation (addition)
-            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_spell_amplify_10");
-            if (talent10.Level > 0)
+            var talent10 = Owner.Spellbook.Spells.FirstOrDefault(x => x.Level > 0 && x.Name.StartsWith("special_bonus_spell_amplify_"));
+            if (talent10 != null)
             {
                 totalSpellAmp += (talent10.AbilitySpecialData.First(x => x.Name == "value").Value) / 100.0f;
             }
@@ -3180,9 +3177,8 @@ namespace TinkerFastComboPlus
                 rocketDamage += rocket.AbilitySpecialData.First(x => x.Name == "damage").GetValue(rocket.Level - 1);
             }
 
-            //Spell Amplification Calculation (addition)
-            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_spell_amplify_10");
-            if (talent10.Level > 0)
+            var talent10 = Owner.Spellbook.Spells.FirstOrDefault(x => x.Level > 0 && x.Name.StartsWith("special_bonus_spell_amplify_"));
+            if (talent10 != null)
             {
                 totalSpellAmp += (talent10.AbilitySpecialData.First(x => x.Name == "value").Value) / 100.0f;
             }
@@ -3210,9 +3206,8 @@ namespace TinkerFastComboPlus
                 dagonDamage += (dagon.AbilitySpecialData.FirstOrDefault(x => x.Name == "damage").GetValue(dagon.Level - 1));
             }
 
-            //Spell Amplification Calculation (addition)
-            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_spell_amplify_10");
-            if (talent10.Level > 0)
+            var talent10 = Owner.Spellbook.Spells.FirstOrDefault(x => x.Level > 0 && x.Name.StartsWith("special_bonus_spell_amplify_"));
+            if (talent10 != null)
             {
                 totalSpellAmp += (talent10.AbilitySpecialData.First(x => x.Name == "value").Value) / 100.0f;
             }
@@ -3251,9 +3246,8 @@ namespace TinkerFastComboPlus
                 etherealBladeDamage += ((Owner.TotalIntelligence * eblade.AbilitySpecialData.FirstOrDefault(x => x.Name == "blast_agility_multiplier").Value) + eblade.AbilitySpecialData.FirstOrDefault(x => x.Name == "blast_damage_base").Value);
             }
 
-            //Spell Amplification Calculation (addition)
-            var talent10 = Owner.Spellbook.Spells.First(x => x.Name == "special_bonus_spell_amplify_10");
-            if (talent10.Level > 0)
+            var talent10 = Owner.Spellbook.Spells.FirstOrDefault(x => x.Level > 0 && x.Name.StartsWith("special_bonus_spell_amplify_"));
+            if (talent10 != null)
             {
                 totalSpellAmp += (talent10.AbilitySpecialData.First(x => x.Name == "value").Value) / 100.0f;
             }
