@@ -24,28 +24,32 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Ensage">
-      <HintPath>C:\EnsageSharp\References\Ensage.dll</HintPath>
+      <HintPath>..\..\..\..\..\Ensage\References\Ensage.dll</HintPath>
     </Reference>
     <Reference Include="Ensage.Common">
-      <HintPath>C:\EnsageSharp\References\Ensage.Common.dll</HintPath>
+      <HintPath>..\..\..\..\..\Ensage\References\Ensage.Common.dll</HintPath>
     </Reference>
     <Reference Include="Ensage.SDK">
-      <HintPath>C:\EnsageSharp\References\Ensage.SDK.dll</HintPath>
+      <HintPath>..\..\..\..\..\Ensage\References\Ensage.SDK.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog">
+      <HintPath>..\..\..\..\..\Ensage\References\NLog.dll</HintPath>
     </Reference>
     <Reference Include="PlaySharp.Toolkit">
-      <HintPath>C:\EnsageSharp\References\PlaySharp.Toolkit.dll</HintPath>
+      <HintPath>..\..\..\..\..\Ensage\References\PlaySharp.Toolkit.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX">
-      <HintPath>C:\EnsageSharp\References\SharpDX.dll</HintPath>
+      <HintPath>..\..\..\..\..\Ensage\References\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Mathematics">
-      <HintPath>C:\EnsageSharp\References\SharpDX.Mathematics.dll</HintPath>
+      <HintPath>..\..\..\..\..\Ensage\References\SharpDX.Mathematics.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensioms\AbilityExtensions.cs" />
     <Compile Include="Features\FarmMode.cs" />
     <Compile Include="Features\AutoKillSteal.cs" />
     <Compile Include="Features\DamageCalculation.cs" />

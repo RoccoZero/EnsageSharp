@@ -6,6 +6,8 @@ using Ensage.SDK.Abilities;
 using Ensage.SDK.Extensions;
 using Ensage.SDK.Helpers;
 
+using ZeusPlus.Extensioms;
+
 namespace ZeusPlus.Features
 {
     internal class DamageCalculation
@@ -154,7 +156,7 @@ namespace ZeusPlus.Features
 
             var treant = heroes.FirstOrDefault(x => x.IsEnemy(Owner) && x.HeroId == HeroId.npc_dota_hero_treant);
             var ability = treant.GetAbilityById(AbilityId.treant_living_armor);
-            var block = ability.GetAbilitySpecialData("damage_block");
+            var block = ability.GetSpecialData("damage_block");
 
             var count = abilities.Where(x => x.GetDamage(hero) > block).Count();
 
@@ -172,11 +174,11 @@ namespace ZeusPlus.Features
                 var brist = bristleback.Owner as Hero;
                 if (brist.FindRotationAngle(Owner.Position) > 1.90f)
                 {
-                    value -= bristleback.GetAbilitySpecialData("back_damage_reduction") / 100f;
+                    value -= bristleback.GetSpecialData("back_damage_reduction") / 100f;
                 }
                 else if (brist.FindRotationAngle(Owner.Position) > 1.20f)
                 {
-                    value -= bristleback.GetAbilitySpecialData("side_damage_reduction") / 100f;
+                    value -= bristleback.GetSpecialData("side_damage_reduction") / 100f;
                 }
             }
 
@@ -188,7 +190,7 @@ namespace ZeusPlus.Features
                 {
                     var ability = centaur.GetAbilityById(AbilityId.centaur_stampede);
 
-                    value -= ability.GetAbilitySpecialData("damage_reduction") / 100f;
+                    value -= ability.GetSpecialData("damage_reduction") / 100f;
                 }
             }
 
@@ -198,7 +200,7 @@ namespace ZeusPlus.Features
                 var kunkka = heroes.FirstOrDefault(x => x.IsEnemy(Owner) && x.HeroId == HeroId.npc_dota_hero_kunkka);
                 var ability = kunkka.GetAbilityById(AbilityId.kunkka_ghostship);
 
-                value -= ability.GetAbilitySpecialData("ghostship_absorb") / 100f;
+                value -= ability.GetSpecialData("ghostship_absorb") / 100f;
             }
 
             // Modifier Wisp Overcharge
@@ -207,7 +209,7 @@ namespace ZeusPlus.Features
                 var wisp = heroes.FirstOrDefault(x => x.IsEnemy(Owner) && x.HeroId == HeroId.npc_dota_hero_wisp);
                 var ability = wisp.GetAbilityById(AbilityId.wisp_overcharge);
 
-                value -= ability.GetAbilitySpecialData("bonus_damage_pct") / 100f;
+                value -= ability.GetSpecialData("bonus_damage_pct") / 100f;
             }
 
             // Modifier Bloodseeker Bloodrage
@@ -216,7 +218,7 @@ namespace ZeusPlus.Features
                 var bloodseeker = heroes.FirstOrDefault(x => x.HeroId == HeroId.npc_dota_hero_bloodseeker);
                 var ability = bloodseeker.GetAbilityById(AbilityId.bloodseeker_bloodrage);
 
-                value += ability.GetAbilitySpecialData("damage_increase_pct") / 100f;
+                value += ability.GetSpecialData("damage_increase_pct") / 100f;
             }
 
             // Modifier Medusa Mana Shield
@@ -226,7 +228,7 @@ namespace ZeusPlus.Features
 
                 if (hero.Mana >= 50)
                 {
-                    value -= ability.GetAbilitySpecialData("absorption_tooltip") / 100f;
+                    value -= ability.GetSpecialData("absorption_tooltip") / 100f;
                 }
             }
 
@@ -234,7 +236,7 @@ namespace ZeusPlus.Features
             if (hero.HasModifier("modifier_ursa_enrage"))
             {
                 var ability = hero.GetAbilityById(AbilityId.ursa_enrage);
-                value -= ability.GetAbilitySpecialData("damage_reduction") / 100f;
+                value -= ability.GetSpecialData("damage_reduction") / 100f;
             }
 
             // Modifier Chen Penitence
@@ -243,7 +245,7 @@ namespace ZeusPlus.Features
                 var chen = heroes.FirstOrDefault(x => x.IsAlly(Owner) && x.HeroId == HeroId.npc_dota_hero_chen);
                 var ability = chen.GetAbilityById(AbilityId.chen_penitence);
 
-                value += ability.GetAbilitySpecialData("bonus_damage_taken") / 100f;
+                value += ability.GetSpecialData("bonus_damage_taken") / 100f;
             }
 
             return value;
@@ -259,7 +261,7 @@ namespace ZeusPlus.Features
                 var item = hero.GetItemById(AbilityId.item_hood_of_defiance);
                 if (item != null)
                 {
-                    value -= item.GetAbilitySpecialData("barrier_block");
+                    value -= item.GetSpecialData("barrier_block");
                 }
             }
 
@@ -271,7 +273,7 @@ namespace ZeusPlus.Features
                 {
                     var ability = pipehero.GetItemById(AbilityId.item_pipe);
 
-                    value -= ability.GetAbilitySpecialData("barrier_block");
+                    value -= ability.GetSpecialData("barrier_block");
                 }
             }
 
@@ -281,7 +283,7 @@ namespace ZeusPlus.Features
                 var item = hero.GetItemById(AbilityId.item_infused_raindrop);
                 if (item != null && item.Cooldown <= 0)
                 {
-                    value -= item.GetAbilitySpecialData("magic_damage_block");
+                    value -= item.GetSpecialData("magic_damage_block");
                 }
             }
 
@@ -291,12 +293,12 @@ namespace ZeusPlus.Features
                 var abaddon = heroes.FirstOrDefault(x => x.IsEnemy(Owner) && x.HeroId == HeroId.npc_dota_hero_abaddon);
                 var ability = abaddon.GetAbilityById(AbilityId.abaddon_aphotic_shield);
 
-                value -= ability.GetAbilitySpecialData("damage_absorb");
+                value -= ability.GetSpecialData("damage_absorb");
 
                 var talent = abaddon.GetAbilityById(AbilityId.special_bonus_unique_abaddon);
                 if (talent != null && talent.Level > 0)
                 {
-                    value -= talent.GetAbilitySpecialData("value");
+                    value -= talent.GetSpecialData("value");
                 }
             }
 
@@ -306,13 +308,13 @@ namespace ZeusPlus.Features
                 var ability = hero.GetAbilityById(AbilityId.ember_spirit_flame_guard);
                 if (ability != null)
                 {
-                    value -= ability.GetAbilitySpecialData("absorb_amount");
+                    value -= ability.GetSpecialData("absorb_amount");
 
                     var emberSpirit = ability.Owner as Hero;
                     var talent = emberSpirit.GetAbilityById(AbilityId.special_bonus_unique_ember_spirit_1);
                     if (talent != null && talent.Level > 0)
                     {
-                        value -= talent.GetAbilitySpecialData("value");
+                        value -= talent.GetSpecialData("value");
                     }
                 }
             }
